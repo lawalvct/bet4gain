@@ -58,32 +58,16 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Wallet
     Route::prefix('wallet')->name('api.wallet.')->group(function () {
-        Route::get('/', function (\Illuminate\Http\Request $request) {
-            return response()->json([
-                'wallet' => $request->user()->wallet,
-                'coins' => $request->user()->coinBalance,
-            ]);
-        })->name('show');
-
-        Route::get('/transactions', function (\Illuminate\Http\Request $request) {
-            $transactions = $request->user()->transactions()
-                ->orderByDesc('created_at')
-                ->paginate(20);
-            return response()->json($transactions);
-        })->name('transactions');
-
-        // Deposit / Withdraw / Purchase Coins — Placeholder
-        Route::post('/deposit', function () {
-            return response()->json(['message' => 'Not implemented yet'], 501);
-        })->name('deposit');
-
-        Route::post('/withdraw', function () {
-            return response()->json(['message' => 'Not implemented yet'], 501);
-        })->name('withdraw');
-
-        Route::post('/purchase-coins', function () {
-            return response()->json(['message' => 'Not implemented yet'], 501);
-        })->name('purchase-coins');
+        Route::get('/',                  [\App\Http\Controllers\WalletController::class, 'show'])->name('show');
+        Route::get('/transactions',      [\App\Http\Controllers\WalletController::class, 'transactions'])->name('transactions');
+        Route::get('/transactions/export', [\App\Http\Controllers\WalletController::class, 'exportTransactions'])->name('transactions.export');
+        Route::get('/gateways',          [\App\Http\Controllers\WalletController::class, 'gateways'])->name('gateways');
+        Route::get('/banks',             [\App\Http\Controllers\WalletController::class, 'banks'])->name('banks');
+        Route::post('/resolve-account',  [\App\Http\Controllers\WalletController::class, 'resolveAccount'])->name('resolve-account');
+        Route::post('/deposit',          [\App\Http\Controllers\WalletController::class, 'deposit'])->name('deposit');
+        Route::post('/withdraw',         [\App\Http\Controllers\WalletController::class, 'withdraw'])->name('withdraw');
+        Route::post('/purchase-coins',   [\App\Http\Controllers\WalletController::class, 'purchaseCoins'])->name('purchase-coins');
+        Route::post('/sell-coins',       [\App\Http\Controllers\WalletController::class, 'sellCoins'])->name('sell-coins');
     });
 
     // Game actions — Bet placement, cashout, cancel
@@ -152,4 +136,11 @@ Route::middleware('auth:sanctum')->group(function () {
             return response()->json(['ok' => true]);
         })->name('click');
     });
+});
+
+// ────── Payment Webhooks & Callbacks (public — no auth) ──────
+Route::prefix('payments')->name('api.payments.')->group(function () {
+    Route::post('/paystack/webhook', [\App\Http\Controllers\PaymentController::class, 'paystackWebhook'])->name('paystack.webhook');
+    Route::post('/nomba/webhook',    [\App\Http\Controllers\PaymentController::class, 'nombaWebhook'])->name('nomba.webhook');
+    Route::get('/{gateway}/callback', [\App\Http\Controllers\PaymentController::class, 'callback'])->name('callback');
 });

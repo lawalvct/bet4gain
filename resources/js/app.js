@@ -13,6 +13,7 @@ import ForgotPasswordPage from "./Components/Pages/ForgotPasswordPage.vue";
 import ResetPasswordPage from "./Components/Pages/ResetPasswordPage.vue";
 import ConfirmPasswordPage from "./Components/Pages/ConfirmPasswordPage.vue";
 import ProfilePage from "./Components/Pages/ProfilePage.vue";
+import WalletPage from "./Components/Pages/WalletPage.vue";
 
 const pageComponents = {
     "game-page": GamePage,
@@ -23,6 +24,7 @@ const pageComponents = {
     "reset-password-page": ResetPasswordPage,
     "confirm-password-page": ConfirmPasswordPage,
     "profile-page": ProfilePage,
+    "wallet-page": WalletPage,
 };
 
 const toCamelCase = (value) =>

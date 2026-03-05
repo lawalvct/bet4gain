@@ -29,7 +29,7 @@ Route::get('/auth/{provider}/callback', [\App\Http\Controllers\SocialAuthControl
 // Authenticated web routes
 Route::middleware('auth')->group(function () {
     Route::get('/wallet', function () {
-        return view('game');
+        return view('wallet');
     })->name('wallet');
 
     Route::get('/profile', function () {

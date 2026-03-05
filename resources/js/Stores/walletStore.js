@@ -76,6 +76,24 @@ export const useWalletStore = defineStore("wallet", () => {
             if (response.data.coins) {
                 coinBalance.value = response.data.coins;
             }
+            if (response.data.wallet) {
+                wallet.value = response.data.wallet;
+            }
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    const sellCoins = async (data) => {
+        try {
+            const response = await api.post("/api/wallet/sell-coins", data);
+            if (response.data.coins) {
+                coinBalance.value = response.data.coins;
+            }
+            if (response.data.wallet) {
+                wallet.value = response.data.wallet;
+            }
             return response.data;
         } catch (error) {
             throw error;
@@ -100,5 +118,6 @@ export const useWalletStore = defineStore("wallet", () => {
         deposit,
         withdraw,
         purchaseCoins,
+        sellCoins,
     };
 });
