@@ -113,8 +113,23 @@ class WalletController extends Controller
         $amount  = (float) $validated['amount'];
         $gateway = $validated['gateway'] ?? config('payment.default_gateway', 'paystack');
 
+        // Phase 10: Responsible gaming — deposit limit check
+        $rgService = app(\App\Services\ResponsibleGamingService::class);
+        $limitCheck = $rgService->checkDepositLimit($user, $amount);
+        if (!$limitCheck['allowed']) {
+            return response()->json([
+                'message' => $limitCheck['reason'],
+            ], 422);
+        }
+
+        // Phase 10: Anti-cheat — deposit spike check
+        app(\App\Services\AntiCheatService::class)->checkDepositSpike($user, $amount);
+
         try {
             $result = $this->walletService->initializeDeposit($user, $amount, $gateway);
+
+            // Phase 10: Track deposit for limit enforcement
+            $rgService->trackDeposit($user->id, $amount);
 
             return response()->json([
                 'message'           => 'Deposit initialized. Redirect to payment page.',
@@ -146,6 +161,9 @@ class WalletController extends Controller
         $user    = $request->user();
         $amount  = (float) $validated['amount'];
         $gateway = $validated['gateway'] ?? config('payment.default_gateway', 'paystack');
+
+        // Phase 10: Anti-cheat — rapid withdrawal check
+        app(\App\Services\AntiCheatService::class)->checkRapidWithdrawal($user);
 
         try {
             $transaction = $this->walletService->requestWithdrawal(

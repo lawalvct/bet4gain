@@ -10,10 +10,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Filament\Models\Contracts\HasName;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 
-class User extends Authenticatable implements MustVerifyEmail, FilamentUser
+class User extends Authenticatable implements MustVerifyEmail, FilamentUser, HasName
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, SoftDeletes;
@@ -38,6 +39,20 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
         'role',
         'last_seen_at',
         'settings',
+        // Security & Responsible Gaming (Phase 10)
+        'self_excluded',
+        'self_excluded_until',
+        'daily_deposit_limit',
+        'weekly_deposit_limit',
+        'monthly_deposit_limit',
+        'daily_bet_limit',
+        'cooldown_until',
+        'last_login_ip',
+        'registration_ip',
+        'browser_fingerprint',
+        'is_flagged',
+        'flag_reason',
+        'flagged_at',
     ];
 
     /**
@@ -67,6 +82,16 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
             'muted_until' => 'datetime',
             'settings' => 'json',
             'role' => UserRole::class,
+            // Security & Responsible Gaming (Phase 10)
+            'self_excluded' => 'boolean',
+            'self_excluded_until' => 'datetime',
+            'daily_deposit_limit' => 'decimal:2',
+            'weekly_deposit_limit' => 'decimal:2',
+            'monthly_deposit_limit' => 'decimal:2',
+            'daily_bet_limit' => 'decimal:2',
+            'cooldown_until' => 'datetime',
+            'is_flagged' => 'boolean',
+            'flagged_at' => 'datetime',
         ];
     }
 
@@ -76,6 +101,17 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
         return $this->role === UserRole::Admin;
+    }
+
+    /**
+     * Filament display name (must always be a non-null string).
+     */
+    public function getFilamentName(): string
+    {
+        return $this->username
+            ?? $this->name
+            ?? $this->email
+            ?? ('User #' . $this->id);
     }
 
     // ─── Relationships ─────────────────────────────────────
@@ -118,6 +154,16 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     public function activeProvablyFairSeed(): HasOne
     {
         return $this->hasOne(ProvablyFairSeed::class)->where('is_active', true);
+    }
+
+    public function loginLogs(): HasMany
+    {
+        return $this->hasMany(LoginLog::class);
+    }
+
+    public function suspiciousActivities(): HasMany
+    {
+        return $this->hasMany(SuspiciousActivity::class);
     }
 
     // ─── Helpers ────────────────────────────────────────────

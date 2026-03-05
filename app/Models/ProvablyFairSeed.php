@@ -2,11 +2,18 @@
 
 namespace App\Models;
 
+use App\Traits\EncryptsAttributes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProvablyFairSeed extends Model
 {
+    use EncryptsAttributes;
+
+    /**
+     * Attributes encrypted at rest (Phase 10: Security).
+     */
+    protected array $encryptable = ['server_seed'];
     protected $fillable = [
         'user_id',
         'server_seed',

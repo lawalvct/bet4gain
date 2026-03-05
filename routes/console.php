@@ -19,3 +19,7 @@ Schedule::command('leaderboard:calculate daily')->everyFiveMinutes();
 Schedule::command('leaderboard:calculate weekly')->hourly();
 Schedule::command('leaderboard:calculate monthly')->hourly();
 Schedule::command('leaderboard:calculate alltime')->everyThreeHours();
+
+// Phase 10: Security scheduled tasks
+Schedule::command('security:anti-cheat-scan')->everyFourHours();
+Schedule::command('security:clean-data --days=90')->daily();

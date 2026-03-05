@@ -8,7 +8,9 @@ use App\Events\BetCashedOut;
 use App\Events\BetPlaced;
 use App\Models\Bet;
 use App\Models\GameRound;
+use App\Services\AntiCheatService;
 use App\Services\GameEngine;
+use App\Services\ResponsibleGamingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -36,6 +38,15 @@ class BetController extends Controller
         $amount   = (float) $validated['amount'];
         $slot     = (int) $validated['bet_slot'];
         $currency = $validated['currency'] ?? 'COINS';
+
+        // ── Phase 10: Responsible Gaming — Bet limit check ──
+        $rgService = app(ResponsibleGamingService::class);
+        $betLimitCheck = $rgService->checkBetLimit($user, $amount);
+        if (!$betLimitCheck['allowed']) {
+            return response()->json([
+                'message' => $betLimitCheck['reason'],
+            ], 422);
+        }
 
         // Find current round accepting bets
         $round = GameRound::whereIn('status', [
