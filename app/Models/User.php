@@ -34,6 +34,7 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
         'is_guest',
         'guest_token',
         'is_banned',
+        'muted_until',
         'role',
         'last_seen_at',
         'settings',
@@ -63,6 +64,7 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
             'password' => 'hashed',
             'is_guest' => 'boolean',
             'is_banned' => 'boolean',
+            'muted_until' => 'datetime',
             'settings' => 'json',
             'role' => UserRole::class,
         ];

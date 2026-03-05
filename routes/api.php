@@ -79,33 +79,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Chat
     Route::prefix('chat')->name('api.chat.')->group(function () {
-        Route::get('/messages', function () {
-            $messages = \App\Models\ChatMessage::visible()
-                ->with('user:id,username,avatar')
-                ->orderByDesc('id')
-                ->limit(config('game.chat.max_messages', 100))
-                ->get()
-                ->reverse()
-                ->values();
-
-            return response()->json(['data' => $messages]);
-        })->name('messages');
-
-        Route::post('/messages', function (\Illuminate\Http\Request $request) {
-            $request->validate([
-                'content' => 'required|string|max:500',
-            ]);
-
-            $message = $request->user()->chatMessages()->create([
-                'content' => $request->content,
-                'type' => \App\Enums\ChatMessageType::Text,
-            ]);
-
-            $message->load('user:id,username,avatar');
-
-            // Broadcast will be handled in Phase 5
-            return response()->json(['data' => $message]);
-        })->name('send');
+        Route::get('/messages',       [\App\Http\Controllers\ChatController::class, 'messages'])->name('messages');
+        Route::get('/messages/older', [\App\Http\Controllers\ChatController::class, 'older'])->name('messages.older');
+        Route::post('/messages',      [\App\Http\Controllers\ChatController::class, 'send'])->name('send');
+        Route::delete('/messages/{id}', [\App\Http\Controllers\ChatController::class, 'delete'])->name('delete');
+        Route::post('/mute',          [\App\Http\Controllers\ChatController::class, 'mute'])->name('mute');
+        Route::post('/unmute',        [\App\Http\Controllers\ChatController::class, 'unmute'])->name('unmute');
+        Route::get('/user/{id}',      [\App\Http\Controllers\ChatController::class, 'userProfile'])->name('user-profile');
     });
 
     // Leaderboard

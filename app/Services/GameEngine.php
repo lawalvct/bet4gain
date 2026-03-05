@@ -204,6 +204,21 @@ class GameEngine
             payout:     round((float) $bet->amount * $multiplier, 4),
             isAuto:     $isAuto,
         ));
+
+        // Announce big wins in chat
+        if ($bet->currency !== 'DEMO') {
+            try {
+                $payout = round((float) $bet->amount * $multiplier, 4);
+                app(ChatService::class)->announceWin(
+                    username:   $bet->user->username,
+                    amount:     (float) $bet->amount,
+                    multiplier: $multiplier,
+                    payout:     $payout,
+                );
+            } catch (\Throwable $e) {
+                Log::warning("Win announcement failed: {$e->getMessage()}");
+            }
+        }
     }
 
     /**
