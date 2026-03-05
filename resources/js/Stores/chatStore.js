@@ -12,7 +12,7 @@ export const useChatStore = defineStore("chat", () => {
     // Actions
     const fetchMessages = async () => {
         try {
-            const response = await api.get("/api/chat/messages");
+            const response = await api.get("/chat/messages");
             messages.value = response.data.data || [];
         } catch (error) {
             console.error("Failed to fetch messages:", error);
@@ -22,7 +22,7 @@ export const useChatStore = defineStore("chat", () => {
     const sendMessage = async (content) => {
         sending.value = true;
         try {
-            const response = await api.post("/api/chat/messages", { content });
+            const response = await api.post("/chat/messages", { content });
             return response.data;
         } catch (error) {
             throw error;

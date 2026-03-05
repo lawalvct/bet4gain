@@ -21,7 +21,7 @@
                     ]"
                 >
                     <ChatBox />
-                    <OnlineUsers />
+                    <OnlineUsers :users="onlineUsers" />
                 </aside>
 
                 <!-- Center Column: Game + Bet Panel (always visible on desktop) -->
@@ -93,14 +93,17 @@ import ChatBox from "@/Components/Chat/ChatBox.vue";
 import OnlineUsers from "@/Components/Chat/OnlineUsers.vue";
 import LeaderboardPanel from "@/Components/Leaderboard/LeaderboardPanel.vue";
 import AdSlot from "@/Components/Layout/AdSlot.vue";
+import { usePresence } from "@/Composables/usePresence";
 
 // Mobile tab state
 const mobileTab = ref("game");
 const unreadMessages = ref(0);
 
+// Online presence
+const { onlineUsers, onlineCount } = usePresence();
+
 // These will be populated from stores in later phases
 const user = ref(null);
 const walletBalance = ref(0);
 const coinBalance = ref(0);
-const onlineCount = ref(0);
 </script>

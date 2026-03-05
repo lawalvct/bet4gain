@@ -44,29 +44,8 @@ Route::prefix('game')->name('api.game.')->group(function () {
 });
 
 // Guest session
-Route::post('/guest', function (\Illuminate\Http\Request $request) {
-    // Create guest user with demo balance
-    $guestToken = \Illuminate\Support\Str::random(64);
-    $user = \App\Models\User::create([
-        'name' => 'Guest_' . \Illuminate\Support\Str::random(6),
-        'username' => 'guest_' . \Illuminate\Support\Str::random(8),
-        'email' => 'guest_' . \Illuminate\Support\Str::random(8) . '@guest.bet4gain.com',
-        'password' => bcrypt(\Illuminate\Support\Str::random(32)),
-        'is_guest' => true,
-        'guest_token' => $guestToken,
-    ]);
-
-    // Create demo coin balance
-    $user->coinBalance()->create([
-        'balance' => 0,
-        'demo_balance' => config('game.demo.initial_balance', 10000),
-    ]);
-
-    return response()->json([
-        'data' => $user->only(['id', 'username', 'is_guest']),
-        'guest_token' => $guestToken,
-    ]);
-})->name('api.guest');
+Route::post('/guest', [\App\Http\Controllers\GuestController::class, 'create'])->name('api.guest');
+Route::post('/guest/resume', [\App\Http\Controllers\GuestController::class, 'resume'])->name('api.guest.resume');
 
 // Authenticated API routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -77,9 +56,17 @@ Route::middleware('auth:sanctum')->group(function () {
     })->name('api.user');
 
     Route::put('/user/profile', function (\Illuminate\Http\Request $request) {
-        // Placeholder — will be implemented in Phase 4
-        return response()->json(['message' => 'Not implemented yet'], 501);
+        // Profile info update is handled by Fortify at PUT /user/profile-information
+        // Password update is handled by Fortify at PUT /user/password
+        return response()->json(['message' => 'Use PUT /user/profile-information or PUT /user/password'], 301);
     })->name('api.user.profile');
+
+    // Avatar
+    Route::post('/user/avatar', [\App\Http\Controllers\ProfileController::class, 'uploadAvatar'])->name('api.user.avatar');
+    Route::delete('/user/avatar', [\App\Http\Controllers\ProfileController::class, 'removeAvatar'])->name('api.user.avatar.remove');
+
+    // User settings/preferences
+    Route::put('/user/settings', [\App\Http\Controllers\ProfileController::class, 'updateSettings'])->name('api.user.settings');
 
     // Wallet
     Route::prefix('wallet')->name('api.wallet.')->group(function () {

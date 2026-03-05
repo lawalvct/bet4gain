@@ -14,6 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
+
+        // Update last_seen_at for authenticated users on web + API requests
+        $middleware->appendToGroup('web', \App\Http\Middleware\UpdateLastSeen::class);
+        $middleware->appendToGroup('api', \App\Http\Middleware\UpdateLastSeen::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

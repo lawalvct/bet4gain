@@ -29,15 +29,33 @@
                 class="flex items-center gap-1.5 bg-surface-light dark:bg-surface-dark rounded-full pl-1 pr-3 py-1"
                 :title="user.username"
             >
-                <img
-                    :src="user.avatar_url || '/images/default-avatar.png'"
-                    :alt="user.username"
-                    class="w-5 h-5 rounded-full object-cover"
-                />
+                <div
+                    class="w-5 h-5 rounded-full bg-primary-500/20 flex items-center justify-center overflow-hidden"
+                >
+                    <img
+                        v-if="user.avatar"
+                        :src="
+                            user.avatar.startsWith('http')
+                                ? user.avatar
+                                : `/storage/${user.avatar}`
+                        "
+                        :alt="user.username"
+                        class="w-full h-full object-cover"
+                    />
+                    <span v-else class="text-[10px] font-bold text-primary-500">
+                        {{ user.username?.[0]?.toUpperCase() || "?" }}
+                    </span>
+                </div>
                 <span
                     class="text-xs text-slate-600 dark:text-slate-400 truncate max-w-[80px]"
-                    >{{ user.username }}</span
                 >
+                    {{ user.username }}
+                    <span
+                        v-if="user.is_guest"
+                        class="text-slate-400 text-[10px]"
+                        >(guest)</span
+                    >
+                </span>
             </div>
 
             <div

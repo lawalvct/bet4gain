@@ -3,6 +3,7 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -15,6 +16,7 @@ class CreateNewUser implements CreatesNewUsers
 
     /**
      * Validate and create a newly registered user.
+     * If a guest user is currently logged in, convert them to a registered user.
      *
      * @param  array<string, string>  $input
      *
@@ -29,22 +31,31 @@ class CreateNewUser implements CreatesNewUsers
                 'min:3',
                 'max:20',
                 'regex:/^[a-zA-Z0-9_]+$/',
-                Rule::unique(User::class),
+                Rule::unique(User::class)->ignore(
+                    Auth::check() && Auth::user()->is_guest ? Auth::id() : null
+                ),
             ],
             'email' => [
                 'required',
                 'string',
                 'email',
                 'max:255',
-                Rule::unique(User::class),
+                Rule::unique(User::class)->ignore(
+                    Auth::check() && Auth::user()->is_guest ? Auth::id() : null
+                ),
             ],
             'password' => $this->passwordRules(),
         ], [
             'username.regex' => 'Username may only contain letters, numbers, and underscores.',
         ])->validate();
 
+        // Check if we're converting a guest user
+        if (Auth::check() && Auth::user()->is_guest) {
+            return $this->convertGuestToRegistered(Auth::user(), $input);
+        }
+
+        // Create fresh user
         $user = User::create([
-            'name' => $input['username'],
             'username' => $input['username'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
@@ -63,5 +74,41 @@ class CreateNewUser implements CreatesNewUsers
         ]);
 
         return $user;
+    }
+
+    /**
+     * Convert an existing guest user to a fully registered user.
+     * Preserves their betting history, stats, and demo balance.
+     */
+    protected function convertGuestToRegistered(User $guest, array $input): User
+    {
+        $guest->update([
+            'username' => $input['username'],
+            'email' => $input['email'],
+            'password' => Hash::make($input['password']),
+            'is_guest' => false,
+            'guest_token' => null,
+        ]);
+
+        // Create wallet if guest doesn't have one
+        if (!$guest->wallet) {
+            $guest->wallet()->create([
+                'balance' => 0,
+                'currency' => 'NGN',
+            ]);
+        }
+
+        // Ensure coin balance exists (guest should already have one)
+        if (!$guest->coinBalance) {
+            $guest->coinBalance()->create([
+                'balance' => 0,
+                'demo_balance' => config('game.demo.initial_balance', 10000),
+            ]);
+        }
+
+        // Clear the guest cookie
+        cookie()->queue(cookie()->forget('bet4gain_guest_token'));
+
+        return $guest->fresh();
     }
 }

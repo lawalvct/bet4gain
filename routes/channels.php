@@ -29,3 +29,16 @@ Broadcast::channel('chat', function ($user) {
     }
     return false;
 });
+
+// Presence channel for tracking online users
+Broadcast::channel('online', function ($user) {
+    if ($user) {
+        return [
+            'id' => $user->id,
+            'username' => $user->username,
+            'avatar' => $user->avatar,
+            'is_guest' => $user->is_guest,
+        ];
+    }
+    return false;
+});

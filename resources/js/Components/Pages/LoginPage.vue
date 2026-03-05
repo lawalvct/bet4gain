@@ -1,11 +1,19 @@
 <template>
     <div
-        class="min-h-screen flex items-center justify-center bg-surface-light dark:bg-surface-dark px-4"
+        class="min-h-screen flex items-center justify-center bg-surface-light dark:bg-surface-dark px-4 py-8"
     >
         <div class="w-full max-w-md">
             <!-- Logo -->
             <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-primary-500">🎮 Bet4Gain</h1>
+                <a href="/" class="inline-block group">
+                    <span
+                        class="text-4xl block transition-transform group-hover:scale-110"
+                        >🎮</span
+                    >
+                    <h1 class="text-2xl font-bold text-primary-500 mt-2">
+                        Bet4Gain
+                    </h1>
+                </a>
                 <p class="text-slate-500 dark:text-slate-400 mt-2">
                     Sign in to your account
                 </p>
@@ -15,52 +23,88 @@
             <div
                 class="bg-surface-light-card dark:bg-surface-dark-card rounded-2xl shadow-xl p-6 sm:p-8 border border-surface-light-border dark:border-surface-dark-border"
             >
+                <!-- Global error message -->
+                <div
+                    v-if="globalError"
+                    class="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm flex items-center gap-2"
+                >
+                    <svg
+                        class="w-5 h-5 shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                    </svg>
+                    <span>{{ globalError }}</span>
+                </div>
+
                 <form @submit.prevent="handleLogin" class="space-y-5">
                     <!-- Email / Username -->
-                    <div>
-                        <label
-                            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
-                            >Email or Username</label
-                        >
-                        <input
-                            v-model="form.email"
-                            type="text"
-                            required
-                            class="w-full px-4 py-3 rounded-xl border border-surface-light-border dark:border-surface-dark-border bg-surface-light dark:bg-surface-dark text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
-                            placeholder="Enter email or username"
-                        />
-                        <p
-                            v-if="errors.email"
-                            class="text-red-500 text-sm mt-1"
-                        >
-                            {{ errors.email }}
-                        </p>
-                    </div>
+                    <BaseInput
+                        v-model="form.email"
+                        label="Email or Username"
+                        placeholder="Enter email or username"
+                        :error="errors.email?.[0] || errors.email"
+                        required
+                        autocomplete="username"
+                        size="lg"
+                    >
+                        <template #prefix>
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                />
+                            </svg>
+                        </template>
+                    </BaseInput>
 
                     <!-- Password -->
-                    <div>
-                        <label
-                            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
-                            >Password</label
-                        >
-                        <input
-                            v-model="form.password"
-                            type="password"
-                            required
-                            class="w-full px-4 py-3 rounded-xl border border-surface-light-border dark:border-surface-dark-border bg-surface-light dark:bg-surface-dark text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
-                            placeholder="Enter password"
-                        />
-                        <p
-                            v-if="errors.password"
-                            class="text-red-500 text-sm mt-1"
-                        >
-                            {{ errors.password }}
-                        </p>
-                    </div>
+                    <BaseInput
+                        v-model="form.password"
+                        type="password"
+                        label="Password"
+                        placeholder="Enter password"
+                        :error="errors.password?.[0] || errors.password"
+                        required
+                        autocomplete="current-password"
+                        size="lg"
+                    >
+                        <template #prefix>
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                                />
+                            </svg>
+                        </template>
+                    </BaseInput>
 
                     <!-- Remember + Forgot -->
                     <div class="flex items-center justify-between">
-                        <label class="flex items-center gap-2 cursor-pointer">
+                        <label
+                            class="flex items-center gap-2 cursor-pointer select-none"
+                        >
                             <input
                                 v-model="form.remember"
                                 type="checkbox"
@@ -79,14 +123,15 @@
                     </div>
 
                     <!-- Submit -->
-                    <button
+                    <BaseButton
                         type="submit"
-                        :disabled="loading"
-                        class="w-full py-3 px-4 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        variant="primary"
+                        size="lg"
+                        block
+                        :loading="loading"
                     >
-                        <span v-if="!loading">Sign In</span>
-                        <span v-else>Signing in...</span>
-                    </button>
+                        Sign In
+                    </BaseButton>
                 </form>
 
                 <!-- Divider -->
@@ -104,7 +149,7 @@
                 <div class="grid grid-cols-2 gap-3">
                     <a
                         href="/auth/google"
-                        class="flex items-center justify-center gap-2 py-3 px-4 border border-surface-light-border dark:border-surface-dark-border rounded-xl hover:bg-slate-50 dark:hover:bg-surface-dark transition text-slate-700 dark:text-slate-300"
+                        class="flex items-center justify-center gap-2 py-3 px-4 border border-surface-light-border dark:border-surface-dark-border rounded-xl hover:bg-slate-50 dark:hover:bg-surface-dark transition text-slate-700 dark:text-slate-300 active:scale-95"
                     >
                         <svg class="w-5 h-5" viewBox="0 0 24 24">
                             <path
@@ -128,7 +173,7 @@
                     </a>
                     <a
                         href="/auth/github"
-                        class="flex items-center justify-center gap-2 py-3 px-4 border border-surface-light-border dark:border-surface-dark-border rounded-xl hover:bg-slate-50 dark:hover:bg-surface-dark transition text-slate-700 dark:text-slate-300"
+                        class="flex items-center justify-center gap-2 py-3 px-4 border border-surface-light-border dark:border-surface-dark-border rounded-xl hover:bg-slate-50 dark:hover:bg-surface-dark transition text-slate-700 dark:text-slate-300 active:scale-95"
                     >
                         <svg
                             class="w-5 h-5"
@@ -157,9 +202,8 @@
                 <a
                     href="/"
                     class="inline-block text-sm text-slate-400 hover:text-primary-500 transition"
+                    >← Play as Guest</a
                 >
-                    ← Play as Guest
-                </a>
             </div>
         </div>
     </div>
@@ -167,9 +211,11 @@
 
 <script setup>
 import { ref, reactive } from "vue";
-import api from "@/Utils/api";
+import axios from "axios";
+import { BaseInput, BaseButton } from "@/Components/UI";
 
 const loading = ref(false);
+const globalError = ref("");
 const errors = reactive({});
 
 const form = reactive({
@@ -180,14 +226,34 @@ const form = reactive({
 
 const handleLogin = async () => {
     loading.value = true;
+    globalError.value = "";
     Object.keys(errors).forEach((k) => delete errors[k]);
 
     try {
-        await api.post("/login", form);
+        await axios.post("/login", form, {
+            headers: {
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    ?.getAttribute("content"),
+                Accept: "application/json",
+            },
+        });
         window.location.href = "/";
     } catch (error) {
         if (error.response?.status === 422) {
-            Object.assign(errors, error.response.data.errors);
+            const data = error.response.data;
+            if (data.errors) {
+                Object.assign(errors, data.errors);
+            }
+            if (data.message && !data.errors) {
+                globalError.value = data.message;
+            }
+        } else if (error.response?.status === 429) {
+            globalError.value =
+                "Too many login attempts. Please try again later.";
+        } else {
+            globalError.value =
+                "An unexpected error occurred. Please try again.";
         }
     } finally {
         loading.value = false;

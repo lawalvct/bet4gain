@@ -13,14 +13,9 @@ Route::get('/', function () {
     return view('game');
 })->name('game');
 
-// Auth pages (Fortify handles POST routes)
-Route::get('/login', function () {
-    return view('auth.login');
-})->middleware('guest')->name('login');
-
-Route::get('/register', function () {
-    return view('auth.register');
-})->middleware('guest')->name('register');
+// Auth views & POST routes are registered by Fortify (login, register, logout,
+// forgot-password, reset-password, email/verify, user/confirm-password).
+// View callbacks are configured in FortifyServiceProvider.
 
 // Social Auth (OAuth)
 Route::get('/auth/{provider}', [\App\Http\Controllers\SocialAuthController::class, 'redirect'])
@@ -38,7 +33,7 @@ Route::middleware('auth')->group(function () {
     })->name('wallet');
 
     Route::get('/profile', function () {
-        return view('game');
+        return view('profile');
     })->name('profile');
 
     Route::get('/history', function () {

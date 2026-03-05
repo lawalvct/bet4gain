@@ -18,7 +18,7 @@
     <!-- Pass server data to Vue -->
     <script>
         window.__BET4GAIN__ = {
-            user: @json(auth()->user()?->only(['id', 'username', 'email', 'avatar', 'role', 'is_guest', 'settings']) ?? null),
+            user: {!! json_encode(auth()->user()?->only(['id', 'username', 'email', 'avatar', 'role', 'is_guest', 'settings'])) !!},
             csrfToken: '{{ csrf_token() }}',
             appName: '{{ config("app.name") }}',
             appUrl: '{{ config("app.url") }}',
