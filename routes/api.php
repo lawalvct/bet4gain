@@ -86,19 +86,11 @@ Route::middleware('auth:sanctum')->group(function () {
         })->name('purchase-coins');
     });
 
-    // Game actions — Placeholder (Phase 3)
+    // Game actions — Bet placement, cashout, cancel
     Route::prefix('game')->name('api.game.')->group(function () {
-        Route::post('/bet', function () {
-            return response()->json(['message' => 'Not implemented yet'], 501);
-        })->name('bet');
-
-        Route::post('/cashout', function () {
-            return response()->json(['message' => 'Not implemented yet'], 501);
-        })->name('cashout');
-
-        Route::post('/cancel-bet', function () {
-            return response()->json(['message' => 'Not implemented yet'], 501);
-        })->name('cancel-bet');
+        Route::post('/bet',        [\App\Http\Controllers\BetController::class, 'placeBet'])->name('bet');
+        Route::post('/cashout',    [\App\Http\Controllers\BetController::class, 'cashout'])->name('cashout');
+        Route::post('/cancel-bet', [\App\Http\Controllers\BetController::class, 'cancelBet'])->name('cancel-bet');
     });
 
     // Chat

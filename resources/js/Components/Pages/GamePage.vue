@@ -52,7 +52,16 @@
                     </div>
 
                     <!-- Bet Panel -->
-                    <BetPanel />
+                    <BetPanel
+                        :status="gameStore.status"
+                        :current-multiplier="gameStore.currentMultiplier"
+                        :can-bet="canPlaceBet"
+                        @place-bet="onPlaceBet"
+                        @cashout="onCashout"
+                        @cancel-bet="onCancelBet"
+                        @start-auto="onStartAuto"
+                        @stop-auto="onStopAuto"
+                    />
 
                     <!-- Between-rounds ad (mobile only) -->
                     <div class="lg:hidden">
@@ -69,7 +78,7 @@
                             : 'hidden lg:block',
                     ]"
                 >
-                    <LiveBets />
+                    <LiveBets :bets="betStore.liveBets" />
                     <LeaderboardPanel />
                     <AdSlot placement="sidebar" />
                 </aside>
@@ -89,7 +98,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import AppHeader from "@/Components/Layout/AppHeader.vue";
 import MobileBottomNav from "@/Components/Layout/MobileBottomNav.vue";
 import { ToastContainer } from "@/Components/UI";
@@ -104,6 +113,7 @@ import AdSlot from "@/Components/Layout/AdSlot.vue";
 import { usePresence } from "@/Composables/usePresence";
 import { useGameStore } from "@/Stores/gameStore";
 import { useUserStore } from "@/Stores/userStore";
+import { useBetStore } from "@/Stores/betStore";
 import { storeToRefs } from "pinia";
 
 // Mobile tab state
@@ -116,9 +126,58 @@ const { onlineUsers, onlineCount } = usePresence();
 // Stores
 const gameStore = useGameStore();
 const userStore = useUserStore();
+const betStore = useBetStore();
 
 // Convenience aliases for header (storeToRefs preserves reactivity)
 const { user, walletBalance, coinBalance } = storeToRefs(userStore);
+
+// ── Bet panel props ────────────────────────────────────────────────────────
+const canPlaceBet = computed(() => {
+    return ["waiting", "betting"].includes(gameStore.status);
+});
+
+// ── Bet event handlers ─────────────────────────────────────────────────────
+const onPlaceBet = async ({ amount, autoCashout, slot }) => {
+    try {
+        await betStore.placeBet({ amount, autoCashout, slot });
+    } catch (err) {
+        console.error("Place bet error:", err?.response?.data?.message || err);
+    }
+};
+
+const onCashout = async ({ slot }) => {
+    try {
+        await betStore.cashout({ slot });
+    } catch (err) {
+        console.error("Cashout error:", err?.response?.data?.message || err);
+    }
+};
+
+const onCancelBet = async ({ slot }) => {
+    try {
+        await betStore.cancelBet({ slot });
+    } catch (err) {
+        console.error("Cancel bet error:", err?.response?.data?.message || err);
+    }
+};
+
+const onStartAuto = (config) => {
+    betStore.startAutoBet(config);
+};
+
+const onStopAuto = () => {
+    betStore.stopAutoBet();
+};
+
+// Clear bets when a new round starts (betting phase)
+watch(
+    () => gameStore.status,
+    (newStatus, oldStatus) => {
+        if (newStatus === "waiting" && oldStatus === "crashed") {
+            betStore.clearRound();
+        }
+    },
+);
 
 onMounted(async () => {
     // Load initial data

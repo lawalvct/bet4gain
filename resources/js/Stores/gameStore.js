@@ -87,9 +87,46 @@ export const useGameStore = defineStore("game", () => {
         currentMultiplier.value = parseFloat(e.crash_point);
         clearCountdown();
 
+        // Mark all remaining active bets as lost
+        liveBets.value = liveBets.value.map((b) =>
+            !b.cashed_out_at ? { ...b, lost: true } : b,
+        );
+
         // Add to history (keep newest 50)
         history.value.unshift(crashPoint.value);
         if (history.value.length > 50) history.value.length = 50;
+    };
+
+    /** Event: bet.placed – a player placed a bet */
+    const onBetPlaced = (e) => {
+        if (e.round_id !== roundId.value) return;
+        liveBets.value.push({
+            id: e.id,
+            username: e.username,
+            user: { username: e.username, avatar_url: e.avatar },
+            amount: parseFloat(e.amount),
+            currency: e.currency,
+            bet_slot: e.bet_slot,
+            cashed_out_at: null,
+            cashout_multiplier: null,
+            profit: null,
+            lost: false,
+        });
+    };
+
+    /** Event: bet.cashed_out – a player cashed out */
+    const onBetCashedOut = (e) => {
+        if (e.round_id !== roundId.value) return;
+        const index = liveBets.value.findIndex((b) => b.id === e.id);
+        if (index !== -1) {
+            liveBets.value[index] = {
+                ...liveBets.value[index],
+                cashed_out_at: parseFloat(e.cashed_out_at),
+                cashout_multiplier: parseFloat(e.cashed_out_at),
+                payout: parseFloat(e.payout),
+                profit: parseFloat(e.profit),
+            };
+        }
     };
 
     // ── Init WebSocket channel ─────────────────────────────────────────────────
@@ -102,7 +139,9 @@ export const useGameStore = defineStore("game", () => {
             .listen(".betting.started", onBettingStarted)
             .listen(".round.started", onRoundStarted)
             .listen(".multiplier.updated", onMultiplierUpdated)
-            .listen(".round.crashed", onRoundCrashed);
+            .listen(".round.crashed", onRoundCrashed)
+            .listen(".bet.placed", onBetPlaced)
+            .listen(".bet.cashed_out", onBetCashedOut);
     };
 
     const leaveGameChannel = () => {

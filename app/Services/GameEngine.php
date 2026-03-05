@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\BetStatus;
 use App\Enums\GameRoundStatus;
+use App\Events\BetCashedOut;
 use App\Events\GameBettingStarted;
 use App\Events\GameCountdown;
 use App\Events\GameCrashed;
@@ -89,6 +90,7 @@ class GameEngine
 
     /**
      * Transition round to RUNNING and broadcast game start.
+     * Also activates all pending bets for this round.
      */
     public static function startRound(GameRound $round): void
     {
@@ -96,6 +98,11 @@ class GameEngine
             'status'     => GameRoundStatus::Running,
             'started_at' => now(),
         ]);
+
+        // Activate all pending bets — they are now locked in
+        Bet::where('game_round_id', $round->id)
+            ->where('status', BetStatus::Pending)
+            ->update(['status' => BetStatus::Active]);
 
         broadcast(new GameStarted(
             roundId:        $round->id,
@@ -167,6 +174,7 @@ class GameEngine
 
     /**
      * Cash out a bet at a given multiplier (manual or auto).
+     * Handles both real and demo currency.
      */
     public static function cashOutBet(Bet $bet, float $multiplier, bool $isAuto = false): void
     {
@@ -180,9 +188,22 @@ class GameEngine
                 'is_auto'      => $isAuto,
             ]);
 
-            // Credit coins back to user
-            $bet->user->coinBalance()->increment('balance', $payout);
+            // Credit coins back to user (demo or real)
+            $column = $bet->currency === 'DEMO' ? 'demo_balance' : 'balance';
+            $bet->user->coinBalance()->increment($column, $payout);
         });
+
+        // Broadcast cashout for live bets feed
+        $bet->loadMissing('user:id,username,avatar');
+        broadcast(new BetCashedOut(
+            betId:      $bet->id,
+            roundId:    $bet->game_round_id,
+            username:   $bet->user->username,
+            amount:     (float) $bet->amount,
+            cashedOutAt: $multiplier,
+            payout:     round((float) $bet->amount * $multiplier, 4),
+            isAuto:     $isAuto,
+        ));
     }
 
     /**

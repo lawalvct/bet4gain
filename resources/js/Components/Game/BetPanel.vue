@@ -176,11 +176,11 @@
 <script setup>
 import { ref, computed } from "vue";
 import { QUICK_BET_AMOUNTS } from "@/Utils/constants";
+import { useBetStore } from "@/Stores/betStore";
 
 const props = defineProps({
     status: { type: String, default: "waiting" },
     currentMultiplier: { type: Number, default: 1.0 },
-    hasBet: { type: Boolean, default: false },
     canBet: { type: Boolean, default: true },
 });
 
@@ -191,6 +191,8 @@ const emit = defineEmits([
     "start-auto",
     "stop-auto",
 ]);
+
+const betStore = useBetStore();
 
 const activeTab = ref("manual");
 const activeSlot = ref(1);
@@ -204,23 +206,33 @@ const isAutoBetting = ref(false);
 
 const quickAmounts = QUICK_BET_AMOUNTS;
 
+/** Does the current active slot have a bet placed? */
+const slotHasBet = computed(() => betStore.bets[activeSlot.value] !== null);
+
 const actionDisabled = computed(() => {
+    if (betStore.placing || betStore.cashingOut) return true;
     if (props.status === "betting" || props.status === "waiting") {
+        if (slotHasBet.value) return false; // allow cancel
         return !betAmount.value || betAmount.value <= 0 || !props.canBet;
     }
     if (props.status === "running") {
-        return !props.hasBet;
+        return !slotHasBet.value;
     }
     return true;
 });
 
 const actionLabel = computed(() => {
     if (isAutoBetting.value) return "Stop Auto Bet";
-    if (props.hasBet && props.status === "running") {
-        return `Cashout ${(betAmount.value * props.currentMultiplier).toFixed(2)}`;
+    if (betStore.placing) return "Placing...";
+    if (betStore.cashingOut) return "Cashing out...";
+    if (slotHasBet.value && props.status === "running") {
+        const potential = (betAmount.value * props.currentMultiplier).toFixed(
+            2,
+        );
+        return `Cashout ${potential}`;
     }
     if (
-        props.hasBet &&
+        slotHasBet.value &&
         (props.status === "betting" || props.status === "waiting")
     ) {
         return "Cancel Bet";
@@ -234,10 +246,10 @@ const actionLabel = computed(() => {
 });
 
 const actionButtonClass = computed(() => {
-    if (props.hasBet && props.status === "running") {
+    if (slotHasBet.value && props.status === "running") {
         return "bg-game-green hover:brightness-110 text-white shadow-lg shadow-game-green/30 animate-pulse";
     }
-    if (props.hasBet) {
+    if (slotHasBet.value) {
         return "bg-red-500 hover:bg-red-600 text-white";
     }
     if (actionDisabled.value) {
@@ -252,11 +264,11 @@ const handleAction = () => {
         emit("stop-auto");
         return;
     }
-    if (props.hasBet && props.status === "running") {
+    if (slotHasBet.value && props.status === "running") {
         emit("cashout", { slot: activeSlot.value });
         return;
     }
-    if (props.hasBet) {
+    if (slotHasBet.value) {
         emit("cancel-bet", { slot: activeSlot.value });
         return;
     }
