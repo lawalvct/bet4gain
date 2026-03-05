@@ -34,13 +34,21 @@
                     ]"
                 >
                     <!-- Game History Rail -->
-                    <GameHistory />
+                    <GameHistory :history="gameStore.history" />
 
                     <!-- Game Canvas -->
                     <div
                         class="game-canvas-container aspect-[16/9] min-h-[240px]"
                     >
-                        <GameCanvas />
+                        <GameCanvas
+                            :status="gameStore.status"
+                            :current-multiplier="gameStore.currentMultiplier"
+                            :crash-point="gameStore.crashPoint"
+                            :countdown="gameStore.countdown"
+                            :betting-countdown="gameStore.bettingCountdown"
+                            :round-id="gameStore.roundId"
+                            :hash="gameStore.roundHash"
+                        />
                     </div>
 
                     <!-- Bet Panel -->
@@ -81,7 +89,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import AppHeader from "@/Components/Layout/AppHeader.vue";
 import MobileBottomNav from "@/Components/Layout/MobileBottomNav.vue";
 import { ToastContainer } from "@/Components/UI";
@@ -94,6 +102,9 @@ import OnlineUsers from "@/Components/Chat/OnlineUsers.vue";
 import LeaderboardPanel from "@/Components/Leaderboard/LeaderboardPanel.vue";
 import AdSlot from "@/Components/Layout/AdSlot.vue";
 import { usePresence } from "@/Composables/usePresence";
+import { useGameStore } from "@/Stores/gameStore";
+import { useUserStore } from "@/Stores/userStore";
+import { storeToRefs } from "pinia";
 
 // Mobile tab state
 const mobileTab = ref("game");
@@ -102,8 +113,25 @@ const unreadMessages = ref(0);
 // Online presence
 const { onlineUsers, onlineCount } = usePresence();
 
-// These will be populated from stores in later phases
-const user = ref(null);
-const walletBalance = ref(0);
-const coinBalance = ref(0);
+// Stores
+const gameStore = useGameStore();
+const userStore = useUserStore();
+
+// Convenience aliases for header (storeToRefs preserves reactivity)
+const { user, walletBalance, coinBalance } = storeToRefs(userStore);
+
+onMounted(async () => {
+    // Load initial data
+    await Promise.all([
+        gameStore.fetchHistory(),
+        gameStore.fetchCurrentState(),
+    ]);
+
+    // Subscribe to realtime events
+    gameStore.initGameChannel();
+});
+
+onBeforeUnmount(() => {
+    gameStore.leaveGameChannel();
+});
 </script>

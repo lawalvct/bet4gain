@@ -14,24 +14,48 @@ import ResetPasswordPage from "./Components/Pages/ResetPasswordPage.vue";
 import ConfirmPasswordPage from "./Components/Pages/ConfirmPasswordPage.vue";
 import ProfilePage from "./Components/Pages/ProfilePage.vue";
 
-const app = createApp({});
-const pinia = createPinia();
+const pageComponents = {
+    "game-page": GamePage,
+    "login-page": LoginPage,
+    "register-page": RegisterPage,
+    "verify-email-page": EmailVerifyPage,
+    "forgot-password-page": ForgotPasswordPage,
+    "reset-password-page": ResetPasswordPage,
+    "confirm-password-page": ConfirmPasswordPage,
+    "profile-page": ProfilePage,
+};
 
-app.use(pinia);
-app.use(router);
+const toCamelCase = (value) =>
+    value.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
 
-// Register page-level components as global (used in Blade templates)
-app.component("game-page", GamePage);
-app.component("login-page", LoginPage);
-app.component("register-page", RegisterPage);
-app.component("verify-email-page", EmailVerifyPage);
-app.component("forgot-password-page", ForgotPasswordPage);
-app.component("reset-password-page", ResetPasswordPage);
-app.component("confirm-password-page", ConfirmPasswordPage);
-app.component("profile-page", ProfilePage);
+const getPropsFromAttributes = (element) => {
+    const props = {};
+
+    for (const attribute of element.attributes) {
+        props[toCamelCase(attribute.name)] = attribute.value;
+    }
+
+    return props;
+};
+
+const mountPageComponent = () => {
+    for (const [selector, component] of Object.entries(pageComponents)) {
+        const element = document.querySelector(selector);
+
+        if (!element) {
+            continue;
+        }
+
+        const app = createApp(component, getPropsFromAttributes(element));
+        app.use(createPinia());
+        app.use(router);
+        app.mount(element);
+        return;
+    }
+};
 
 // Initialize theme system
 const { init: initTheme } = useTheme();
 initTheme();
 
-app.mount("#app");
+mountPageComponent();

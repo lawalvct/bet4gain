@@ -3,8 +3,8 @@ import { ref, computed } from "vue";
 import api from "@/Utils/api";
 
 export const useGameStore = defineStore("game", () => {
-    // State
-    const status = ref("waiting"); // waiting, betting, running, crashed
+    // ── State ──────────────────────────────────────────────────────────────────
+    const status = ref("waiting"); // waiting | betting | running | crashed
     const currentMultiplier = ref(1.0);
     const crashPoint = ref(null);
     const roundId = ref(null);
@@ -13,31 +13,121 @@ export const useGameStore = defineStore("game", () => {
     const bettingCountdown = ref(0);
     const history = ref([]);
     const serverSeedHash = ref("");
+    const liveBets = ref([]); // active bets for current round (Phase 5)
 
-    // Computed
+    let echoChannel = null;
+    let countdownTimer = null;
+
+    // ── Computed ───────────────────────────────────────────────────────────────
     const isAcceptingBets = computed(() =>
         ["waiting", "betting"].includes(status.value),
     );
     const isRunning = computed(() => status.value === "running");
     const hasCrashed = computed(() => status.value === "crashed");
 
-    // Actions
-    const setStatus = (newStatus) => {
-        status.value = newStatus;
+    // ── Helpers ────────────────────────────────────────────────────────────────
+    const clearCountdown = () => {
+        if (countdownTimer) {
+            clearInterval(countdownTimer);
+            countdownTimer = null;
+        }
     };
 
-    const setMultiplier = (value) => {
-        currentMultiplier.value = value;
+    const startLocalCountdown = (seconds, onTick) => {
+        clearCountdown();
+        let remaining = seconds;
+        onTick(remaining);
+        countdownTimer = setInterval(() => {
+            remaining -= 1;
+            onTick(remaining);
+            if (remaining <= 0) clearCountdown();
+        }, 1000);
     };
 
-    const setCrashPoint = (value) => {
-        crashPoint.value = value;
+    // ── WebSocket handlers ─────────────────────────────────────────────────────
+
+    /** Event: countdown.tick  – broadcasted every second during waiting phase */
+    const onCountdownTick = (e) => {
+        countdown.value = e.seconds_left ?? e.secondsLeft ?? 0;
+    };
+
+    /** Event: betting.started */
+    const onBettingStarted = (e) => {
+        roundId.value = e.round_id;
+        serverSeedHash.value = e.server_seed_hash ?? "";
+        roundHash.value = e.server_seed_hash ?? "";
+        status.value = "betting";
+        currentMultiplier.value = 1.0;
+        crashPoint.value = null;
+        liveBets.value = [];
+        clearCountdown();
+        startLocalCountdown(e.betting_duration ?? 10, (s) => {
+            bettingCountdown.value = s;
+        });
+    };
+
+    /** Event: round.started */
+    const onRoundStarted = (e) => {
+        roundId.value = e.round_id;
+        status.value = "running";
+        clearCountdown();
+        bettingCountdown.value = 0;
+    };
+
+    /** Event: multiplier.updated  – ~100 ms ticks */
+    const onMultiplierUpdated = (e) => {
+        if (e.round_id !== roundId.value) return;
+        currentMultiplier.value = parseFloat(e.multiplier);
+    };
+
+    /** Event: round.crashed */
+    const onRoundCrashed = (e) => {
+        crashPoint.value = parseFloat(e.crash_point);
+        status.value = "crashed";
+        currentMultiplier.value = parseFloat(e.crash_point);
+        clearCountdown();
+
+        // Add to history (keep newest 50)
+        history.value.unshift(crashPoint.value);
+        if (history.value.length > 50) history.value.length = 50;
+    };
+
+    // ── Init WebSocket channel ─────────────────────────────────────────────────
+    const initGameChannel = () => {
+        if (!window.Echo) return;
+        if (echoChannel) return; // already subscribed
+
+        echoChannel = window.Echo.channel("game")
+            .listen(".countdown.tick", onCountdownTick)
+            .listen(".betting.started", onBettingStarted)
+            .listen(".round.started", onRoundStarted)
+            .listen(".multiplier.updated", onMultiplierUpdated)
+            .listen(".round.crashed", onRoundCrashed);
+    };
+
+    const leaveGameChannel = () => {
+        if (window.Echo && echoChannel) {
+            window.Echo.leaveChannel("game");
+            echoChannel = null;
+        }
+        clearCountdown();
+    };
+
+    // ── Actions ────────────────────────────────────────────────────────────────
+    const setStatus = (v) => {
+        status.value = v;
+    };
+    const setMultiplier = (v) => {
+        currentMultiplier.value = v;
+    };
+    const setCrashPoint = (v) => {
+        crashPoint.value = v;
     };
 
     const startNewRound = (data) => {
         roundId.value = data.round_id;
-        roundHash.value = data.hash || "";
-        serverSeedHash.value = data.server_seed_hash || "";
+        roundHash.value = data.hash ?? "";
+        serverSeedHash.value = data.server_seed_hash ?? "";
         status.value = "betting";
         currentMultiplier.value = 1.0;
         crashPoint.value = null;
@@ -46,20 +136,36 @@ export const useGameStore = defineStore("game", () => {
     const endRound = (data) => {
         crashPoint.value = data.crash_point;
         status.value = "crashed";
-
-        // Add to history (keep last 50)
         history.value.unshift(data.crash_point);
-        if (history.value.length > 50) {
-            history.value = history.value.slice(0, 50);
-        }
+        if (history.value.length > 50) history.value.length = 50;
     };
 
     const fetchHistory = async () => {
         try {
-            const response = await api.get("/api/game/history");
-            history.value = response.data.data || [];
-        } catch (error) {
-            console.error("Failed to fetch game history:", error);
+            const res = await api.get("/api/game/history");
+            const rows = res.data.data ?? [];
+            // history can be array of objects {crash_point} or plain numbers
+            history.value = rows.map((r) =>
+                typeof r === "object"
+                    ? parseFloat(r.crash_point)
+                    : parseFloat(r),
+            );
+        } catch (err) {
+            console.error("Failed to fetch game history:", err);
+        }
+    };
+
+    const fetchCurrentState = async () => {
+        try {
+            const res = await api.get("/api/game/state");
+            const round = res.data.data;
+            if (!round) return;
+            roundId.value = round.round_id;
+            serverSeedHash.value = round.server_seed_hash ?? "";
+            roundHash.value = round.server_seed_hash ?? "";
+            status.value = round.status ?? "waiting";
+        } catch (err) {
+            console.error("Failed to fetch game state:", err);
         }
     };
 
@@ -82,17 +188,21 @@ export const useGameStore = defineStore("game", () => {
         bettingCountdown,
         history,
         serverSeedHash,
+        liveBets,
         // Computed
         isAcceptingBets,
         isRunning,
         hasCrashed,
         // Actions
+        initGameChannel,
+        leaveGameChannel,
+        fetchHistory,
+        fetchCurrentState,
         setStatus,
         setMultiplier,
         setCrashPoint,
         startNewRound,
         endRound,
-        fetchHistory,
         reset,
     };
 });

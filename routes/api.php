@@ -23,24 +23,12 @@ Route::get('/settings', function () {
 
 // Game public routes
 Route::prefix('game')->name('api.game.')->group(function () {
-    Route::get('/history', function () {
-        $rounds = \App\Models\GameRound::where('status', \App\Enums\GameRoundStatus::Crashed)
-            ->orderByDesc('id')
-            ->limit(50)
-            ->pluck('crash_point');
-
-        return response()->json(['data' => $rounds]);
-    })->name('history');
-
-    Route::get('/current', function () {
-        $round = \App\Models\GameRound::whereIn('status', [
-            \App\Enums\GameRoundStatus::Waiting,
-            \App\Enums\GameRoundStatus::Betting,
-            \App\Enums\GameRoundStatus::Running,
-        ])->latest()->first();
-
-        return response()->json(['data' => $round]);
-    })->name('current');
+    Route::get('/history',             [\App\Http\Controllers\GameController::class, 'history'])->name('history');
+    Route::get('/state',               [\App\Http\Controllers\GameController::class, 'state'])->name('state');
+    Route::get('/live-bets',           [\App\Http\Controllers\GameController::class, 'liveBets'])->name('live-bets');
+    Route::get('/round/{id}',          [\App\Http\Controllers\GameController::class, 'round'])->name('round');
+    Route::get('/round/{id}/bets',     [\App\Http\Controllers\GameController::class, 'roundBets'])->name('round.bets');
+    Route::post('/verify',             [\App\Http\Controllers\GameController::class, 'verify'])->name('verify');
 });
 
 // Guest session
