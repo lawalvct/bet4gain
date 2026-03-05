@@ -31,6 +31,10 @@ Route::prefix('game')->name('api.game.')->group(function () {
     Route::post('/verify',             [\App\Http\Controllers\GameController::class, 'verify'])->name('verify');
 });
 
+// Public statistics (no auth required)
+Route::get('/stats/live', [\App\Http\Controllers\LeaderboardController::class, 'liveStats'])->name('api.stats.live');
+Route::get('/leaderboard-public/{period?}', [\App\Http\Controllers\LeaderboardController::class, 'index'])->name('api.leaderboard.public');
+
 // Guest session
 Route::post('/guest', [\App\Http\Controllers\GuestController::class, 'create'])->name('api.guest');
 Route::post('/guest/resume', [\App\Http\Controllers\GuestController::class, 'resume'])->name('api.guest.resume');
@@ -88,21 +92,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/user/{id}',      [\App\Http\Controllers\ChatController::class, 'userProfile'])->name('user-profile');
     });
 
-    // Leaderboard
-    Route::get('/leaderboard/{period?}', function (string $period = 'daily') {
-        $validPeriods = ['daily', 'weekly', 'monthly', 'all_time'];
-        if (!in_array($period, $validPeriods)) {
-            $period = 'daily';
-        }
+    // Leaderboard & Statistics
+    Route::get('/leaderboard/{period?}', [\App\Http\Controllers\LeaderboardController::class, 'index'])->name('api.leaderboard');
 
-        $entries = \App\Models\LeaderboardEntry::where('period', $period)
-            ->with('user:id,username,avatar')
-            ->orderByDesc('total_profit')
-            ->limit(20)
-            ->get();
+    Route::prefix('stats')->name('api.stats.')->group(function () {
+        Route::get('/me',           [\App\Http\Controllers\LeaderboardController::class, 'personalStats'])->name('me');
+        Route::get('/my-bets',      [\App\Http\Controllers\LeaderboardController::class, 'myBets'])->name('my-bets');
+        Route::get('/player/{id}',  [\App\Http\Controllers\LeaderboardController::class, 'playerStats'])->name('player');
+    });
 
-        return response()->json(['data' => $entries]);
-    })->name('api.leaderboard');
+    // Game rounds (paginated history)
+    Route::get('/game/rounds', [\App\Http\Controllers\LeaderboardController::class, 'gameHistory'])->name('api.game.rounds');
 
     // Ads
     Route::prefix('ads')->name('api.ads.')->group(function () {

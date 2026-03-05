@@ -11,10 +11,28 @@
                 @click.stop
             >
                 <!-- Loading -->
-                <div v-if="loading" class="flex items-center justify-center py-6">
-                    <svg class="animate-spin w-6 h-6 text-primary-500" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                <div
+                    v-if="loading"
+                    class="flex items-center justify-center py-6"
+                >
+                    <svg
+                        class="animate-spin w-6 h-6 text-primary-500"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                        />
+                        <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                        />
                     </svg>
                 </div>
 
@@ -22,55 +40,101 @@
                 <div v-else-if="profile" class="space-y-3">
                     <!-- Avatar + Name -->
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-full bg-primary-500/10 flex items-center justify-center overflow-hidden border-2 border-surface-light-border dark:border-surface-dark-border">
+                        <div
+                            class="w-12 h-12 rounded-full bg-primary-500/10 flex items-center justify-center overflow-hidden border-2 border-surface-light-border dark:border-surface-dark-border"
+                        >
                             <img
                                 v-if="profile.avatar_url"
                                 :src="profile.avatar_url"
                                 :alt="profile.username"
                                 class="w-full h-full object-cover"
                             />
-                            <span v-else class="text-lg font-bold text-primary-500">
-                                {{ profile.username?.[0]?.toUpperCase() || '?' }}
+                            <span
+                                v-else
+                                class="text-lg font-bold text-primary-500"
+                            >
+                                {{
+                                    profile.username?.[0]?.toUpperCase() || "?"
+                                }}
                             </span>
                         </div>
                         <div>
-                            <div class="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
+                            <div
+                                class="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5"
+                            >
                                 {{ profile.username }}
                                 <span
                                     v-if="profile.role === 'admin'"
                                     class="text-[10px] px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-medium"
-                                >ADMIN</span>
+                                    >ADMIN</span
+                                >
                                 <span
                                     v-else-if="profile.role === 'moderator'"
                                     class="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
-                                >MOD</span>
+                                    >MOD</span
+                                >
                             </div>
-                            <div class="text-xs text-slate-400">Joined {{ profile.joined }}</div>
+                            <div class="text-xs text-slate-400">
+                                Joined {{ profile.joined }}
+                            </div>
                         </div>
                     </div>
 
                     <!-- Stats -->
                     <div class="grid grid-cols-2 gap-2">
-                        <div class="bg-slate-50 dark:bg-surface-dark-alt rounded-lg p-2 text-center">
-                            <div class="text-sm font-bold text-slate-900 dark:text-white">{{ profile.total_bets }}</div>
-                            <div class="text-[10px] text-slate-400">Total Bets</div>
+                        <div
+                            class="bg-slate-50 dark:bg-surface-dark-alt rounded-lg p-2 text-center"
+                        >
+                            <div
+                                class="text-sm font-bold text-slate-900 dark:text-white"
+                            >
+                                {{ profile.total_bets }}
+                            </div>
+                            <div class="text-[10px] text-slate-400">
+                                Total Bets
+                            </div>
                         </div>
-                        <div class="bg-slate-50 dark:bg-surface-dark-alt rounded-lg p-2 text-center">
-                            <div class="text-sm font-bold text-game-green">{{ profile.win_rate }}%</div>
-                            <div class="text-[10px] text-slate-400">Win Rate</div>
+                        <div
+                            class="bg-slate-50 dark:bg-surface-dark-alt rounded-lg p-2 text-center"
+                        >
+                            <div class="text-sm font-bold text-game-green">
+                                {{ profile.win_rate }}%
+                            </div>
+                            <div class="text-[10px] text-slate-400">
+                                Win Rate
+                            </div>
                         </div>
-                        <div class="bg-slate-50 dark:bg-surface-dark-alt rounded-lg p-2 text-center">
-                            <div class="text-sm font-bold text-slate-900 dark:text-white">{{ profile.wins }}</div>
+                        <div
+                            class="bg-slate-50 dark:bg-surface-dark-alt rounded-lg p-2 text-center"
+                        >
+                            <div
+                                class="text-sm font-bold text-slate-900 dark:text-white"
+                            >
+                                {{ profile.wins }}
+                            </div>
                             <div class="text-[10px] text-slate-400">Wins</div>
                         </div>
-                        <div class="bg-slate-50 dark:bg-surface-dark-alt rounded-lg p-2 text-center">
-                            <div class="text-sm font-bold text-amber-500">{{ Number(profile.best_multiplier || 0).toFixed(2) }}x</div>
-                            <div class="text-[10px] text-slate-400">Best Multi</div>
+                        <div
+                            class="bg-slate-50 dark:bg-surface-dark-alt rounded-lg p-2 text-center"
+                        >
+                            <div class="text-sm font-bold text-amber-500">
+                                {{
+                                    Number(
+                                        profile.best_multiplier || 0,
+                                    ).toFixed(2)
+                                }}x
+                            </div>
+                            <div class="text-[10px] text-slate-400">
+                                Best Multi
+                            </div>
                         </div>
                     </div>
 
                     <!-- Mod Actions -->
-                    <div v-if="isModerator && profile.role !== 'admin'" class="flex gap-2 pt-1 border-t border-surface-light-border dark:border-surface-dark-border">
+                    <div
+                        v-if="isModerator && profile.role !== 'admin'"
+                        class="flex gap-2 pt-1 border-t border-surface-light-border dark:border-surface-dark-border"
+                    >
                         <button
                             @click="$emit('mute', profile.id)"
                             class="flex-1 text-xs py-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition font-medium"
@@ -90,8 +154,8 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue';
-import api from '@/Utils/api';
+import { ref, watch, computed } from "vue";
+import api from "@/Utils/api";
 
 const props = defineProps({
     visible: { type: Boolean, default: false },
@@ -101,7 +165,7 @@ const props = defineProps({
     isModerator: { type: Boolean, default: false },
 });
 
-defineEmits(['close', 'mute']);
+defineEmits(["close", "mute"]);
 
 const profile = ref(null);
 const loading = ref(false);
@@ -126,21 +190,25 @@ const popoverStyle = computed(() => {
     };
 });
 
-watch(() => [props.visible, props.userId], async ([visible, userId]) => {
-    if (!visible || !userId) {
-        profile.value = null;
-        return;
-    }
+watch(
+    () => [props.visible, props.userId],
+    async ([visible, userId]) => {
+        if (!visible || !userId) {
+            profile.value = null;
+            return;
+        }
 
-    loading.value = true;
-    try {
-        const response = await api.get(`/api/chat/user/${userId}`);
-        profile.value = response.data.data;
-    } catch (e) {
-        console.error('Failed to load profile:', e);
-        profile.value = null;
-    } finally {
-        loading.value = false;
-    }
-}, { immediate: true });
+        loading.value = true;
+        try {
+            const response = await api.get(`/api/chat/user/${userId}`);
+            profile.value = response.data.data;
+        } catch (e) {
+            console.error("Failed to load profile:", e);
+            profile.value = null;
+        } finally {
+            loading.value = false;
+        }
+    },
+    { immediate: true },
+);
 </script>

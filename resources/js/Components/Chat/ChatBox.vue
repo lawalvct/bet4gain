@@ -29,7 +29,7 @@
                     :disabled="loadingOlder"
                     class="text-xs text-primary-500 hover:text-primary-600 transition disabled:opacity-50"
                 >
-                    {{ loadingOlder ? 'Loading...' : '↑ Load older messages' }}
+                    {{ loadingOlder ? "Loading..." : "↑ Load older messages" }}
                 </button>
             </div>
 
@@ -43,10 +43,13 @@
             >
                 <!-- System message -->
                 <template v-if="msg.type === 'system'">
-                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 max-w-full">
-                        <span class="text-xs text-primary-600 dark:text-primary-400 font-medium truncate">{{
-                            msg.message
-                        }}</span>
+                    <div
+                        class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 max-w-full"
+                    >
+                        <span
+                            class="text-xs text-primary-600 dark:text-primary-400 font-medium truncate"
+                            >{{ msg.message }}</span
+                        >
                     </div>
                 </template>
 
@@ -54,7 +57,9 @@
                 <template v-else>
                     <img
                         :src="
-                            msg.avatar || msg.user?.avatar_url || defaultAvatar(msg.username || msg.user?.username)
+                            msg.avatar ||
+                            msg.user?.avatar_url ||
+                            defaultAvatar(msg.username || msg.user?.username)
                         "
                         class="w-6 h-6 rounded-full object-cover flex-shrink-0 mt-0.5 cursor-pointer hover:ring-2 hover:ring-primary-500 transition"
                         @click="showProfile($event, msg.user_id)"
@@ -64,7 +69,11 @@
                             <span
                                 class="text-xs font-semibold text-primary-500 truncate cursor-pointer hover:underline"
                                 @click="showProfile($event, msg.user_id)"
-                                >{{ msg.username || msg.user?.username || "Guest" }}</span
+                                >{{
+                                    msg.username ||
+                                    msg.user?.username ||
+                                    "Guest"
+                                }}</span
                             >
                             <span
                                 class="text-[10px] text-slate-400 flex-shrink-0"
@@ -98,11 +107,10 @@
         </div>
 
         <!-- Rate limit indicator -->
-        <div
-            v-if="rateLimitRemaining > 0"
-            class="px-4 py-1 text-center"
-        >
-            <span class="text-[10px] text-slate-400">Wait {{ rateLimitRemaining }}s</span>
+        <div v-if="rateLimitRemaining > 0" class="px-4 py-1 text-center">
+            <span class="text-[10px] text-slate-400"
+                >Wait {{ rateLimitRemaining }}s</span
+            >
         </div>
 
         <!-- Input -->
@@ -110,9 +118,14 @@
             class="border-t border-surface-light-border dark:border-surface-dark-border p-3 flex-shrink-0"
         >
             <!-- Error message -->
-            <p v-if="sendError" class="text-xs text-game-red mb-1.5">{{ sendError }}</p>
+            <p v-if="sendError" class="text-xs text-game-red mb-1.5">
+                {{ sendError }}
+            </p>
 
-            <form @submit.prevent="sendMessage" class="flex gap-2 items-end relative">
+            <form
+                @submit.prevent="sendMessage"
+                class="flex gap-2 items-end relative"
+            >
                 <!-- Emoji Picker Toggle -->
                 <button
                     type="button"
@@ -125,10 +138,7 @@
                 </button>
 
                 <!-- Emoji Picker -->
-                <EmojiPicker
-                    v-if="showEmojiPicker"
-                    @select="insertEmoji"
-                />
+                <EmojiPicker v-if="showEmojiPicker" @select="insertEmoji" />
 
                 <input
                     ref="inputRef"
@@ -138,16 +148,20 @@
                     :disabled="!canChat"
                     class="flex-1 px-3 py-2 rounded-xl border border-surface-light-border dark:border-surface-dark-border bg-surface-light dark:bg-surface-dark text-slate-900 dark:text-white text-sm placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition disabled:opacity-50"
                     :placeholder="
-                        canChat ? 'Type a message... (/help for commands)' : 'Login to chat'
+                        canChat
+                            ? 'Type a message... (/help for commands)'
+                            : 'Login to chat'
                     "
                     @keydown.escape="showEmojiPicker = false"
                 />
                 <button
                     type="submit"
-                    :disabled="!newMessage.trim() || !canChat || chatStore.sending"
+                    :disabled="
+                        !newMessage.trim() || !canChat || chatStore.sending
+                    "
                     class="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
                 >
-                    {{ chatStore.sending ? '...' : 'Send' }}
+                    {{ chatStore.sending ? "..." : "Send" }}
                 </button>
             </form>
         </div>
@@ -166,7 +180,15 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, nextTick, watch, onMounted, onUnmounted } from "vue";
+import {
+    ref,
+    reactive,
+    computed,
+    nextTick,
+    watch,
+    onMounted,
+    onUnmounted,
+} from "vue";
 import { timeAgo } from "@/Utils/formatters";
 import { useChatStore } from "@/Stores/chatStore";
 import { useUserStore } from "@/Stores/userStore";
@@ -190,7 +212,7 @@ let rateLimitTimer = null;
 const canChat = computed(() => !!userStore.user && !userStore.user.is_banned);
 const isModerator = computed(() => {
     const role = userStore.user?.role;
-    return role === 'admin' || role === 'moderator';
+    return role === "admin" || role === "moderator";
 });
 
 // ── Popover state ──
@@ -202,7 +224,7 @@ const popover = reactive({
 });
 
 const defaultAvatar = (username) => {
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(username || '?')}&background=random&color=fff&size=32`;
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(username || "?")}&background=random&color=fff&size=32`;
 };
 
 const formatTimeAgo = (date) => timeAgo(date);
@@ -225,7 +247,8 @@ const sendMessage = async () => {
         // Start rate limit countdown
         startRateLimitTimer();
     } catch (e) {
-        sendError.value = e.response?.data?.message || "Failed to send message.";
+        sendError.value =
+            e.response?.data?.message || "Failed to send message.";
         // Restore message on error
         newMessage.value = content;
     }
@@ -312,7 +335,8 @@ watch(
         // Only auto-scroll if user hasn't scrolled up
         if (!messagesContainer.value) return;
         const el = messagesContainer.value;
-        const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+        const isNearBottom =
+            el.scrollHeight - el.scrollTop - el.clientHeight < 80;
 
         if (isNearBottom || newLen > oldLen) {
             await nextTick();

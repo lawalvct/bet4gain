@@ -36,7 +36,20 @@ Route::middleware('auth')->group(function () {
         return view('profile');
     })->name('profile');
 
-    Route::get('/history', function () {
-        return view('game');
-    })->name('history');
+    Route::get('/stats', function () {
+        return view('stats');
+    })->name('stats');
 });
+
+// Public pages (no auth required)
+Route::get('/leaderboard', function () {
+    return view('leaderboard');
+})->name('leaderboard');
+
+Route::get('/history', function () {
+    return view('history');
+})->name('history');
+
+Route::get('/provably-fair', function () {
+    return view('fair');
+})->name('fair');

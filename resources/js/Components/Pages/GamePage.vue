@@ -33,6 +33,9 @@
                             : 'hidden lg:block',
                     ]"
                 >
+                    <!-- Live Stats Bar -->
+                    <LiveStatsBar />
+
                     <!-- Game History Rail -->
                     <GameHistory :history="gameStore.history" />
 
@@ -109,6 +112,7 @@ import LiveBets from "@/Components/Game/LiveBets.vue";
 import ChatBox from "@/Components/Chat/ChatBox.vue";
 import OnlineUsers from "@/Components/Chat/OnlineUsers.vue";
 import LeaderboardPanel from "@/Components/Leaderboard/LeaderboardPanel.vue";
+import LiveStatsBar from "@/Components/Stats/LiveStatsBar.vue";
 import AdSlot from "@/Components/Layout/AdSlot.vue";
 import { usePresence } from "@/Composables/usePresence";
 import { useGameStore } from "@/Stores/gameStore";
