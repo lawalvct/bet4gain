@@ -1,5 +1,5 @@
-import { ref } from 'vue';
-import { SOUNDS } from '@/Utils/constants';
+import { ref } from "vue";
+import { SOUNDS } from "@/Utils/constants";
 
 const soundEnabled = ref(true);
 const volume = ref(0.5);
@@ -13,10 +13,10 @@ let initialized = false;
  */
 export function useSound() {
     if (!initialized) {
-        const saved = localStorage.getItem('bet4gain_sound');
-        if (saved !== null) soundEnabled.value = saved === '1';
+        const saved = localStorage.getItem("bet4gain_sound");
+        if (saved !== null) soundEnabled.value = saved === "1";
 
-        const savedVol = localStorage.getItem('bet4gain_volume');
+        const savedVol = localStorage.getItem("bet4gain_volume");
         if (savedVol !== null) volume.value = parseFloat(savedVol);
 
         initialized = true;
@@ -29,7 +29,7 @@ export function useSound() {
         Object.values(SOUNDS).forEach((path) => {
             if (!audioCache.has(path)) {
                 const audio = new Audio(path);
-                audio.preload = 'auto';
+                audio.preload = "auto";
                 audio.volume = volume.value;
                 audioCache.set(path, audio);
             }
@@ -47,7 +47,7 @@ export function useSound() {
             let source = audioCache.get(soundPath);
             if (!source) {
                 source = new Audio(soundPath);
-                source.preload = 'auto';
+                source.preload = "auto";
                 audioCache.set(soundPath, source);
             }
 
@@ -63,19 +63,31 @@ export function useSound() {
     }
 
     // Convenience methods matching SOUNDS constants
-    function betPlaced() { play(SOUNDS.BET_PLACED); }
-    function cashout() { play(SOUNDS.CASHOUT); }
-    function crash() { play(SOUNDS.CRASH); }
-    function tick() { play(SOUNDS.TICK); }
-    function chat() { play(SOUNDS.CHAT); }
-    function win() { play(SOUNDS.WIN); }
+    function betPlaced() {
+        play(SOUNDS.BET_PLACED);
+    }
+    function cashout() {
+        play(SOUNDS.CASHOUT);
+    }
+    function crash() {
+        play(SOUNDS.CRASH);
+    }
+    function tick() {
+        play(SOUNDS.TICK);
+    }
+    function chat() {
+        play(SOUNDS.CHAT);
+    }
+    function win() {
+        play(SOUNDS.WIN);
+    }
 
     /**
      * Toggle sound on/off.
      */
     function toggle() {
         soundEnabled.value = !soundEnabled.value;
-        localStorage.setItem('bet4gain_sound', soundEnabled.value ? '1' : '0');
+        localStorage.setItem("bet4gain_sound", soundEnabled.value ? "1" : "0");
     }
 
     /**
@@ -83,7 +95,7 @@ export function useSound() {
      */
     function setVolume(val) {
         volume.value = Math.max(0, Math.min(1, val));
-        localStorage.setItem('bet4gain_volume', volume.value.toString());
+        localStorage.setItem("bet4gain_volume", volume.value.toString());
 
         // Update cached audio nodes
         audioCache.forEach((audio) => {

@@ -21,33 +21,41 @@
                 ></span>
 
                 <span class="text-xl leading-none">{{ tab.icon }}</span>
-                <span class="text-[10px] font-medium leading-tight">{{ tab.label }}</span>
+                <span class="text-[10px] font-medium leading-tight">{{
+                    tab.label
+                }}</span>
 
                 <!-- Badge -->
                 <span
                     v-if="tab.badge"
                     class="absolute top-0.5 right-0.5 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center"
-                >{{ tab.badge > 99 ? '99+' : tab.badge }}</span>
+                    >{{ tab.badge > 99 ? "99+" : tab.badge }}</span
+                >
             </button>
         </div>
     </nav>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed } from "vue";
 
 const props = defineProps({
-    activeTab: { type: String, default: 'game' },
+    activeTab: { type: String, default: "game" },
     unreadMessages: { type: Number, default: 0 },
 });
 
-defineEmits(['tab-change']);
+defineEmits(["tab-change"]);
 
 const tabs = computed(() => [
-    { id: 'game', icon: '🎮', label: 'Game' },
-    { id: 'bet', icon: '💰', label: 'Bet' },
-    { id: 'chat', icon: '💬', label: 'Chat', badge: props.unreadMessages > 0 ? props.unreadMessages : null },
-    { id: 'leaderboard', icon: '🏆', label: 'Top' },
-    { id: 'menu', icon: '☰', label: 'More' },
+    { id: "game", icon: "🎮", label: "Game" },
+    { id: "bet", icon: "💰", label: "Bet" },
+    {
+        id: "chat",
+        icon: "💬",
+        label: "Chat",
+        badge: props.unreadMessages > 0 ? props.unreadMessages : null,
+    },
+    { id: "leaderboard", icon: "🏆", label: "Top" },
+    { id: "menu", icon: "☰", label: "More" },
 ]);
 </script>

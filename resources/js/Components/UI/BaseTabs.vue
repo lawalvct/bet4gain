@@ -1,10 +1,12 @@
 <template>
     <div>
         <!-- Tab Headers -->
-        <div :class="[
-            'flex border-b border-surface-light-border dark:border-surface-dark-border',
-            headerClass,
-        ]">
+        <div
+            :class="[
+                'flex border-b border-surface-light-border dark:border-surface-dark-border',
+                headerClass,
+            ]"
+        >
             <button
                 v-for="tab in tabs"
                 :key="tab.value"
@@ -20,7 +22,10 @@
             >
                 <span v-if="tab.icon" class="text-sm">{{ tab.icon }}</span>
                 <span>{{ tab.label }}</span>
-                <span v-if="tab.badge" class="ml-1 px-1.5 py-0.5 text-[10px] font-bold bg-primary-500/10 text-primary-500 rounded-full">
+                <span
+                    v-if="tab.badge"
+                    class="ml-1 px-1.5 py-0.5 text-[10px] font-bold bg-primary-500/10 text-primary-500 rounded-full"
+                >
                     {{ tab.badge }}
                 </span>
             </button>
@@ -34,29 +39,37 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed } from "vue";
 
 const props = defineProps({
     modelValue: { type: String, required: true },
     tabs: {
         type: Array,
         required: true,
-        validator: v => v.every(t => t.value && t.label),
+        validator: (v) => v.every((t) => t.value && t.label),
     },
-    size: { type: String, default: 'sm', validator: v => ['xs', 'sm', 'md'].includes(v) },
+    size: {
+        type: String,
+        default: "sm",
+        validator: (v) => ["xs", "sm", "md"].includes(v),
+    },
     stretch: { type: Boolean, default: true },
-    headerClass: { type: String, default: '' },
-    contentClass: { type: String, default: '' },
+    headerClass: { type: String, default: "" },
+    contentClass: { type: String, default: "" },
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(["update:modelValue"]);
 
 const sizeClasses = computed(() => {
-    const sizes = { xs: 'px-2 text-xs', sm: 'px-3 text-sm', md: 'px-4 text-sm' };
+    const sizes = {
+        xs: "px-2 text-xs",
+        sm: "px-3 text-sm",
+        md: "px-4 text-sm",
+    };
     return sizes[props.size];
 });
 
 const selectTab = (value) => {
-    emit('update:modelValue', value);
+    emit("update:modelValue", value);
 };
 </script>

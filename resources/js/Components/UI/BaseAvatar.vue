@@ -37,43 +37,53 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref } from "vue";
 
 const props = defineProps({
-    src: { type: String, default: '' },
-    alt: { type: String, default: '' },
-    name: { type: String, default: '' },
-    size: { type: String, default: 'md', validator: v => ['xs', 'sm', 'md', 'lg', 'xl'].includes(v) },
+    src: { type: String, default: "" },
+    alt: { type: String, default: "" },
+    name: { type: String, default: "" },
+    size: {
+        type: String,
+        default: "md",
+        validator: (v) => ["xs", "sm", "md", "lg", "xl"].includes(v),
+    },
     rounded: { type: Boolean, default: true },
     ring: { type: Boolean, default: false },
     online: { type: Boolean, default: false },
     showStatus: { type: Boolean, default: false },
 });
 
-const fallbackSrc = ref('');
+const fallbackSrc = ref("");
 
 const sizeClasses = computed(() => {
     const sizes = {
-        xs: 'w-5 h-5 text-[8px]',
-        sm: 'w-6 h-6 text-[10px]',
-        md: 'w-8 h-8 text-xs',
-        lg: 'w-10 h-10 text-sm',
-        xl: 'w-14 h-14 text-base',
+        xs: "w-5 h-5 text-[8px]",
+        sm: "w-6 h-6 text-[10px]",
+        md: "w-8 h-8 text-xs",
+        lg: "w-10 h-10 text-sm",
+        xl: "w-14 h-14 text-base",
     };
     return sizes[props.size];
 });
 
 const statusSizeClasses = computed(() => {
-    const sizes = { xs: 'w-1.5 h-1.5', sm: 'w-2 h-2', md: 'w-2.5 h-2.5', lg: 'w-3 h-3', xl: 'w-3.5 h-3.5' };
+    const sizes = {
+        xs: "w-1.5 h-1.5",
+        sm: "w-2 h-2",
+        md: "w-2.5 h-2.5",
+        lg: "w-3 h-3",
+        xl: "w-3.5 h-3.5",
+    };
     return sizes[props.size];
 });
 
 const initials = computed(() => {
-    const name = props.name || props.alt || '?';
+    const name = props.name || props.alt || "?";
     return name.charAt(0).toUpperCase();
 });
 
 const handleError = () => {
-    fallbackSrc.value = '';
+    fallbackSrc.value = "";
 };
 </script>

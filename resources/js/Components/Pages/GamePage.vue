@@ -15,7 +15,9 @@
                 <aside
                     :class="[
                         'lg:col-span-3 space-y-2',
-                        mobileTab === 'chat' ? 'block lg:block' : 'hidden lg:block',
+                        mobileTab === 'chat'
+                            ? 'block lg:block'
+                            : 'hidden lg:block',
                     ]"
                 >
                     <ChatBox />
@@ -26,14 +28,18 @@
                 <section
                     :class="[
                         'lg:col-span-6 space-y-2',
-                        mobileTab === 'game' || mobileTab === 'bet' ? 'block lg:block' : 'hidden lg:block',
+                        mobileTab === 'game' || mobileTab === 'bet'
+                            ? 'block lg:block'
+                            : 'hidden lg:block',
                     ]"
                 >
                     <!-- Game History Rail -->
                     <GameHistory />
 
                     <!-- Game Canvas -->
-                    <div class="game-canvas-container aspect-[16/9] min-h-[240px]">
+                    <div
+                        class="game-canvas-container aspect-[16/9] min-h-[240px]"
+                    >
                         <GameCanvas />
                     </div>
 
@@ -50,7 +56,9 @@
                 <aside
                     :class="[
                         'lg:col-span-3 space-y-2',
-                        mobileTab === 'leaderboard' ? 'block lg:block' : 'hidden lg:block',
+                        mobileTab === 'leaderboard'
+                            ? 'block lg:block'
+                            : 'hidden lg:block',
                     ]"
                 >
                     <LiveBets />
@@ -73,21 +81,21 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import AppHeader from '@/Components/Layout/AppHeader.vue';
-import MobileBottomNav from '@/Components/Layout/MobileBottomNav.vue';
-import { ToastContainer } from '@/Components/UI';
-import GameCanvas from '@/Components/Game/GameCanvas.vue';
-import GameHistory from '@/Components/Game/GameHistory.vue';
-import BetPanel from '@/Components/Game/BetPanel.vue';
-import LiveBets from '@/Components/Game/LiveBets.vue';
-import ChatBox from '@/Components/Chat/ChatBox.vue';
-import OnlineUsers from '@/Components/Chat/OnlineUsers.vue';
-import LeaderboardPanel from '@/Components/Leaderboard/LeaderboardPanel.vue';
-import AdSlot from '@/Components/Layout/AdSlot.vue';
+import { ref } from "vue";
+import AppHeader from "@/Components/Layout/AppHeader.vue";
+import MobileBottomNav from "@/Components/Layout/MobileBottomNav.vue";
+import { ToastContainer } from "@/Components/UI";
+import GameCanvas from "@/Components/Game/GameCanvas.vue";
+import GameHistory from "@/Components/Game/GameHistory.vue";
+import BetPanel from "@/Components/Game/BetPanel.vue";
+import LiveBets from "@/Components/Game/LiveBets.vue";
+import ChatBox from "@/Components/Chat/ChatBox.vue";
+import OnlineUsers from "@/Components/Chat/OnlineUsers.vue";
+import LeaderboardPanel from "@/Components/Leaderboard/LeaderboardPanel.vue";
+import AdSlot from "@/Components/Layout/AdSlot.vue";
 
 // Mobile tab state
-const mobileTab = ref('game');
+const mobileTab = ref("game");
 const unreadMessages = ref(0);
 
 // These will be populated from stores in later phases

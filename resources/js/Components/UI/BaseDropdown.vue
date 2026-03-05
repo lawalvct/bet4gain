@@ -27,10 +27,17 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 
 const props = defineProps({
-    position: { type: String, default: 'bottom-right', validator: v => ['bottom-left', 'bottom-right', 'top-left', 'top-right'].includes(v) },
+    position: {
+        type: String,
+        default: "bottom-right",
+        validator: (v) =>
+            ["bottom-left", "bottom-right", "top-left", "top-right"].includes(
+                v,
+            ),
+    },
 });
 
 const isOpen = ref(false);
@@ -38,16 +45,20 @@ const dropdownRef = ref(null);
 
 const positionClasses = computed(() => {
     const positions = {
-        'bottom-right': 'top-full right-0 mt-2',
-        'bottom-left': 'top-full left-0 mt-2',
-        'top-right': 'bottom-full right-0 mb-2',
-        'top-left': 'bottom-full left-0 mb-2',
+        "bottom-right": "top-full right-0 mt-2",
+        "bottom-left": "top-full left-0 mt-2",
+        "top-right": "bottom-full right-0 mb-2",
+        "top-left": "bottom-full left-0 mb-2",
     };
     return positions[props.position];
 });
 
-const toggle = () => { isOpen.value = !isOpen.value; };
-const close = () => { isOpen.value = false; };
+const toggle = () => {
+    isOpen.value = !isOpen.value;
+};
+const close = () => {
+    isOpen.value = false;
+};
 
 const handleClickOutside = (e) => {
     if (dropdownRef.value && !dropdownRef.value.contains(e.target)) {
@@ -55,8 +66,10 @@ const handleClickOutside = (e) => {
     }
 };
 
-onMounted(() => document.addEventListener('click', handleClickOutside));
-onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside));
+onMounted(() => document.addEventListener("click", handleClickOutside));
+onBeforeUnmount(() =>
+    document.removeEventListener("click", handleClickOutside),
+);
 
 defineExpose({ close, toggle, isOpen });
 </script>
