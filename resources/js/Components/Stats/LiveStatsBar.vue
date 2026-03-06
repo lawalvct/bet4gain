@@ -1,6 +1,6 @@
 <template>
     <div
-        class="flex items-center justify-between gap-3 px-4 py-2 bg-surface-light-card dark:bg-surface-dark-card rounded-xl border border-surface-light-border dark:border-surface-dark-border text-xs"
+        class="flex items-center justify-between gap-3 px-3 py-1.5 lg:py-1 bg-surface-light-card dark:bg-surface-dark-card rounded-xl border border-surface-light-border dark:border-surface-dark-border text-xs"
     >
         <div class="flex items-center gap-1.5">
             <span class="text-slate-400">💰 Today:</span>

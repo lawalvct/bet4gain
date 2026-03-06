@@ -9,25 +9,32 @@
         />
 
         <!-- Main Game Layout: 3-column on desktop, tabbed on mobile -->
-        <main class="max-w-[1920px] mx-auto px-2 sm:px-4 py-2 pb-20 lg:pb-2">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-2 sm:gap-3">
+        <main
+            class="max-w-[1920px] mx-auto px-2 sm:px-4 py-2 pb-20 lg:py-1 lg:pb-1 lg:h-[calc(100vh-3.5rem)] lg:overflow-hidden"
+        >
+            <div
+                class="grid grid-cols-1 lg:grid-cols-12 gap-2 sm:gap-3 lg:gap-2 lg:h-full"
+            >
                 <!-- Left Column: Chat (hidden on mobile, shown via tab) -->
                 <aside
                     :class="[
-                        'lg:col-span-3 space-y-2',
+                        'lg:col-span-3 space-y-2 lg:space-y-0 lg:flex lg:flex-col lg:gap-1 lg:min-h-0 lg:h-full',
                         mobileTab === 'chat'
                             ? 'block lg:block'
                             : 'hidden lg:block',
                     ]"
                 >
-                    <ChatBox />
-                    <OnlineUsers :users="onlineUsers" />
+                    <ChatBox class="lg:flex-1 lg:min-h-0" />
+                    <OnlineUsers
+                        :users="onlineUsers"
+                        class="lg:flex-shrink-0"
+                    />
                 </aside>
 
                 <!-- Center Column: Game + Bet Panel (always visible on desktop) -->
                 <section
                     :class="[
-                        'lg:col-span-6 space-y-2',
+                        'lg:col-span-6 space-y-2 lg:space-y-1 lg:overflow-y-auto lg:min-h-0 scrollbar-thin',
                         mobileTab === 'game' || mobileTab === 'bet'
                             ? 'block lg:block'
                             : 'hidden lg:block',
@@ -41,7 +48,7 @@
 
                     <!-- Game Canvas -->
                     <div
-                        class="game-canvas-container aspect-[16/9] min-h-[240px]"
+                        class="game-canvas-container aspect-[16/9] min-h-[240px] lg:min-h-[220px] lg:max-h-[52vh] lg:mx-auto lg:w-full"
                     >
                         <GameCanvas
                             :status="gameStore.status"
@@ -75,7 +82,7 @@
                 <!-- Right Column: Live Bets + Leaderboard -->
                 <aside
                     :class="[
-                        'lg:col-span-3 space-y-2',
+                        'lg:col-span-3 space-y-2 lg:space-y-1 lg:overflow-y-auto lg:min-h-0 scrollbar-thin',
                         mobileTab === 'leaderboard'
                             ? 'block lg:block'
                             : 'hidden lg:block',

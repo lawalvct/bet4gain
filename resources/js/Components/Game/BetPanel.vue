@@ -11,7 +11,7 @@
                 :key="tab"
                 @click="activeTab = tab"
                 :class="[
-                    'flex-1 py-2.5 text-sm font-medium transition',
+                    'flex-1 py-2 lg:py-1.5 text-sm font-medium transition',
                     activeTab === tab
                         ? 'text-primary-500 border-b-2 border-primary-500'
                         : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300',
@@ -21,7 +21,7 @@
             </button>
         </div>
 
-        <div class="p-4 space-y-4">
+        <div class="p-3 space-y-3 lg:p-2.5 lg:space-y-2">
             <!-- Bet Slot Tabs (Bet 1 / Bet 2) -->
             <div class="flex gap-2">
                 <button
@@ -29,7 +29,7 @@
                     :key="slot"
                     @click="activeSlot = slot"
                     :class="[
-                        'flex-1 py-1.5 text-xs font-medium rounded-lg transition',
+                        'flex-1 py-1 text-xs font-medium rounded-lg transition',
                         activeSlot === slot
                             ? 'bg-primary-500/10 text-primary-500 border border-primary-500/30'
                             : 'bg-surface-light dark:bg-surface-dark text-slate-400 border border-transparent',
@@ -50,7 +50,7 @@
                         type="number"
                         min="0"
                         step="0.01"
-                        class="w-full px-4 py-3 pr-20 rounded-xl border border-surface-light-border dark:border-surface-dark-border bg-surface-light dark:bg-surface-dark text-slate-900 dark:text-white text-lg font-semibold tabular-nums focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+                        class="w-full px-4 py-2.5 lg:py-2 pr-20 rounded-xl border border-surface-light-border dark:border-surface-dark-border bg-surface-light dark:bg-surface-dark text-slate-900 dark:text-white text-lg font-semibold tabular-nums focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
                         placeholder="0.00"
                     />
                     <div
@@ -78,7 +78,7 @@
                     v-for="amount in quickAmounts"
                     :key="amount"
                     @click="betAmount = amount"
-                    class="py-1.5 text-xs font-medium bg-surface-light dark:bg-surface-dark border border-surface-light-border dark:border-surface-dark-border rounded-lg text-slate-600 dark:text-slate-400 hover:border-primary-500 hover:text-primary-500 transition"
+                    class="py-1 text-xs font-medium bg-surface-light dark:bg-surface-dark border border-surface-light-border dark:border-surface-dark-border rounded-lg text-slate-600 dark:text-slate-400 hover:border-primary-500 hover:text-primary-500 transition"
                 >
                     {{ amount }}
                 </button>
@@ -163,7 +163,7 @@
                 @click="handleAction"
                 :disabled="actionDisabled"
                 :class="[
-                    'w-full py-4 rounded-xl font-bold text-lg transition-all duration-200',
+                    'w-full py-3 lg:py-2.5 rounded-xl font-bold text-lg transition-all duration-200',
                     actionButtonClass,
                 ]"
             >

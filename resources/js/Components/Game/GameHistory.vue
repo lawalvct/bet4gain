@@ -4,7 +4,7 @@
     >
         <!-- Header -->
         <div
-            class="flex items-center px-4 py-2.5 border-b border-surface-light-border dark:border-surface-dark-border"
+            class="flex items-center px-3 py-2 lg:py-1.5 border-b border-surface-light-border dark:border-surface-dark-border"
         >
             <h3
                 class="text-sm font-semibold text-slate-700 dark:text-slate-300"
@@ -15,7 +15,7 @@
 
         <!-- Crash Points -->
         <div
-            class="px-3 py-2 flex flex-wrap gap-1.5 max-h-20 overflow-y-auto scrollbar-thin"
+            class="px-3 py-1.5 lg:py-1 flex flex-wrap gap-1.5 max-h-20 lg:max-h-12 overflow-y-auto scrollbar-thin"
         >
             <span
                 v-for="(point, index) in history"

@@ -440,6 +440,13 @@ body {
     }
 }
 
+/* Compact layout for small laptop screens (13" / 768px height) */
+@media (min-width: 1024px) and (max-height: 800px) {
+    .game-canvas-container {
+        max-height: 44vh;
+    }
+}
+
 /* Touch device optimizations */
 @media (hover: none) {
     /* Larger tap targets */

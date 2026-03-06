@@ -4,7 +4,7 @@
     >
         <!-- Header -->
         <div
-            class="flex items-center justify-between px-4 py-2.5 border-b border-surface-light-border dark:border-surface-dark-border flex-shrink-0"
+            class="flex items-center justify-between px-3 py-2 lg:py-1.5 border-b border-surface-light-border dark:border-surface-dark-border flex-shrink-0"
         >
             <h3
                 class="text-sm font-semibold text-slate-700 dark:text-slate-300"
@@ -115,7 +115,7 @@
 
         <!-- Input -->
         <div
-            class="border-t border-surface-light-border dark:border-surface-dark-border p-3 flex-shrink-0"
+            class="border-t border-surface-light-border dark:border-surface-dark-border p-2 flex-shrink-0"
         >
             <!-- Error message -->
             <p v-if="sendError" class="text-xs text-game-red mb-1.5">
@@ -124,13 +124,13 @@
 
             <form
                 @submit.prevent="sendMessage"
-                class="flex gap-2 items-end relative"
+                class="flex gap-1.5 items-center relative"
             >
                 <!-- Emoji Picker Toggle -->
                 <button
                     type="button"
                     @click.stop="showEmojiPicker = !showEmojiPicker"
-                    class="p-2 text-slate-400 hover:text-primary-500 transition flex-shrink-0"
+                    class="p-1.5 text-slate-400 hover:text-primary-500 transition flex-shrink-0"
                     :disabled="!canChat"
                     title="Emoji"
                 >
@@ -146,11 +146,9 @@
                     type="text"
                     maxlength="200"
                     :disabled="!canChat"
-                    class="flex-1 px-3 py-2 rounded-xl border border-surface-light-border dark:border-surface-dark-border bg-surface-light dark:bg-surface-dark text-slate-900 dark:text-white text-sm placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition disabled:opacity-50"
+                    class="flex-1 min-w-0 px-2.5 py-1.5 rounded-lg border border-surface-light-border dark:border-surface-dark-border bg-surface-light dark:bg-surface-dark text-slate-900 dark:text-white text-sm placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition disabled:opacity-50"
                     :placeholder="
-                        canChat
-                            ? 'Type a message... (/help for commands)'
-                            : 'Login to chat'
+                        canChat ? 'Message... (/help)' : 'Login to chat'
                     "
                     @keydown.escape="showEmojiPicker = false"
                 />
@@ -159,7 +157,7 @@
                     :disabled="
                         !newMessage.trim() || !canChat || chatStore.sending
                     "
-                    class="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                    class="px-2.5 py-1.5 bg-primary-500 hover:bg-primary-600 text-white text-xs font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
                 >
                     {{ chatStore.sending ? "..." : "Send" }}
                 </button>
