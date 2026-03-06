@@ -210,7 +210,7 @@ import ThemeToggle from "./ThemeToggle.vue";
 import { BaseDropdown, BaseAvatar } from "@/Components/UI";
 import { formatCurrency, formatCoins } from "@/Utils/formatters";
 import { useSound } from "@/Composables/useSound";
-import api from "@/Utils/api";
+import axios from "axios";
 
 const props = defineProps({
     user: { type: Object, default: null },
@@ -223,7 +223,7 @@ const sound = useSound();
 
 const logout = async () => {
     try {
-        await api.post("/logout");
+        await axios.post("/logout");
         window.location.href = "/";
     } catch {
         window.location.href = "/";
