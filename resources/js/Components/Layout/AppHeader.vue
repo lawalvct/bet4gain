@@ -84,24 +84,26 @@
 
                 <!-- Balance (authenticated) -->
                 <template v-if="user">
-                    <div
-                        class="hidden sm:flex items-center gap-2 bg-surface-light dark:bg-surface-dark rounded-xl px-3 py-1.5 border border-surface-light-border dark:border-surface-dark-border"
+                    <a
+                        href="/wallet"
+                        class="hidden sm:flex items-center gap-2 bg-surface-light dark:bg-surface-dark rounded-xl px-3 py-1.5 border border-surface-light-border dark:border-surface-dark-border hover:border-primary-500/40 transition cursor-pointer"
                     >
                         <span class="text-xs text-slate-400">₦</span>
                         <span
                             class="text-sm font-semibold tabular-nums text-slate-900 dark:text-white"
                             >{{ formatCurrency(walletBalance) }}</span
                         >
-                    </div>
-                    <div
-                        class="hidden sm:flex items-center gap-2 bg-surface-light dark:bg-surface-dark rounded-xl px-3 py-1.5 border border-surface-light-border dark:border-surface-dark-border"
+                    </a>
+                    <a
+                        href="/wallet"
+                        class="hidden sm:flex items-center gap-2 bg-surface-light dark:bg-surface-dark rounded-xl px-3 py-1.5 border border-surface-light-border dark:border-surface-dark-border hover:border-primary-500/40 transition cursor-pointer"
                     >
                         <span class="text-xs text-amber-500">🪙</span>
                         <span
                             class="text-sm font-semibold tabular-nums text-slate-900 dark:text-white"
                             >{{ formatCoins(coinBalance) }}</span
                         >
-                    </div>
+                    </a>
 
                     <!-- User Menu -->
                     <BaseDropdown position="bottom-end">
