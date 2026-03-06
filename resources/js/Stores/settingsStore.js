@@ -16,7 +16,7 @@ export const useSettingsStore = defineStore("settings", () => {
     const fetchSettings = async () => {
         loading.value = true;
         try {
-            const response = await api.get("/api/settings");
+            const response = await api.get("/settings");
             settings.value = response.data.data || {};
         } catch (error) {
             console.error("Failed to fetch settings:", error);

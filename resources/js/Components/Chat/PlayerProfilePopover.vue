@@ -200,7 +200,7 @@ watch(
 
         loading.value = true;
         try {
-            const response = await api.get(`/api/chat/user/${userId}`);
+            const response = await api.get(`/chat/user/${userId}`);
             profile.value = response.data.data;
         } catch (e) {
             console.error("Failed to load profile:", e);

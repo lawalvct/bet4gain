@@ -53,7 +53,7 @@ export function useTheme() {
 
         // Persist to DB for authenticated users (fire & forget)
         if (window.__BET4GAIN__?.user) {
-            api.put("/api/user/profile", {
+            api.put("/user/profile", {
                 theme: isDark.value ? "dark" : "light",
             }).catch(() => {});
         }

@@ -336,7 +336,7 @@ const toggleRound = async (roundId) => {
     roundBets.value = [];
 
     try {
-        const response = await api.get(`/api/game/round/${roundId}/bets`);
+        const response = await api.get(`/game/round/${roundId}/bets`);
         roundBets.value = response.data.data || [];
     } catch (error) {
         console.error("Failed to fetch round bets:", error);

@@ -231,7 +231,7 @@ const fetchPage = async (page = 1) => {
         if (filter.type) params.type = filter.type;
         if (filter.status) params.status = filter.status;
 
-        const response = await api.get("/api/wallet/transactions", { params });
+        const response = await api.get("/wallet/transactions", { params });
         transactions.value = response.data.data || [];
         meta.current_page = response.data.current_page || 1;
         meta.last_page = response.data.last_page || 1;

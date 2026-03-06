@@ -42,7 +42,7 @@ export const useChatStore = defineStore("chat", () => {
      */
     const fetchMessages = async () => {
         try {
-            const response = await api.get("/api/chat/messages");
+            const response = await api.get("/chat/messages");
             messages.value = response.data.data || [];
         } catch (error) {
             console.error("Failed to fetch messages:", error);
@@ -55,7 +55,7 @@ export const useChatStore = defineStore("chat", () => {
      */
     const loadOlderMessages = async (beforeId) => {
         try {
-            const response = await api.get("/api/chat/messages/older", {
+            const response = await api.get("/chat/messages/older", {
                 params: { before_id: beforeId, limit: 30 },
             });
             const older = response.data.data || [];
@@ -75,7 +75,7 @@ export const useChatStore = defineStore("chat", () => {
     const sendMessage = async (content) => {
         sending.value = true;
         try {
-            const response = await api.post("/api/chat/messages", {
+            const response = await api.post("/chat/messages", {
                 message: content,
             });
             return response.data;

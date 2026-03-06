@@ -399,7 +399,7 @@ const loadRound = async () => {
     result.value = null;
 
     try {
-        const response = await api.get(`/api/game/round/${roundId.value}`);
+        const response = await api.get(`/game/round/${roundId.value}`);
         const data = response.data.data;
         roundData.value = data;
 
@@ -428,7 +428,7 @@ const verify = async () => {
     result.value = null;
 
     try {
-        const response = await api.post("/api/game/verify", {
+        const response = await api.post("/game/verify", {
             server_seed: form.serverSeed,
             server_seed_hash: form.serverSeedHash,
             client_seed: form.clientSeed,

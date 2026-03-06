@@ -27,7 +27,7 @@ export const useBetStore = defineStore("bet", () => {
     const placeBet = async ({ amount, autoCashout, slot = 1 }) => {
         placing.value = true;
         try {
-            const response = await api.post("/api/game/bet", {
+            const response = await api.post("/game/bet", {
                 amount,
                 auto_cashout_at: autoCashout,
                 bet_slot: slot,
@@ -44,7 +44,7 @@ export const useBetStore = defineStore("bet", () => {
     const cashout = async ({ slot = 1 }) => {
         cashingOut.value = true;
         try {
-            const response = await api.post("/api/game/cashout", {
+            const response = await api.post("/game/cashout", {
                 bet_slot: slot,
             });
             if (bets.value[slot]) {
@@ -63,7 +63,7 @@ export const useBetStore = defineStore("bet", () => {
 
     const cancelBet = async ({ slot = 1 }) => {
         try {
-            await api.post("/api/game/cancel-bet", { bet_slot: slot });
+            await api.post("/game/cancel-bet", { bet_slot: slot });
             bets.value[slot] = null;
         } catch (error) {
             throw error;

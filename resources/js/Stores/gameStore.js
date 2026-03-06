@@ -181,7 +181,7 @@ export const useGameStore = defineStore("game", () => {
 
     const fetchHistory = async () => {
         try {
-            const res = await api.get("/api/game/history");
+            const res = await api.get("/game/history");
             const rows = res.data.data ?? [];
             // history can be array of objects {crash_point} or plain numbers
             history.value = rows.map((r) =>
@@ -196,7 +196,7 @@ export const useGameStore = defineStore("game", () => {
 
     const fetchCurrentState = async () => {
         try {
-            const res = await api.get("/api/game/state");
+            const res = await api.get("/game/state");
             const round = res.data.data;
             if (!round) return;
             roundId.value = round.round_id;

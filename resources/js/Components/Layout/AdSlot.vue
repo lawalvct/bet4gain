@@ -124,13 +124,13 @@ const placeholderHeightClass = computed(() => {
 
 const trackImpression = () => {
     if (props.ad?.id) {
-        api.post(`/api/ads/${props.ad.id}/impression`).catch(() => {});
+        api.post(`/ads/${props.ad.id}/impression`).catch(() => {});
     }
 };
 
 const trackClick = () => {
     if (props.ad?.id) {
-        api.post(`/api/ads/${props.ad.id}/click`).catch(() => {});
+        api.post(`/ads/${props.ad.id}/click`).catch(() => {});
     }
 };
 

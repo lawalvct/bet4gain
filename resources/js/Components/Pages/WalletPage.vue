@@ -235,7 +235,7 @@ const formatNumber = (num) => {
 
 const fetchGatewayConfig = async () => {
     try {
-        const response = await api.get("/api/wallet/gateways");
+        const response = await api.get("/wallet/gateways");
         gatewayConfig.value = response.data;
     } catch (e) {
         console.error("Failed to load gateway config:", e);

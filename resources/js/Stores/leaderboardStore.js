@@ -38,7 +38,7 @@ export const useLeaderboardStore = defineStore("leaderboard", () => {
 
         try {
             const response = await api.get(
-                `/api/leaderboard/${activePeriod.value}`,
+                `/leaderboard/${activePeriod.value}`,
             );
             entries.value = response.data.data || [];
         } catch (error) {
@@ -57,7 +57,7 @@ export const useLeaderboardStore = defineStore("leaderboard", () => {
 
     const fetchLiveStats = async () => {
         try {
-            const response = await api.get("/api/stats/live");
+            const response = await api.get("/stats/live");
             liveStats.value = response.data.data;
         } catch (error) {
             console.error("Failed to fetch live stats:", error);
@@ -69,7 +69,7 @@ export const useLeaderboardStore = defineStore("leaderboard", () => {
     const fetchPersonalStats = async () => {
         loadingStats.value = true;
         try {
-            const response = await api.get("/api/stats/me");
+            const response = await api.get("/stats/me");
             personalStats.value = response.data.data;
         } catch (error) {
             console.error("Failed to fetch personal stats:", error);
@@ -83,7 +83,7 @@ export const useLeaderboardStore = defineStore("leaderboard", () => {
     const fetchMyBets = async (page = 1) => {
         loadingBets.value = true;
         try {
-            const response = await api.get("/api/stats/my-bets", {
+            const response = await api.get("/stats/my-bets", {
                 params: { page, per_page: 20 },
             });
             myBets.value = response.data.data || [];
@@ -104,7 +104,7 @@ export const useLeaderboardStore = defineStore("leaderboard", () => {
     const fetchGameHistory = async (page = 1) => {
         loadingHistory.value = true;
         try {
-            const response = await api.get("/api/game/rounds", {
+            const response = await api.get("/game/rounds", {
                 params: { page, per_page: 30 },
             });
             gameHistory.value = response.data.data || [];

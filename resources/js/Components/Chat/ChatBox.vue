@@ -295,7 +295,7 @@ const onScroll = () => {
 
 const deleteMessage = async (messageId) => {
     try {
-        await api.delete(`/api/chat/messages/${messageId}`);
+        await api.delete(`/chat/messages/${messageId}`);
         chatStore.removeMessage(messageId);
     } catch (e) {
         console.error("Failed to delete message:", e);
@@ -304,7 +304,7 @@ const deleteMessage = async (messageId) => {
 
 const muteUser = async (userId) => {
     try {
-        await api.post("/api/chat/mute", { user_id: userId, minutes: 10 });
+        await api.post("/chat/mute", { user_id: userId, minutes: 10 });
         popover.visible = false;
     } catch (e) {
         console.error("Failed to mute user:", e);

@@ -18,7 +18,7 @@ export const useWalletStore = defineStore("wallet", () => {
     const fetchWallet = async () => {
         loading.value = true;
         try {
-            const response = await api.get("/api/wallet");
+            const response = await api.get("/wallet");
             wallet.value = response.data.wallet;
             coinBalance.value = response.data.coins;
         } catch (error) {
@@ -30,7 +30,7 @@ export const useWalletStore = defineStore("wallet", () => {
 
     const fetchTransactions = async (page = 1) => {
         try {
-            const response = await api.get("/api/wallet/transactions", {
+            const response = await api.get("/wallet/transactions", {
                 params: { page },
             });
             transactions.value = response.data.data;
@@ -54,7 +54,7 @@ export const useWalletStore = defineStore("wallet", () => {
 
     const deposit = async (data) => {
         try {
-            const response = await api.post("/api/wallet/deposit", data);
+            const response = await api.post("/wallet/deposit", data);
             return response.data;
         } catch (error) {
             throw error;
@@ -63,7 +63,7 @@ export const useWalletStore = defineStore("wallet", () => {
 
     const withdraw = async (data) => {
         try {
-            const response = await api.post("/api/wallet/withdraw", data);
+            const response = await api.post("/wallet/withdraw", data);
             return response.data;
         } catch (error) {
             throw error;
@@ -72,7 +72,7 @@ export const useWalletStore = defineStore("wallet", () => {
 
     const purchaseCoins = async (data) => {
         try {
-            const response = await api.post("/api/wallet/purchase-coins", data);
+            const response = await api.post("/wallet/purchase-coins", data);
             if (response.data.coins) {
                 coinBalance.value = response.data.coins;
             }
@@ -87,7 +87,7 @@ export const useWalletStore = defineStore("wallet", () => {
 
     const sellCoins = async (data) => {
         try {
-            const response = await api.post("/api/wallet/sell-coins", data);
+            const response = await api.post("/wallet/sell-coins", data);
             if (response.data.coins) {
                 coinBalance.value = response.data.coins;
             }

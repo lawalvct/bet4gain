@@ -188,7 +188,7 @@ const isValid = computed(() => {
 
 const fetchBanks = async () => {
     try {
-        const response = await api.get("/api/wallet/banks");
+        const response = await api.get("/wallet/banks");
         banks.value = response.data.data || [];
     } catch (e) {
         console.error("Failed to load banks:", e);
@@ -213,7 +213,7 @@ const resolveAccount = async () => {
     form.value.account_name = "";
 
     try {
-        const response = await api.post("/api/wallet/resolve-account", {
+        const response = await api.post("/wallet/resolve-account", {
             account_number: form.value.account_number,
             bank_code: form.value.bank_code,
         });

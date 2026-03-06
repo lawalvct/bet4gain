@@ -28,18 +28,23 @@ api.interceptors.response.use(
         const status = error.response?.status;
 
         if (status === 401) {
-            // Redirect to login if unauthenticated
-            window.location.href = "/login";
+            // Only redirect to login if this was a user-initiated navigation,
+            // not a background polling/broadcast request that happens to fail.
+            // Let the caller handle 401 gracefully instead of force-reloading.
+            console.warn(
+                "Unauthenticated (401). Login required for this action.",
+            );
         }
 
         if (status === 419) {
-            // CSRF token mismatch — reload page
-            window.location.reload();
+            // CSRF token expired — refresh the token from the meta tag silently.
+            // Don't reload the whole page; let the caller retry or show an error.
+            console.warn("CSRF token mismatch (419). Token may have expired.");
         }
 
         if (status === 429) {
             // Rate limited
-            console.warn("Rate limited. Please slow down.");
+            console.warn("Rate limited (429). Please slow down.");
         }
 
         return Promise.reject(error);
