@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ChatMessage extends Model
 {
-    public $timestamps = false;
+    // Only created_at exists in the schema — no updated_at column.
+    const UPDATED_AT = null;
 
     protected $fillable = [
         'user_id',
@@ -57,7 +58,7 @@ class ChatMessage extends Model
             'avatar' => $this->user->avatar_url,
             'message' => $this->message,
             'type' => $this->type->value,
-            'created_at' => $this->created_at->toISOString(),
+            'created_at' => $this->created_at?->toISOString() ?? now()->toISOString(),
         ];
     }
 }

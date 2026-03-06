@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\LoginLog;
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,9 +26,20 @@ class TrackLoginAttempt
         $user = $request->user();
         $successful = $response->getStatusCode() < 400;
 
+        // On failure, try to resolve the user by their submitted email/username
+        // so we can still associate the failed log entry with their account.
+        if (!$user && !$successful) {
+            $emailField = $request->input('email') ?? $request->input('username');
+            if ($emailField) {
+                $user = User::where('email', $emailField)
+                    ->orWhere('username', $emailField)
+                    ->first();
+            }
+        }
+
         if ($user || !$successful) {
             LoginLog::record(
-                userId:        $user?->id,
+                userId:        $user?->id,   // nullable — null when unknown user attempts login
                 ip:            $request->ip(),
                 userAgent:     $request->userAgent(),
                 fingerprint:   $request->header('X-Browser-Fingerprint'),

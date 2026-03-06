@@ -444,6 +444,7 @@ body {
 @media (min-width: 1024px) and (max-height: 800px) {
     .game-canvas-container {
         max-height: 44vh;
+        max-width: calc(44vh * 16 / 9);
     }
 }
 

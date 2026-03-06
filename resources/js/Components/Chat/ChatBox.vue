@@ -148,7 +148,7 @@
                     :disabled="!canChat"
                     class="flex-1 min-w-0 px-2.5 py-1.5 rounded-lg border border-surface-light-border dark:border-surface-dark-border bg-surface-light dark:bg-surface-dark text-slate-900 dark:text-white text-sm placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition disabled:opacity-50"
                     :placeholder="
-                        canChat ? 'Message... (/help)' : 'Login to chat'
+                        canChat ? 'Message... ' : 'Login to chat'
                     "
                     @keydown.escape="showEmojiPicker = false"
                 />

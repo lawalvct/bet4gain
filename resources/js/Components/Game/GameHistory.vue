@@ -18,7 +18,7 @@
             class="px-3 py-1.5 lg:py-1 flex flex-wrap gap-1.5 max-h-20 lg:max-h-12 overflow-y-auto scrollbar-thin"
         >
             <span
-                v-for="(point, index) in history"
+                v-for="(point, index) in visibleHistory"
                 :key="index"
                 :class="[
                     'px-2 py-0.5 rounded-full text-xs font-bold tabular-nums cursor-pointer hover:scale-110 transition-transform',
@@ -28,7 +28,9 @@
             >
                 {{ point }}x
             </span>
-            <span v-if="!history.length" class="text-xs text-slate-400 py-1"
+            <span
+                v-if="!visibleHistory.length"
+                class="text-xs text-slate-400 py-1"
                 >No history yet</span
             >
         </div>
@@ -36,9 +38,13 @@
 </template>
 
 <script setup>
-defineProps({
+import { computed } from "vue";
+
+const props = defineProps({
     history: { type: Array, default: () => [] },
 });
+
+const visibleHistory = computed(() => props.history.slice(0, 8));
 
 const crashPillClass = (point) => {
     if (point >= 10) return "crash-pill-purple";

@@ -34,11 +34,7 @@
                 >
                     <img
                         v-if="user.avatar"
-                        :src="
-                            user.avatar.startsWith('http')
-                                ? user.avatar
-                                : `/storage/${user.avatar}`
-                        "
+                        :src="avatarSrc(user.avatar)"
                         :alt="user.username"
                         class="w-full h-full object-cover"
                     />
@@ -72,4 +68,13 @@
 defineProps({
     users: { type: Array, default: () => [] },
 });
+
+const avatarSrc = (avatar) => {
+    const value = String(avatar || "");
+    if (!value) return "";
+    if (value.startsWith("http")) return value;
+    if (value.startsWith("/storage/")) return value;
+    if (value.startsWith("storage/")) return `/${value}`;
+    return `/storage/${value.replace(/^\/+/, "")}`;
+};
 </script>

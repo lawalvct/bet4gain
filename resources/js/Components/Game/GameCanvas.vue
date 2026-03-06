@@ -179,36 +179,41 @@ const mToColor = (m, alpha = 1) => {
     return `rgba(255,255,255,${alpha})`;
 };
 
-//  Curve drawing
-const PAD_X = 48;
-const PAD_Y = 36;
+//  Curve drawing — scale padding to canvas size
+const padX = () => Math.max(W * 0.055, 24);
+const padY = () => Math.max(H * 0.08, 18);
 
-const timeToX = (ms, maxMs) =>
-    PAD_X + (maxMs > 0 ? ms / maxMs : 0) * (W - PAD_X * 2);
+const timeToX = (ms, maxMs) => {
+    const px = padX();
+    return px + (maxMs > 0 ? ms / maxMs : 0) * (W - px * 2);
+};
 
 const multiplierToY = (m) => {
+    const py = padY();
     const logM = Math.log(Math.max(m, 1));
     const logMax = Math.log(20);
     const frac = Math.min(logM / logMax, 1);
-    return H - PAD_Y - frac * (H - PAD_Y * 2);
+    return H - py - frac * (H - py * 2);
 };
 
 const drawCurve = (currentMs, maxMs) => {
     if (!ctx || W === 0) return;
     ctx.clearRect(0, 0, W, H);
 
-    // Multiplier labels
-    ctx.font = "10px monospace";
+    // Multiplier labels — scale font to canvas
+    const fontSize = Math.max(Math.round(H * 0.035), 8);
+    const px = padX();
+    ctx.font = `${fontSize}px monospace`;
     [2, 3, 5, 10].forEach((m) => {
         const y = multiplierToY(m);
         ctx.strokeStyle = "rgba(255,255,255,0.06)";
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.moveTo(PAD_X / 2, y);
-        ctx.lineTo(W - PAD_X / 2, y);
+        ctx.moveTo(px / 2, y);
+        ctx.lineTo(W - px / 2, y);
         ctx.stroke();
         ctx.fillStyle = "rgba(255,255,255,0.2)";
-        ctx.fillText(`${m}x`, 2, y + 4);
+        ctx.fillText(`${m}x`, 2, y + Math.round(fontSize * 0.4));
     });
 
     if (currentMs <= 0) return;
@@ -245,8 +250,8 @@ const drawCurve = (currentMs, maxMs) => {
     ctx.stroke();
 
     // Fill
-    ctx.lineTo(tipX, H - PAD_Y);
-    ctx.lineTo(timeToX(0, maxMs), H - PAD_Y);
+    ctx.lineTo(tipX, H - padY());
+    ctx.lineTo(timeToX(0, maxMs), H - padY());
     ctx.closePath();
     const fill = ctx.createLinearGradient(0, tipY, 0, H);
     fill.addColorStop(0, mToColor(tipM, 0.18));
@@ -260,29 +265,34 @@ const drawCurve = (currentMs, maxMs) => {
 const drawRocket = (x, y, m) => {
     ctx.save();
     ctx.translate(x, y);
+    // Scale rocket proportionally to canvas height
+    const baseSize = Math.max(H * 0.025, 4);
     const s = 1 + Math.min(m / 20, 0.9);
 
     // Halo
     ctx.beginPath();
-    ctx.arc(0, 0, 14 * s, 0, Math.PI * 2);
+    ctx.arc(0, 0, baseSize * 2 * s, 0, Math.PI * 2);
     ctx.fillStyle = mToColor(m, 0.12);
     ctx.fill();
 
     // Body
     ctx.shadowColor = mToColor(m, 0.9);
-    ctx.shadowBlur = 14;
+    ctx.shadowBlur = baseSize * 2;
     ctx.beginPath();
-    ctx.arc(0, 0, 7 * s, 0, Math.PI * 2);
+    ctx.arc(0, 0, baseSize * s, 0, Math.PI * 2);
     ctx.fillStyle = mToColor(m, 1);
     ctx.fill();
     ctx.shadowBlur = 0;
 
     // Exhaust
+    const eW = baseSize * 0.6 * s;
+    const eStart = baseSize * 0.7 * s;
+    const eEnd = baseSize * 2.6 * s;
     ctx.beginPath();
-    ctx.moveTo(-4 * s, 5 * s);
-    ctx.lineTo(0, 18 * s);
-    ctx.lineTo(4 * s, 5 * s);
-    const ex = ctx.createLinearGradient(0, 5 * s, 0, 18 * s);
+    ctx.moveTo(-eW, eStart);
+    ctx.lineTo(0, eEnd);
+    ctx.lineTo(eW, eStart);
+    const ex = ctx.createLinearGradient(0, eStart, 0, eEnd);
     ex.addColorStop(0, mToColor(m, 0.85));
     ex.addColorStop(1, "rgba(255,140,0,0)");
     ctx.fillStyle = ex;
@@ -302,9 +312,9 @@ const drawCrashed = () => {
     ctx.save();
     ctx.translate(tipX, tipY);
     ctx.strokeStyle = "#ef4444";
-    ctx.lineWidth = 3;
+    ctx.lineWidth = Math.max(H * 0.008, 2);
     ctx.lineCap = "round";
-    const sz = 10;
+    const sz = Math.max(H * 0.035, 6);
     ctx.beginPath();
     ctx.moveTo(-sz, -sz);
     ctx.lineTo(sz, sz);
@@ -341,6 +351,8 @@ const startGameLoop = () => {
 };
 
 //  Canvas resize
+let resizeObserver = null;
+
 const resize = () => {
     const dpr = window.devicePixelRatio || 1;
     for (const el of [bgCanvasRef.value, canvasRef.value]) {
@@ -387,12 +399,20 @@ watch(
 onMounted(() => {
     resize();
     window.addEventListener("resize", resize);
+
+    // Watch for container size changes (CSS max-h, layout shifts)
+    if (window.ResizeObserver && wrapperRef.value) {
+        resizeObserver = new ResizeObserver(() => resize());
+        resizeObserver.observe(wrapperRef.value);
+    }
+
     startBgLoop();
     startGameLoop();
 });
 
 onBeforeUnmount(() => {
     window.removeEventListener("resize", resize);
+    resizeObserver?.disconnect();
     cancelAnimationFrame(bgRaf);
     cancelAnimationFrame(gameRaf);
 });

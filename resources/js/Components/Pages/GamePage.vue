@@ -48,7 +48,7 @@
 
                     <!-- Game Canvas -->
                     <div
-                        class="game-canvas-container aspect-[16/9] min-h-[240px] lg:min-h-[220px] lg:max-h-[52vh] lg:mx-auto lg:w-full"
+                        class="game-canvas-container aspect-[16/9] min-h-[240px] lg:min-h-[220px] lg:max-h-[52vh] lg:max-w-[calc(52vh*16/9)] lg:mx-auto lg:w-full"
                     >
                         <GameCanvas
                             :status="gameStore.status"
@@ -122,6 +122,7 @@ import LeaderboardPanel from "@/Components/Leaderboard/LeaderboardPanel.vue";
 import LiveStatsBar from "@/Components/Stats/LiveStatsBar.vue";
 import AdSlot from "@/Components/Layout/AdSlot.vue";
 import { usePresence } from "@/Composables/usePresence";
+import { useSound } from "@/Composables/useSound";
 import { useGameStore } from "@/Stores/gameStore";
 import { useUserStore } from "@/Stores/userStore";
 import { useBetStore } from "@/Stores/betStore";
@@ -138,6 +139,7 @@ const { onlineUsers, onlineCount } = usePresence();
 const gameStore = useGameStore();
 const userStore = useUserStore();
 const betStore = useBetStore();
+const sound = useSound();
 
 // Convenience aliases for header (storeToRefs preserves reactivity)
 const { user, walletBalance, coinBalance } = storeToRefs(userStore);
@@ -184,6 +186,10 @@ const onStopAuto = () => {
 watch(
     () => gameStore.status,
     (newStatus, oldStatus) => {
+        if (newStatus === "crashed" && oldStatus !== "crashed") {
+            sound.crash();
+        }
+
         if (newStatus === "waiting" && oldStatus === "crashed") {
             betStore.clearRound();
         }

@@ -624,9 +624,13 @@ const selectedAvatarFile = ref(null);
 
 const avatarUrl = computed(() => {
     if (!user.value?.avatar) return null;
-    return user.value.avatar.startsWith("http")
-        ? user.value.avatar
-        : `/storage/${user.value.avatar}`;
+    const avatar = String(user.value.avatar);
+
+    if (avatar.startsWith("http")) return avatar;
+    if (avatar.startsWith("/storage/")) return avatar;
+    if (avatar.startsWith("storage/")) return `/${avatar}`;
+
+    return `/storage/${avatar.replace(/^\/+/, "")}`;
 });
 
 // Profile form
@@ -708,7 +712,10 @@ const uploadAvatar = async () => {
         const { data } = await api.post("/user/avatar", formData, {
             headers: { "Content-Type": "multipart/form-data" },
         });
-        user.value.avatar = data.avatar;
+        user.value.avatar =
+            typeof data.avatar === "string"
+                ? data.avatar.replace(/^https?:\/\/[^/]+/, "")
+                : data.avatar;
         avatarSuccess.value = "Avatar updated!";
         selectedAvatarFile.value = null;
         avatarPreview.value = null;

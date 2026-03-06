@@ -186,7 +186,17 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser, Has
     public function getAvatarUrlAttribute(): string
     {
         if ($this->avatar) {
-            return asset('storage/' . $this->avatar);
+            $path = ltrim($this->avatar, '/');
+
+            if (str_starts_with($path, 'storage/')) {
+                $path = substr($path, 8);
+            }
+
+            if (str_starts_with($path, 'public/')) {
+                $path = substr($path, 7);
+            }
+
+            return asset('storage/' . $path);
         }
 
         return 'https://ui-avatars.com/api/?name=' . urlencode($this->username) . '&background=random&color=fff';

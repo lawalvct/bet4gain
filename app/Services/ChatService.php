@@ -162,7 +162,7 @@ class ChatService
             'avatar'     => null,
             'message'    => $text,
             'type'       => 'system',
-            'created_at' => $message->created_at->toISOString(),
+            'created_at' => $message->created_at?->toISOString() ?? now()->toISOString(),
         ];
 
         event(new ChatMessageSent($broadcastData));

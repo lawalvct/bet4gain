@@ -110,7 +110,7 @@
                                 class="flex items-center gap-2 rounded-xl px-2 py-1 hover:bg-surface-light dark:hover:bg-surface-dark transition"
                             >
                                 <BaseAvatar
-                                    :src="user.avatar_url"
+                                    :src="userAvatarSrc"
                                     :name="user.username"
                                     size="sm"
                                 />
@@ -205,7 +205,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed } from "vue";
 import ThemeToggle from "./ThemeToggle.vue";
 import { BaseDropdown, BaseAvatar } from "@/Components/UI";
 import { formatCurrency, formatCoins } from "@/Utils/formatters";
@@ -220,6 +220,20 @@ const props = defineProps({
 });
 
 const sound = useSound();
+
+const userAvatarSrc = computed(() => {
+    if (!props.user) return "";
+
+    const raw = props.user.avatar_url || props.user.avatar;
+    if (!raw) return "";
+
+    const avatar = String(raw);
+    if (avatar.startsWith("http")) return avatar;
+    if (avatar.startsWith("/storage/")) return avatar;
+    if (avatar.startsWith("storage/")) return `/${avatar}`;
+
+    return `/storage/${avatar.replace(/^\/+/, "")}`;
+});
 
 const logout = async () => {
     try {

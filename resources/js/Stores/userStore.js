@@ -27,9 +27,13 @@ export const useUserStore = defineStore("user", () => {
     const username = computed(() => user.value?.username || "Guest");
     const avatarUrl = computed(() => {
         if (!user.value?.avatar) return null;
-        return user.value.avatar.startsWith("http")
-            ? user.value.avatar
-            : `/storage/${user.value.avatar}`;
+        const avatar = String(user.value.avatar);
+
+        if (avatar.startsWith("http")) return avatar;
+        if (avatar.startsWith("/storage/")) return avatar;
+        if (avatar.startsWith("storage/")) return `/${avatar}`;
+
+        return `/storage/${avatar.replace(/^\/+/, "")}`;
     });
     const walletBalance = computed(() => user.value?.wallet?.balance ?? 0);
     const coinBalance = computed(() => user.value?.coin_balance?.balance ?? 0);
