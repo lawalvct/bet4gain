@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import api from "@/Utils/api";
+import { useBetStore } from "@/Stores/betStore";
+import { useWalletStore } from "@/Stores/walletStore";
 
 export const useGameStore = defineStore("game", () => {
     // ── State ──────────────────────────────────────────────────────────────────
@@ -48,11 +50,26 @@ export const useGameStore = defineStore("game", () => {
 
     /** Event: countdown.tick  – broadcasted every second during waiting phase */
     const onCountdownTick = (e) => {
+        // Transition from crashed → waiting so clearRound logic triggers
+        if (status.value === "crashed") {
+            status.value = "waiting";
+        }
         countdown.value = e.seconds_left ?? e.secondsLeft ?? 0;
     };
 
     /** Event: betting.started */
     const onBettingStarted = (e) => {
+        // Only clear bets if this is a genuinely new round.
+        // Bets placed during the waiting phase belong to THIS round
+        // (same round_id) and must NOT be wiped.
+        const betStore = useBetStore();
+        const hasCurrentRoundBet = [1, 2].some(
+            (slot) => betStore.bets[slot]?.game_round_id === e.round_id,
+        );
+        if (!hasCurrentRoundBet) {
+            betStore.clearRound();
+        }
+
         roundId.value = e.round_id;
         serverSeedHash.value = e.server_seed_hash ?? "";
         roundHash.value = e.server_seed_hash ?? "";
@@ -100,10 +117,15 @@ export const useGameStore = defineStore("game", () => {
     /** Event: bet.placed – a player placed a bet */
     const onBetPlaced = (e) => {
         if (e.round_id !== roundId.value) return;
+
+        // Normalize avatar: backend sends avatar_url (full URL) or fallback
+        const avatarUrl =
+            e.avatar_url || e.avatar || "/images/default-avatar.png";
+
         liveBets.value.push({
             id: e.id,
             username: e.username,
-            user: { username: e.username, avatar_url: e.avatar },
+            user: { username: e.username, avatar_url: avatarUrl },
             amount: parseFloat(e.amount),
             currency: e.currency,
             bet_slot: e.bet_slot,
@@ -126,6 +148,25 @@ export const useGameStore = defineStore("game", () => {
                 payout: parseFloat(e.payout),
                 profit: parseFloat(e.profit),
             };
+        }
+
+        // If this is the current user's bet (auto-cashout from server),
+        // update betStore so BetPanel reflects the cashout immediately.
+        const betStore = useBetStore();
+        for (const slot of [1, 2]) {
+            const userBet = betStore.bets[slot];
+            if (userBet && userBet.id === e.id) {
+                betStore.bets[slot] = {
+                    ...userBet,
+                    cashed_out_at: parseFloat(e.cashed_out_at),
+                    payout: parseFloat(e.payout),
+                    status: "won",
+                };
+                // Refresh wallet balance after auto-cashout credit
+                const walletStore = useWalletStore();
+                walletStore.fetchWallet();
+                break;
+            }
         }
     };
 

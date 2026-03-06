@@ -188,9 +188,13 @@ class GameEngine
                 'is_auto'      => $isAuto,
             ]);
 
-            // Credit coins back to user (demo or real)
-            $column = $bet->currency === 'DEMO' ? 'demo_balance' : 'balance';
-            $bet->user->coinBalance()->increment($column, $payout);
+            // Credit funds back to user (NGN, demo, or coins)
+            if ($bet->currency === 'NGN') {
+                $bet->user->wallet()->increment('balance', $payout);
+            } else {
+                $column = $bet->currency === 'DEMO' ? 'demo_balance' : 'balance';
+                $bet->user->coinBalance()->increment($column, $payout);
+            }
         });
 
         // Broadcast cashout for live bets feed

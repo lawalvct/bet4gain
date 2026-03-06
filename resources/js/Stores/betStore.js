@@ -24,13 +24,19 @@ export const useBetStore = defineStore("bet", () => {
     const liveBetCount = computed(() => liveBets.value.length);
 
     // Actions
-    const placeBet = async ({ amount, autoCashout, slot = 1 }) => {
+    const placeBet = async ({
+        amount,
+        autoCashout,
+        slot = 1,
+        currency = "COINS",
+    }) => {
         placing.value = true;
         try {
             const response = await api.post("/game/bet", {
                 amount,
                 auto_cashout_at: autoCashout,
                 bet_slot: slot,
+                currency,
             });
             bets.value[slot] = response.data.data;
             return response.data;

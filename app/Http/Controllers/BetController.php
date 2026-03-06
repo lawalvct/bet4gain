@@ -31,7 +31,7 @@ class BetController extends Controller
             'amount'          => 'required|numeric|min:' . config('game.min_bet') . '|max:' . config('game.max_bet'),
             'auto_cashout_at' => 'nullable|numeric|min:1.01',
             'bet_slot'        => 'required|integer|in:1,2',
-            'currency'        => 'nullable|string|in:COINS,DEMO',
+            'currency'        => 'nullable|string|in:COINS,DEMO,NGN',
         ]);
 
         $user     = $request->user();
@@ -88,28 +88,39 @@ class BetController extends Controller
         // Balance check & deduction inside transaction
         try {
             $bet = DB::transaction(function () use ($user, $round, $amount, $slot, $currency, $validated) {
-                $coinBalance = $user->coinBalance()->lockForUpdate()->first();
+                if ($currency === 'NGN') {
+                    $wallet = $user->wallet()->lockForUpdate()->first();
 
-                if (!$coinBalance) {
-                    throw ValidationException::withMessages([
-                        'amount' => ['No coin balance found. Please contact support.'],
-                    ]);
-                }
-
-                if ($currency === 'DEMO') {
-                    if (!$coinBalance->hasDemoEnough($amount)) {
+                    if (!$wallet || !$wallet->hasEnough($amount)) {
                         throw ValidationException::withMessages([
-                            'amount' => ['Insufficient demo balance.'],
+                            'amount' => ['Insufficient wallet balance.'],
                         ]);
                     }
-                    $coinBalance->decrement('demo_balance', $amount);
+                    $wallet->decrement('balance', $amount);
                 } else {
-                    if (!$coinBalance->hasEnough($amount)) {
+                    $coinBalance = $user->coinBalance()->lockForUpdate()->first();
+
+                    if (!$coinBalance) {
                         throw ValidationException::withMessages([
-                            'amount' => ['Insufficient coin balance.'],
+                            'amount' => ['No coin balance found. Please contact support.'],
                         ]);
                     }
-                    $coinBalance->decrement('balance', $amount);
+
+                    if ($currency === 'DEMO') {
+                        if (!$coinBalance->hasDemoEnough($amount)) {
+                            throw ValidationException::withMessages([
+                                'amount' => ['Insufficient demo balance.'],
+                            ]);
+                        }
+                        $coinBalance->decrement('demo_balance', $amount);
+                    } else {
+                        if (!$coinBalance->hasEnough($amount)) {
+                            throw ValidationException::withMessages([
+                                'amount' => ['Insufficient coin balance.'],
+                            ]);
+                        }
+                        $coinBalance->decrement('balance', $amount);
+                    }
                 }
 
                 return Bet::create([
@@ -141,7 +152,7 @@ class BetController extends Controller
             betId:    $bet->id,
             roundId:  $round->id,
             username: $user->username,
-            avatar:   $user->avatar,
+            avatar:   $user->avatar_url,
             amount:   $amount,
             betSlot:  $slot,
             currency: $currency,
@@ -160,7 +171,7 @@ class BetController extends Controller
                 'bet_slot'        => $bet->bet_slot,
                 'status'          => $bet->status->value,
                 'username'        => $bet->user->username,
-                'avatar'          => $bet->user->avatar,
+                'avatar'          => $bet->user->avatar_url,
             ],
         ], 201);
     }
@@ -298,12 +309,17 @@ class BetController extends Controller
 
         try {
             DB::transaction(function () use ($bet, $user) {
-                $coinBalance = $user->coinBalance()->lockForUpdate()->first();
-
-                if ($bet->currency === 'DEMO') {
-                    $coinBalance->increment('demo_balance', (float) $bet->amount);
+                if ($bet->currency === 'NGN') {
+                    $wallet = $user->wallet()->lockForUpdate()->first();
+                    $wallet->increment('balance', (float) $bet->amount);
                 } else {
-                    $coinBalance->increment('balance', (float) $bet->amount);
+                    $coinBalance = $user->coinBalance()->lockForUpdate()->first();
+
+                    if ($bet->currency === 'DEMO') {
+                        $coinBalance->increment('demo_balance', (float) $bet->amount);
+                    } else {
+                        $coinBalance->increment('balance', (float) $bet->amount);
+                    }
                 }
 
                 $bet->update(['status' => BetStatus::Cancelled]);

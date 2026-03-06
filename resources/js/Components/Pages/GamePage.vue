@@ -66,9 +66,6 @@
                         :status="gameStore.status"
                         :current-multiplier="gameStore.currentMultiplier"
                         :can-bet="canPlaceBet"
-                        @place-bet="onPlaceBet"
-                        @cashout="onCashout"
-                        @cancel-bet="onCancelBet"
                         @start-auto="onStartAuto"
                         @stop-auto="onStopAuto"
                     />
@@ -88,7 +85,7 @@
                             : 'hidden lg:block',
                     ]"
                 >
-                    <LiveBets :bets="betStore.liveBets" />
+                    <LiveBets :bets="gameStore.liveBets" />
                     <LeaderboardPanel />
                     <AdSlot placement="sidebar" />
                 </aside>
@@ -161,30 +158,8 @@ const canPlaceBet = computed(() => {
 });
 
 // ── Bet event handlers ─────────────────────────────────────────────────────
-const onPlaceBet = async ({ amount, autoCashout, slot }) => {
-    try {
-        await betStore.placeBet({ amount, autoCashout, slot });
-    } catch (err) {
-        console.error("Place bet error:", err?.response?.data?.message || err);
-    }
-};
-
-const onCashout = async ({ slot }) => {
-    try {
-        await betStore.cashout({ slot });
-    } catch (err) {
-        console.error("Cashout error:", err?.response?.data?.message || err);
-    }
-};
-
-const onCancelBet = async ({ slot }) => {
-    try {
-        await betStore.cancelBet({ slot });
-    } catch (err) {
-        console.error("Cancel bet error:", err?.response?.data?.message || err);
-    }
-};
-
+// BetPanel now handles API calls directly via betStore + walletStore.
+// These callbacks are kept for any extra parent-level side effects.
 const onStartAuto = (config) => {
     betStore.startAutoBet(config);
 };
