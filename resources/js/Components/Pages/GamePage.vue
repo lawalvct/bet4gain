@@ -126,6 +126,7 @@ import { useSound } from "@/Composables/useSound";
 import { useGameStore } from "@/Stores/gameStore";
 import { useUserStore } from "@/Stores/userStore";
 import { useBetStore } from "@/Stores/betStore";
+import { useWalletStore } from "@/Stores/walletStore";
 import { storeToRefs } from "pinia";
 
 // Mobile tab state
@@ -139,10 +140,20 @@ const { onlineUsers, onlineCount } = usePresence();
 const gameStore = useGameStore();
 const userStore = useUserStore();
 const betStore = useBetStore();
+const walletStore = useWalletStore();
 const sound = useSound();
 
 // Convenience aliases for header (storeToRefs preserves reactivity)
-const { user, walletBalance, coinBalance } = storeToRefs(userStore);
+const { user } = storeToRefs(userStore);
+const { balance: walletBalance, coins: coinBalance } = storeToRefs(walletStore);
+
+const refreshHeaderBalances = () => {
+    if (document.visibilityState === "hidden") {
+        return;
+    }
+
+    walletStore.fetchWallet();
+};
 
 // ── Bet panel props ────────────────────────────────────────────────────────
 const canPlaceBet = computed(() => {
@@ -201,13 +212,21 @@ onMounted(async () => {
     await Promise.all([
         gameStore.fetchHistory(),
         gameStore.fetchCurrentState(),
+        walletStore.fetchWallet(),
+        userStore.fetchUser(),
     ]);
 
     // Subscribe to realtime events
     gameStore.initGameChannel();
+
+    // Keep balances fresh when returning from payment gateway/tab switches
+    window.addEventListener("focus", refreshHeaderBalances);
+    document.addEventListener("visibilitychange", refreshHeaderBalances);
 });
 
 onBeforeUnmount(() => {
+    window.removeEventListener("focus", refreshHeaderBalances);
+    document.removeEventListener("visibilitychange", refreshHeaderBalances);
     gameStore.leaveGameChannel();
 });
 </script>

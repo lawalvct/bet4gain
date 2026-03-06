@@ -22,8 +22,44 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->cleanStaleViteHotFile();
         $this->registerFilamentActionAliases();
         $this->configureRateLimiting();
+    }
+
+    /**
+     * Remove the Vite "hot" file if the dev server is no longer running.
+     *
+     * When `npm run dev` crashes or is stopped without cleanup, the hot file
+     * persists and Laravel tries to load assets from the dead dev server,
+     * resulting in a blank page. This detects that scenario and deletes the
+     * stale file so Laravel falls back to the production build manifest.
+     */
+    private function cleanStaleViteHotFile(): void
+    {
+        if (! $this->app->environment('local')) {
+            return;
+        }
+
+        $hotFile = public_path('hot');
+
+        if (! file_exists($hotFile)) {
+            return;
+        }
+
+        $url   = trim(file_get_contents($hotFile));
+        $parts = parse_url($url);
+        $host  = $parts['host'] ?? 'localhost';
+        $port  = $parts['port'] ?? (($parts['scheme'] ?? 'http') === 'https' ? 443 : 80);
+
+        // Quick TCP check — 100 ms timeout, no HTTP overhead
+        $socket = @fsockopen($host, $port, $errno, $errstr, 0.1);
+
+        if ($socket) {
+            fclose($socket);  // dev server is alive, keep the hot file
+        } else {
+            @unlink($hotFile); // dev server is gone, remove stale file
+        }
     }
 
     /**
