@@ -70,9 +70,15 @@
                         @stop-auto="onStopAuto"
                     />
 
+                    <!-- Banner ad -->
+                    <AdSlot placement="banner" :ad="ads.banner" />
+
                     <!-- Between-rounds ad (mobile only) -->
                     <div class="lg:hidden">
-                        <AdSlot placement="between-rounds" />
+                        <AdSlot
+                            placement="between-rounds"
+                            :ad="ads.betweenRounds"
+                        />
                     </div>
                 </section>
 
@@ -87,7 +93,7 @@
                 >
                     <LiveBets :bets="gameStore.liveBets" />
                     <LeaderboardPanel />
-                    <AdSlot placement="sidebar" />
+                    <AdSlot placement="sidebar" :ad="ads.sidebar" />
                 </aside>
             </div>
         </main>
@@ -125,10 +131,16 @@ import { useUserStore } from "@/Stores/userStore";
 import { useBetStore } from "@/Stores/betStore";
 import { useWalletStore } from "@/Stores/walletStore";
 import { storeToRefs } from "pinia";
+import api from "@/Utils/api";
 
 // Mobile tab state
 const mobileTab = ref("game");
 const unreadMessages = ref(0);
+const ads = ref({
+    sidebar: null,
+    banner: null,
+    betweenRounds: null,
+});
 
 // Online presence
 const { onlineUsers, onlineCount } = usePresence();
@@ -150,6 +162,24 @@ const refreshHeaderBalances = () => {
     }
 
     walletStore.fetchWallet();
+};
+
+const fetchAds = async () => {
+    try {
+        const [sidebarRes, bannerRes, betweenRoundsRes] = await Promise.all([
+            api.get("/ads/sidebar"),
+            api.get("/ads/banner"),
+            api.get("/ads/between-rounds"),
+        ]);
+
+        ads.value.sidebar = sidebarRes.data?.data || null;
+        ads.value.banner = bannerRes.data?.data || null;
+        ads.value.betweenRounds = betweenRoundsRes.data?.data || null;
+    } catch {
+        ads.value.sidebar = null;
+        ads.value.banner = null;
+        ads.value.betweenRounds = null;
+    }
 };
 
 // ── Bet panel props ────────────────────────────────────────────────────────
@@ -189,6 +219,7 @@ onMounted(async () => {
         gameStore.fetchCurrentState(),
         walletStore.fetchWallet(),
         userStore.fetchUser(),
+        fetchAds(),
     ]);
 
     // Subscribe to realtime events

@@ -39,6 +39,58 @@ Route::middleware('throttle:api')->group(function () {
     Route::get('/stats/live', [\App\Http\Controllers\LeaderboardController::class, 'liveStats'])->name('api.stats.live');
     Route::get('/leaderboard-public/{period?}', [\App\Http\Controllers\LeaderboardController::class, 'index'])->name('api.leaderboard.public');
 
+    // Ads (public read)
+    Route::get('/ads/{placement}', function (string $placement) {
+        $normalized = str_replace('-', '_', strtolower($placement));
+        $enum = \App\Enums\AdPlacement::tryFrom($normalized);
+
+        if (! $enum) {
+            return response()->json([
+                'message' => 'Invalid ad placement.',
+            ], 422);
+        }
+
+        $ad = \App\Models\Advertisement::query()
+            ->active()
+            ->forPlacement($enum)
+            ->first();
+
+        // Fallback: if no ad matches the specific placement, serve any active ad
+        if (! $ad) {
+            $ad = \App\Models\Advertisement::query()
+                ->active()
+                ->orderByDesc('priority')
+                ->first();
+        }
+
+        if (! $ad) {
+            return response()->json(['data' => null]);
+        }
+
+        return response()->json([
+            'data' => [
+                'id' => $ad->id,
+                'title' => $ad->title,
+                'image_url' => $ad->image_url,
+                'target_url' => $ad->url,
+                'placement' => $ad->placement->value,
+            ],
+        ]);
+    })->name('api.ads.show');
+
+    // Ad tracking (public so guest users can also register impressions/clicks)
+    Route::prefix('ads')->name('api.ads.')->group(function () {
+        Route::post('/{ad}/impression', function (\App\Models\Advertisement $ad) {
+            $ad->increment('impressions');
+            return response()->json(['ok' => true]);
+        })->name('impression');
+
+        Route::post('/{ad}/click', function (\App\Models\Advertisement $ad) {
+            $ad->increment('clicks');
+            return response()->json(['ok' => true]);
+        })->name('click');
+    });
+
     // Guest session (limited to prevent abuse)
     Route::post('/guest', [\App\Http\Controllers\GuestController::class, 'create'])->name('api.guest')->middleware('throttle:registration');
     Route::post('/guest/resume', [\App\Http\Controllers\GuestController::class, 'resume'])->name('api.guest.resume');
@@ -109,19 +161,6 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
 
     // Game rounds (paginated history)
     Route::get('/game/rounds', [\App\Http\Controllers\LeaderboardController::class, 'gameHistory'])->name('api.game.rounds');
-
-    // Ads
-    Route::prefix('ads')->name('api.ads.')->group(function () {
-        Route::post('/{ad}/impression', function (\App\Models\Advertisement $ad) {
-            $ad->increment('impressions');
-            return response()->json(['ok' => true]);
-        })->name('impression');
-
-        Route::post('/{ad}/click', function (\App\Models\Advertisement $ad) {
-            $ad->increment('clicks');
-            return response()->json(['ok' => true]);
-        })->name('click');
-    });
 
     // Responsible Gaming (Phase 10)
     Route::prefix('responsible-gaming')->name('api.responsible-gaming.')->group(function () {

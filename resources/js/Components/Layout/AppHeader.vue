@@ -8,13 +8,20 @@
             <!-- Logo -->
             <div class="flex items-center gap-3">
                 <a href="/" class="flex items-center gap-2 group">
+                    <img
+                        v-if="siteLogoUrl"
+                        :src="siteLogoUrl"
+                        :alt="siteName"
+                        class="h-8 w-auto object-contain transition-transform group-hover:scale-105"
+                    />
                     <span
+                        v-else
                         class="text-2xl transition-transform group-hover:scale-110"
                         >🎮</span
                     >
                     <span
                         class="text-lg font-bold text-primary-500 hidden sm:inline"
-                        >Bet4Gain</span
+                        >{{ siteName }}</span
                     >
                 </a>
             </div>
@@ -222,6 +229,23 @@ const props = defineProps({
 });
 
 const sound = useSound();
+const appData = window.__BET4GAIN__ || {};
+
+const siteName = computed(
+    () => appData.siteName || appData.appName || "Bet4Gain",
+);
+
+const siteLogoUrl = computed(() => {
+    const raw = appData.siteLogo;
+    if (!raw) return "";
+
+    const logo = String(raw);
+    if (logo.startsWith("http")) return logo;
+    if (logo.startsWith("/storage/")) return logo;
+    if (logo.startsWith("storage/")) return `/${logo}`;
+
+    return `/storage/${logo.replace(/^\/+/, "")}`;
+});
 
 const userAvatarSrc = computed(() => {
     if (!props.user) return "";

@@ -17,7 +17,7 @@
             <div
                 v-if="showCrashOverlay"
                 class="absolute inset-0 bg-game-red/30 pointer-events-none rounded-2xl"
-            ></div>
+            ></div> 
         </Transition>
 
         <!-- Multiplier Overlay -->

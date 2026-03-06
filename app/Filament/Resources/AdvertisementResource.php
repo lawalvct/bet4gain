@@ -49,7 +49,9 @@ class AdvertisementResource extends Resource
 
                         Forms\Components\FileUpload::make('image')
                             ->image()
+                            ->disk('public')
                             ->directory('advertisements')
+                            ->visibility('public')
                             ->maxSize(5120)
                             ->required()
                             ->columnSpanFull(),

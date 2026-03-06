@@ -16,12 +16,18 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Pass server data to Vue -->
+    @php
+        $siteName = \App\Models\SiteSetting::get('site_name', config('app.name', 'Bet4Gain'));
+        $siteLogo = \App\Models\SiteSetting::get('site_logo', '');
+    @endphp
     <script>
         window.__BET4GAIN__ = {
             user: {!! json_encode(auth()->user()?->only(['id', 'username', 'email', 'avatar', 'role', 'is_guest', 'settings'])) !!},
             csrfToken: '{{ csrf_token() }}',
             appName: '{{ config("app.name") }}',
             appUrl: '{{ config("app.url") }}',
+            siteName: {!! json_encode($siteName) !!},
+            siteLogo: {!! json_encode($siteLogo) !!},
             reverb: {
                 key: '{{ config("broadcasting.connections.reverb.key") }}',
                 host: '{{ config("broadcasting.connections.reverb.options.host") }}',

@@ -10,6 +10,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Storage;
 
 class ManageSiteSettings extends Page implements HasForms
 {
@@ -33,6 +34,7 @@ class ManageSiteSettings extends Page implements HasForms
             'site_name' => SiteSetting::get('site_name', 'Bet4Gain'),
             'site_description' => SiteSetting::get('site_description', 'The Ultimate Crash Game'),
             'site_keywords' => SiteSetting::get('site_keywords', 'crash game, betting, aviator'),
+            'site_logo' => SiteSetting::get('site_logo', ''),
             'contact_email' => SiteSetting::get('contact_email', ''),
             'maintenance_mode' => SiteSetting::get('maintenance_mode', false),
             'registration_enabled' => SiteSetting::get('registration_enabled', true),
@@ -76,9 +78,22 @@ class ManageSiteSettings extends Page implements HasForms
                     ]),
 
                 Forms\Components\Section::make('Branding')
-                    ->description('Upload logo and favicon files via the public/storage directory.')
+                    ->description('Upload your site logo. Files are stored on the public disk.')
                     ->columns(2)
                     ->schema([
+                        Forms\Components\FileUpload::make('site_logo')
+                            ->label('Site Logo')
+                            ->image()
+                            ->disk('public')
+                            ->directory('site')
+                            ->visibility('public')
+                            ->maxSize(2048)
+                            ->helperText('Recommended: PNG/SVG, transparent background. Max 2MB.')
+                            ->imagePreviewHeight('80')
+                            ->openable()
+                            ->downloadable()
+                            ->columnSpanFull(),
+
                         Forms\Components\TextInput::make('footer_text')
                             ->label('Footer Text')
                             ->maxLength(500)
@@ -148,12 +163,22 @@ class ManageSiteSettings extends Page implements HasForms
 
         foreach ($data as $key => $value) {
             $old = SiteSetting::get($key);
+
+            if ($key === 'site_logo' && is_string($old) && ! empty($old) && $old !== $value) {
+                Storage::disk('public')->delete($old);
+            }
+
             if ($old !== $value) {
                 $oldValues[$key] = $old;
                 $newValues[$key] = $value;
             }
 
-            $type = is_bool($value) ? 'boolean' : 'string';
+            $type = match (true) {
+                is_bool($value) => 'boolean',
+                $key === 'site_logo' => 'file',
+                default => 'string',
+            };
+
             SiteSetting::set($key, $value, $type, 'site');
         }
 

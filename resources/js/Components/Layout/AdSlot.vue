@@ -1,9 +1,9 @@
 <template>
     <div v-if="ad && !dismissed" :class="containerClasses">
         <a
-            :href="ad.target_url"
-            target="_blank"
-            rel="noopener noreferrer"
+            :href="ad.target_url || '#'"
+            :target="ad.target_url ? '_blank' : undefined"
+            :rel="ad.target_url ? 'noopener noreferrer' : undefined"
             @click="trackClick"
             class="block relative group"
         >
@@ -130,6 +130,9 @@ const trackImpression = () => {
 
 const trackClick = () => {
     if (props.ad?.id) {
+        if (!props.ad.target_url) {
+            return;
+        }
         api.post(`/ads/${props.ad.id}/click`).catch(() => {});
     }
 };
