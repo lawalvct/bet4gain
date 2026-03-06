@@ -34,6 +34,9 @@ class GuestController extends Controller
             'password' => bcrypt(Str::random(32)),
             'is_guest' => true,
             'guest_token' => $guestToken,
+            'registration_ip' => $request->ip(),
+            'last_login_ip' => $request->ip(),
+            'browser_fingerprint' => $request->header('X-Browser-Fingerprint'),
         ]);
 
         // Create demo coin balance only (no real wallet for guests)
@@ -74,6 +77,11 @@ class GuestController extends Controller
         }
 
         Auth::login($user);
+
+        $user->updateQuietly([
+            'last_login_ip' => $request->ip(),
+            'browser_fingerprint' => $request->header('X-Browser-Fingerprint') ?: $user->browser_fingerprint,
+        ]);
 
         return response()->json([
             'data' => $user->only(['id', 'username', 'is_guest']),

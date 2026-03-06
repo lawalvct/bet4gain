@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\IpRestriction;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -25,7 +26,7 @@ class CheckBanned
                 ], 403);
             }
 
-            auth()->logout();
+            Auth::logout();
             $request->session()->invalidate();
 
             return redirect()->route('game')->with('error', 'Your account has been suspended.');
@@ -66,6 +67,14 @@ class CheckBanned
         // ── Check IP blacklist ──────────────────────────────
         if (config('security.ip_restrictions.enabled', true)) {
             $ip = $request->ip();
+
+            if (config('security.ip_restrictions.whitelist_only', false) && ! IpRestriction::isWhitelisted($ip)) {
+                if ($request->expectsJson()) {
+                    return response()->json(['message' => 'Access denied. Your network is not whitelisted.'], 403);
+                }
+
+                abort(403, 'Access denied. Your network is not whitelisted.');
+            }
 
             if (IpRestriction::isBlacklisted($ip)) {
                 if ($request->expectsJson()) {

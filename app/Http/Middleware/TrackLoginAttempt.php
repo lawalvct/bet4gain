@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\AntiCheatService;
 use App\Models\LoginLog;
 use App\Models\User;
 use Closure;
@@ -14,6 +15,10 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class TrackLoginAttempt
 {
+    public function __construct(
+        private readonly AntiCheatService $antiCheatService,
+    ) {}
+
     public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);
@@ -48,7 +53,17 @@ class TrackLoginAttempt
             );
 
             if ($user && $successful) {
-                $user->updateQuietly(['last_login_ip' => $request->ip()]);
+                $user->updateQuietly([
+                    'last_login_ip' => $request->ip(),
+                    'browser_fingerprint' => $request->header('X-Browser-Fingerprint') ?: $user->browser_fingerprint,
+                ]);
+
+                try {
+                    $this->antiCheatService->checkMultiAccount($user);
+                    $this->antiCheatService->checkIpChange($user, $request->ip());
+                } catch (\Throwable $e) {
+                    report($e);
+                }
             }
         }
 

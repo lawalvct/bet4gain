@@ -59,6 +59,9 @@ class CreateNewUser implements CreatesNewUsers
             'username' => $input['username'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
+            'registration_ip' => request()->ip(),
+            'last_login_ip' => request()->ip(),
+            'browser_fingerprint' => request()->header('X-Browser-Fingerprint'),
         ]);
 
         // Create wallet
@@ -88,6 +91,9 @@ class CreateNewUser implements CreatesNewUsers
             'password' => Hash::make($input['password']),
             'is_guest' => false,
             'guest_token' => null,
+            'registration_ip' => $guest->registration_ip ?: request()->ip(),
+            'last_login_ip' => request()->ip(),
+            'browser_fingerprint' => request()->header('X-Browser-Fingerprint') ?: $guest->browser_fingerprint,
         ]);
 
         // Create wallet if guest doesn't have one
