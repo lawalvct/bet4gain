@@ -14,8 +14,13 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
-// Private user channel for personal notifications
+// Private user channel for personal notifications (Laravel default format)
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id;
+});
+
+// Private user channel for custom notifications (coin transfers, etc.)
+Broadcast::channel('user.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
 

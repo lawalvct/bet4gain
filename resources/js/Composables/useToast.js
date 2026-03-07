@@ -48,6 +48,8 @@ export function useToast() {
             addToast("win", message, title, 5000),
         cashout: (message, title = "Cashed Out!") =>
             addToast("cashout", message, title, 4000),
+        transfer: (message, title = "Coins Received!") =>
+            addToast("transfer", message, title, 8000),
     };
 
     return { toasts, toast, removeToast, clearAll };

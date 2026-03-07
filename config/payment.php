@@ -64,4 +64,16 @@ return [
     'auto_approve_withdrawal_limit' => env('PAYMENT_AUTO_APPROVE_LIMIT', 50000),
     'withdrawal_fee_percent' => env('PAYMENT_WITHDRAWAL_FEE', 1),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Coin Transfer (P2P)
+    |--------------------------------------------------------------------------
+    */
+
+    'transfer_fee_percent' => env('COIN_TRANSFER_FEE_PERCENT', 2),
+    'min_transfer' => env('COIN_MIN_TRANSFER', 100),
+    'max_transfer' => env('COIN_MAX_TRANSFER', 100000),
+    'daily_transfer_limit' => env('COIN_DAILY_TRANSFER_LIMIT', 500000),
+    'min_account_age_days' => env('COIN_TRANSFER_MIN_ACCOUNT_AGE', 3),
+
 ];

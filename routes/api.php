@@ -130,6 +130,12 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
         Route::post('/withdraw',         [\App\Http\Controllers\WalletController::class, 'withdraw'])->name('withdraw')->middleware('throttle:withdrawal');
         Route::post('/purchase-coins',   [\App\Http\Controllers\WalletController::class, 'purchaseCoins'])->name('purchase-coins')->middleware('throttle:deposit');
         Route::post('/sell-coins',       [\App\Http\Controllers\WalletController::class, 'sellCoins'])->name('sell-coins')->middleware('throttle:withdrawal');
+
+        // Coin Transfers (P2P)
+        Route::post('/transfer-coins',   [\App\Http\Controllers\CoinTransferController::class, 'transfer'])->name('transfer-coins')->middleware('throttle:deposit');
+        Route::get('/transfers',         [\App\Http\Controllers\CoinTransferController::class, 'history'])->name('transfers');
+        Route::post('/resolve-user',     [\App\Http\Controllers\CoinTransferController::class, 'resolveUser'])->name('resolve-user');
+        Route::get('/transfer-config',   [\App\Http\Controllers\CoinTransferController::class, 'config'])->name('transfer-config');
     });
 
     // Game actions — Bet placement, cashout, cancel (rate limited)

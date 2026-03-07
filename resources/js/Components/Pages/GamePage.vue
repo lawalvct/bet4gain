@@ -125,6 +125,7 @@ import LeaderboardPanel from "@/Components/Leaderboard/LeaderboardPanel.vue";
 import LiveStatsBar from "@/Components/Stats/LiveStatsBar.vue";
 import AdSlot from "@/Components/Layout/AdSlot.vue";
 import { usePresence } from "@/Composables/usePresence";
+import { useNotifications } from "@/Composables/useNotifications";
 import { useSound } from "@/Composables/useSound";
 import { useGameStore } from "@/Stores/gameStore";
 import { useUserStore } from "@/Stores/userStore";
@@ -155,6 +156,11 @@ const sound = useSound();
 // Convenience aliases for header (storeToRefs preserves reactivity)
 const { user } = storeToRefs(userStore);
 const { balance: walletBalance, coins: coinBalance } = storeToRefs(walletStore);
+
+// Private channel notifications (coin transfers, etc.)
+if (user.value?.id) {
+    useNotifications(user.value.id);
+}
 
 const refreshHeaderBalances = () => {
     if (document.visibilityState === "hidden") {

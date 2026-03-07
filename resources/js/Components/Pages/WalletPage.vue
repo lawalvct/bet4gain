@@ -110,7 +110,7 @@
             </div>
 
             <!-- Quick Actions -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
                 <BaseButton
                     variant="primary"
                     size="lg"
@@ -155,6 +155,17 @@
                     </template>
                     Sell Coins
                 </BaseButton>
+                <BaseButton
+                    variant="warning"
+                    size="lg"
+                    block
+                    @click="showTransfer = true"
+                >
+                    <template #icon>
+                        <span>🎁</span>
+                    </template>
+                    Send Coins
+                </BaseButton>
             </div>
 
             <!-- Coin Exchange Panel -->
@@ -169,6 +180,14 @@
                     showSellCoins = false;
                 "
                 @success="onCoinExchangeSuccess"
+            />
+
+            <!-- Coin Transfer Panel -->
+            <CoinTransfer
+                v-if="showTransfer"
+                :coin-balance="coinBalance"
+                @close="showTransfer = false"
+                @success="onTransferSuccess"
             />
 
             <!-- Transaction History -->
@@ -189,6 +208,9 @@
                 @success="onWithdrawSuccess"
             />
         </div>
+
+        <!-- Toast Notifications -->
+        <ToastContainer />
     </div>
 </template>
 
@@ -199,15 +221,25 @@ import BaseButton from "@/Components/UI/BaseButton.vue";
 import DepositModal from "@/Components/Wallet/DepositModal.vue";
 import WithdrawModal from "@/Components/Wallet/WithdrawModal.vue";
 import CoinExchange from "@/Components/Wallet/CoinExchange.vue";
+import CoinTransfer from "@/Components/Wallet/CoinTransfer.vue";
 import TransactionList from "@/Components/Wallet/TransactionList.vue";
+import { ToastContainer } from "@/Components/UI";
+import { useNotifications } from "@/Composables/useNotifications";
 import api from "@/Utils/api";
 
 const walletStore = useWalletStore();
+
+// Private channel notifications (coin transfers, etc.)
+const currentUser = window.__BET4GAIN__?.user;
+if (currentUser?.id) {
+    useNotifications(currentUser.id);
+}
 
 const showDeposit = ref(false);
 const showWithdraw = ref(false);
 const showBuyCoins = ref(false);
 const showSellCoins = ref(false);
+const showTransfer = ref(false);
 const paymentResult = ref(null);
 const gatewayConfig = ref({
     gateways: [],
@@ -256,6 +288,11 @@ const onCoinExchangeSuccess = () => {
     walletStore.fetchTransactions();
     showBuyCoins.value = false;
     showSellCoins.value = false;
+};
+
+const onTransferSuccess = () => {
+    walletStore.fetchWallet();
+    walletStore.fetchTransactions();
 };
 
 onMounted(() => {

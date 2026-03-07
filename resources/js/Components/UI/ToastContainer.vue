@@ -75,6 +75,7 @@ const iconForType = (type) => {
         info: "ℹ️",
         win: "🎉",
         cashout: "💰",
+        transfer: "🪙",
     };
     return icons[type] || "ℹ️";
 };
@@ -87,6 +88,7 @@ const borderColorClass = (type) => {
         info: "border-l-4 !border-l-game-blue",
         win: "border-l-4 !border-l-game-green",
         cashout: "border-l-4 !border-l-primary-500",
+        transfer: "border-l-4 !border-l-amber-500",
     };
     return colors[type] || "";
 };
