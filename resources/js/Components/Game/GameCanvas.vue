@@ -17,7 +17,7 @@
             <div
                 v-if="showCrashOverlay"
                 class="absolute inset-0 bg-game-red/30 pointer-events-none rounded-2xl"
-            ></div> 
+            ></div>
         </Transition>
 
         <!-- Multiplier Overlay -->
@@ -259,44 +259,106 @@ const drawCurve = (currentMs, maxMs) => {
     ctx.fillStyle = fill;
     ctx.fill();
 
-    drawRocket(tipX, tipY, tipM);
+    drawSpaceship(tipX, tipY, tipM);
 };
 
-const drawRocket = (x, y, m) => {
+const drawSpaceship = (x, y, m) => {
     ctx.save();
     ctx.translate(x, y);
-    // Scale rocket proportionally to canvas height
-    const baseSize = Math.max(H * 0.025, 4);
-    const s = 1 + Math.min(m / 20, 0.9);
 
-    // Halo
-    ctx.beginPath();
-    ctx.arc(0, 0, baseSize * 2 * s, 0, Math.PI * 2);
-    ctx.fillStyle = mToColor(m, 0.12);
-    ctx.fill();
+    const now = performance.now();
+    const pulseSlow = 0.88 + Math.sin(now / 350) * 0.12;
+    const pulseFast = 0.82 + Math.sin(now / 95) * 0.18;
 
-    // Body
-    ctx.shadowColor = mToColor(m, 0.9);
-    ctx.shadowBlur = baseSize * 2;
+    const baseSize = Math.max(H * 0.11, 32);
+    const size = baseSize * (1 + Math.min(m / 22, 0.35)) * pulseSlow;
+    const trailLen = size * (3.4 + Math.min(m / 7, 2.0));
+
+    // ── Trail: rotate so -x axis points lower-left (below & behind the rocket) ──
+    ctx.save();
+    ctx.rotate(-Math.PI / 4); // -x → screen lower-left ✓
+
+    // Soft wide outer glow
+    const outerGlow = ctx.createLinearGradient(0, 0, -trailLen * 1.15, 0);
+    outerGlow.addColorStop(0, mToColor(m, 0.3));
+    outerGlow.addColorStop(0.4, mToColor(m, 0.12));
+    outerGlow.addColorStop(1, mToColor(m, 0));
+    ctx.strokeStyle = outerGlow;
+    ctx.lineWidth = size * 0.6;
+    ctx.lineCap = "round";
     ctx.beginPath();
-    ctx.arc(0, 0, baseSize * s, 0, Math.PI * 2);
-    ctx.fillStyle = mToColor(m, 1);
-    ctx.fill();
+    ctx.moveTo(-size * 0.15, 0);
+    ctx.lineTo(-trailLen * 1.15, 0);
+    ctx.stroke();
+
+    // Bright fire core
+    const core = ctx.createLinearGradient(0, 0, -trailLen, 0);
+    core.addColorStop(0, "rgba(255,255,255,1)");
+    core.addColorStop(0.1, "rgba(254,243,150,0.95)");
+    core.addColorStop(0.3, "rgba(251,146,60,0.9)");
+    core.addColorStop(0.6, "rgba(239,68,68,0.55)");
+    core.addColorStop(1, "rgba(180,30,30,0)");
+    ctx.strokeStyle = core;
+    ctx.lineWidth = Math.max(size * 0.22, 5);
+    ctx.beginPath();
+    ctx.moveTo(-size * 0.12, 0);
+    ctx.lineTo(-trailLen, 0);
+    ctx.stroke();
+
+    // Hot white centre streak
+    const streak = ctx.createLinearGradient(0, 0, -trailLen * 0.7, 0);
+    streak.addColorStop(0, "rgba(255,255,255,0.98)");
+    streak.addColorStop(0.4, "rgba(255,255,255,0.5)");
+    streak.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.strokeStyle = streak;
+    ctx.lineWidth = Math.max(size * 0.07, 2.5);
+    ctx.beginPath();
+    ctx.moveTo(-size * 0.1, 0);
+    ctx.lineTo(-trailLen * 0.7, 0);
+    ctx.stroke();
+
+    // Spark particles scattered along the trail
+    for (let i = 0; i < 7; i++) {
+        const t = (i + 1) / 8;
+        const px = -size * (0.5 + t * (trailLen / size - 0.5));
+        const py = (i % 2 === 0 ? -1 : 1) * size * 0.1 * (1 + t * 0.7);
+        const pr = Math.max(size * (0.09 - t * 0.008) * pulseFast, 2);
+        const a = Math.max((0.8 - t * 0.55) * pulseFast, 0.05);
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(255,${210 - i * 15},${110 - i * 12},${a})`;
+        ctx.arc(px, py, pr, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    ctx.restore(); // pop trail rotation
+
+    // ── Rocket emoji — NO rotation (🚀 already faces ~45° upper-right) ──
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.globalAlpha = 1;
+    ctx.font = `${size}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+
+    // Primary glow — multiplier colour
+    ctx.shadowColor = mToColor(m, 1);
+    ctx.shadowBlur = size * (0.55 + pulseFast * 0.45);
+    ctx.fillText("🚀", 0, 0);
+
+    // Warm accent glow
+    ctx.shadowColor = "rgba(255,220,60,0.7)";
+    ctx.shadowBlur = size * (0.3 + pulseSlow * 0.25);
+    ctx.fillText("🚀", 0, 0);
     ctx.shadowBlur = 0;
 
-    // Exhaust
-    const eW = baseSize * 0.6 * s;
-    const eStart = baseSize * 0.7 * s;
-    const eEnd = baseSize * 2.6 * s;
-    ctx.beginPath();
-    ctx.moveTo(-eW, eStart);
-    ctx.lineTo(0, eEnd);
-    ctx.lineTo(eW, eStart);
-    const ex = ctx.createLinearGradient(0, eStart, 0, eEnd);
-    ex.addColorStop(0, mToColor(m, 0.85));
-    ex.addColorStop(1, "rgba(255,140,0,0)");
-    ctx.fillStyle = ex;
-    ctx.fill();
+    // ── Sparkles trailing lower-left behind rocket (screen coords) ──
+    const dx = -0.707; // cos(225°)
+    const dy = 0.707; // sin(225°) — down in canvas
+    ctx.globalAlpha = 0.6 + pulseFast * 0.3;
+    ctx.font = `${Math.round(size * 0.55)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+    ctx.fillText("✨", dx * size * 1.3, dy * size * 1.3);
+    ctx.globalAlpha = 0.45 + pulseSlow * 0.25;
+    ctx.fillText("✨", dx * size * 2.0, dy * size * 2.0);
+    ctx.globalAlpha = 0.3 + pulseFast * 0.2;
+    ctx.fillText("✨", dx * size * 2.7, dy * size * 2.7);
 
     ctx.restore();
 };

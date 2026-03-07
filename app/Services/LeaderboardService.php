@@ -9,7 +9,6 @@ use App\Models\LeaderboardEntry;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class LeaderboardService
 {
@@ -44,7 +43,7 @@ class LeaderboardService
 
         DB::transaction(function () use ($stats, $period, $now) {
             // Delete old entries for this period
-            LeaderboardEntry::where('period', $period)->delete();
+            LeaderboardEntry::where('period', $period->value)->delete();
 
             // Batch insert new entries
             $entries = $stats->map(fn($row) => [
@@ -95,35 +94,17 @@ class LeaderboardService
     {
         $limit = $limit ?? config('game.leaderboard_top_count', 50);
         $ttl   = config('game.leaderboard_cache_ttl', 300);
+        $cacheKey = "leaderboard:{$period->value}";
+        $data = $this->buildLeaderboardData($period, $limit);
 
-        return Cache::remember(
-            "leaderboard:{$period->value}",
-            $ttl,
-            fn() => LeaderboardEntry::where('period', $period)
-                ->with('user:id,username,avatar')
-                ->orderByDesc('total_profit')
-                ->limit($limit)
-                ->get()
-                ->map(fn($entry) => [
-                    'rank'            => null, // filled below
-                    'user_id'         => $entry->user_id,
-                    'username'        => $entry->user?->username ?? 'Unknown',
-                    'avatar_url'      => $entry->user?->avatar_url ?? null,
-                    'total_wagered'   => (float) $entry->total_wagered,
-                    'total_won'       => (float) $entry->total_won,
-                    'total_profit'    => (float) $entry->total_profit,
-                    'best_multiplier' => (float) $entry->best_multiplier,
-                    'total_games'     => (int) $entry->total_games,
-                    'win_count'       => (int) $entry->win_count,
-                    'win_rate'        => $entry->win_rate,
-                ])
-                ->values()
-                ->map(function ($entry, $index) {
-                    $entry['rank'] = $index + 1;
-                    return $entry;
-                })
-                ->toArray()
-        );
+        if (empty($data) && $this->hasLeaderboardSourceData($period)) {
+            $this->calculate($period);
+            $data = $this->buildLeaderboardData($period, $limit);
+        }
+
+        Cache::put($cacheKey, $data, $ttl);
+
+        return $data;
     }
 
     /**
@@ -169,7 +150,7 @@ class LeaderboardService
             ->first();
 
         // Leaderboard rank (all-time)
-        $rank = LeaderboardEntry::where('period', LeaderboardPeriod::AllTime)
+        $rank = LeaderboardEntry::where('period', LeaderboardPeriod::AllTime->value)
             ->where('total_profit', '>', ($allTime->total_profit ?? 0))
             ->count() + 1;
 
@@ -269,6 +250,46 @@ class LeaderboardService
     }
 
     // ── Private Helpers ──
+
+    private function buildLeaderboardData(LeaderboardPeriod $period, int $limit): array
+    {
+        return LeaderboardEntry::where('period', $period->value)
+            ->with('user:id,username,avatar')
+            ->orderByDesc('total_profit')
+            ->limit($limit)
+            ->get()
+            ->map(fn($entry) => [
+                'rank'            => null,
+                'user_id'         => $entry->user_id,
+                'username'        => $entry->user?->username ?? 'Unknown',
+                'avatar_url'      => $entry->user?->avatar_url ?? null,
+                'total_wagered'   => (float) $entry->total_wagered,
+                'total_won'       => (float) $entry->total_won,
+                'total_profit'    => (float) $entry->total_profit,
+                'best_multiplier' => (float) $entry->best_multiplier,
+                'total_games'     => (int) $entry->total_games,
+                'win_count'       => (int) $entry->win_count,
+                'win_rate'        => $entry->win_rate,
+            ])
+            ->values()
+            ->map(function ($entry, $index) {
+                $entry['rank'] = $index + 1;
+
+                return $entry;
+            })
+            ->toArray();
+    }
+
+    private function hasLeaderboardSourceData(LeaderboardPeriod $period): bool
+    {
+        $dateFrom = $this->getDateFrom($period);
+
+        return Bet::query()
+            ->whereIn('status', [BetStatus::Won, BetStatus::Lost])
+            ->where('currency', '!=', 'DEMO')
+            ->when($dateFrom, fn($query) => $query->where('created_at', '>=', $dateFrom))
+            ->exists();
+    }
 
     private function getDateFrom(LeaderboardPeriod $period): ?Carbon
     {

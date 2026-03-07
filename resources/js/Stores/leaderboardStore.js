@@ -3,6 +3,8 @@ import { ref, computed } from "vue";
 import api from "@/Utils/api";
 
 export const useLeaderboardStore = defineStore("leaderboard", () => {
+    const leaderboardPeriods = ["daily", "weekly", "monthly", "alltime"];
+
     // State
     const entries = ref([]);
     const activePeriod = ref("daily");
@@ -33,16 +35,39 @@ export const useLeaderboardStore = defineStore("leaderboard", () => {
     // ── Leaderboard ──
 
     const fetchLeaderboard = async (period = null) => {
-        if (period) activePeriod.value = period;
+        const requestedPeriod = period ?? activePeriod.value;
+        const shouldFallback = period === null;
+
+        activePeriod.value = requestedPeriod;
         loading.value = true;
 
         try {
-            const response = await api.get(
-                `/leaderboard/${activePeriod.value}`,
-            );
-            entries.value = response.data.data || [];
+            const periodsToTry = shouldFallback
+                ? [
+                      requestedPeriod,
+                      ...leaderboardPeriods.filter(
+                          (value) => value !== requestedPeriod,
+                      ),
+                  ]
+                : [requestedPeriod];
+
+            let resolvedEntries = [];
+
+            for (const periodToTry of periodsToTry) {
+                const response = await api.get(`/leaderboard/${periodToTry}`);
+                const periodEntries = response.data.data || [];
+
+                if (periodEntries.length || !shouldFallback) {
+                    activePeriod.value = periodToTry;
+                    resolvedEntries = periodEntries;
+                    break;
+                }
+            }
+
+            entries.value = resolvedEntries;
         } catch (error) {
             console.error("Failed to fetch leaderboard:", error);
+            entries.value = [];
         } finally {
             loading.value = false;
         }
