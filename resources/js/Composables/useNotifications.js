@@ -1,4 +1,3 @@
-import { onBeforeUnmount } from "vue";
 import { useToast } from "@/Composables/useToast";
 import { useWalletStore } from "@/Stores/walletStore";
 import { useSound } from "@/Composables/useSound";
@@ -49,19 +48,8 @@ export function useNotifications(userId) {
         subscribedUserId = userId;
         privateChannel = window.Echo.private(`user.${userId}`);
 
-        console.log(
-            `[Notifications] Subscribing to private channel: user.${userId}`,
-        );
-
-        // Listen for channel errors
-        privateChannel.error?.((error) => {
-            console.error("[Notifications] Channel error:", error);
-        });
-
         // ── Coin Transfer Received ─────────────────────────────────────────
         privateChannel.listen(".coin.transfer.received", (data) => {
-            console.log("[Notifications] Coin transfer received:", data);
-
             const amount = Number(data.amount).toLocaleString();
             const sender = data.sender;
             const type = data.type === "gift" ? "🎁 Gift" : "💸 Transfer";

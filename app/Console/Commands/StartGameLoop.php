@@ -70,7 +70,7 @@ class StartGameLoop extends Command
 
         // Create round
         $round = GameEngine::createRound();
-        $this->info("  Created round #{$round->id} | crash: {$round->crash_point}x");
+        $this->info("  Created round #{$round->id}");
 
         // Waiting countdown
         for ($i = $waitingDuration; $i >= 1; $i--) {
@@ -89,7 +89,7 @@ class StartGameLoop extends Command
         $this->info("  RUNNING...");
 
         GameEngine::runUntilCrash($round, function (float $multiplier) {
-            $this->line(sprintf("  %.2fx", $multiplier));
+            // No per-tick console output in production.
         });
 
         // Crash
