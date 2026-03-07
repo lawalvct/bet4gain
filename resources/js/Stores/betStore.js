@@ -50,8 +50,10 @@ export const useBetStore = defineStore("bet", () => {
     const cashout = async ({ slot = 1 }) => {
         cashingOut.value = true;
         try {
+            const bet = bets.value[slot];
             const response = await api.post("/game/cashout", {
                 bet_slot: slot,
+                bet_id: bet?.id ?? null,
             });
             if (bets.value[slot]) {
                 bets.value[slot] = {

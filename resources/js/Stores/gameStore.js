@@ -50,8 +50,10 @@ export const useGameStore = defineStore("game", () => {
 
     /** Event: countdown.tick  – broadcasted every second during waiting phase */
     const onCountdownTick = (e) => {
-        // Transition from crashed → waiting so clearRound logic triggers
+        // Transition from crashed → waiting: clear stale bet data
         if (status.value === "crashed") {
+            const betStore = useBetStore();
+            betStore.clearRound();
             status.value = "waiting";
         }
         countdown.value = e.seconds_left ?? e.secondsLeft ?? 0;
@@ -59,15 +61,18 @@ export const useGameStore = defineStore("game", () => {
 
     /** Event: betting.started */
     const onBettingStarted = (e) => {
-        // Only clear bets if this is a genuinely new round.
-        // Bets placed during the waiting phase belong to THIS round
-        // (same round_id) and must NOT be wiped.
+        // Clear bets from previous round. Only preserve bets if they
+        // were already placed for THIS exact round (e.g. placed during
+        // the waiting phase of the same round).
         const betStore = useBetStore();
         const hasCurrentRoundBet = [1, 2].some(
             (slot) => betStore.bets[slot]?.game_round_id === e.round_id,
         );
         if (!hasCurrentRoundBet) {
             betStore.clearRound();
+        } else {
+            // Even if we keep bets, clear the live bets list for the new round
+            betStore.liveBets = [];
         }
 
         roundId.value = e.round_id;
@@ -108,6 +113,15 @@ export const useGameStore = defineStore("game", () => {
         liveBets.value = liveBets.value.map((b) =>
             !b.cashed_out_at ? { ...b, lost: true } : b,
         );
+
+        // Mark user's own bet slots as resolved so they don't block the next round
+        const betStore = useBetStore();
+        [1, 2].forEach((slot) => {
+            const bet = betStore.bets[slot];
+            if (bet && bet.status !== "won" && !bet.cashed_out_at) {
+                betStore.bets[slot] = { ...bet, status: "lost" };
+            }
+        });
 
         // Add to history (keep newest 50)
         history.value.unshift(crashPoint.value);

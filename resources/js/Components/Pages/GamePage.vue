@@ -198,7 +198,7 @@ const onStopAuto = () => {
     betStore.stopAutoBet();
 };
 
-// Clear bets when a new round starts (betting phase)
+// Clear bets when transitioning to a new round
 watch(
     () => gameStore.status,
     (newStatus, oldStatus) => {
@@ -206,7 +206,12 @@ watch(
             sound.crash();
         }
 
-        if (newStatus === "waiting" && oldStatus === "crashed") {
+        // Clear bet slots whenever we leave the "crashed" state (new round)
+        // This covers both crashed→waiting AND crashed→betting (if countdown ticks are missed)
+        if (
+            oldStatus === "crashed" &&
+            (newStatus === "waiting" || newStatus === "betting")
+        ) {
             betStore.clearRound();
         }
     },

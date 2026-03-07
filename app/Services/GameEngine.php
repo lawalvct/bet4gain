@@ -240,6 +240,21 @@ class GameEngine
                 ->where('status', BetStatus::Active)
                 ->update(['status' => BetStatus::Lost]);
 
+            // Cancel & refund any stale Pending bets (race condition safety)
+            $pendingBets = Bet::where('game_round_id', $round->id)
+                ->where('status', BetStatus::Pending)
+                ->get();
+
+            foreach ($pendingBets as $pendingBet) {
+                if ($pendingBet->currency === 'NGN') {
+                    $pendingBet->user->wallet()->increment('balance', (float) $pendingBet->amount);
+                } else {
+                    $column = $pendingBet->currency === 'DEMO' ? 'demo_balance' : 'balance';
+                    $pendingBet->user->coinBalance()->increment($column, (float) $pendingBet->amount);
+                }
+                $pendingBet->update(['status' => BetStatus::Cancelled]);
+            }
+
             $round->update([
                 'status'     => GameRoundStatus::Crashed,
                 'crashed_at' => now(),

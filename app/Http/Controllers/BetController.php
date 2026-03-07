@@ -60,11 +60,11 @@ class BetController extends Controller
             ], 422);
         }
 
-        // Duplicate slot check
+        // Duplicate slot check — only block if there's a live (pending/active) bet
         $existingBet = Bet::where('user_id', $user->id)
             ->where('game_round_id', $round->id)
             ->where('bet_slot', $slot)
-            ->whereNotIn('status', [BetStatus::Cancelled])
+            ->whereIn('status', [BetStatus::Pending, BetStatus::Active])
             ->first();
 
         if ($existingBet) {
@@ -73,10 +73,10 @@ class BetController extends Controller
             ], 422);
         }
 
-        // Max bets per round check
+        // Max bets per round check (only count live bets)
         $userBetCount = Bet::where('user_id', $user->id)
             ->where('game_round_id', $round->id)
-            ->whereNotIn('status', [BetStatus::Cancelled])
+            ->whereIn('status', [BetStatus::Pending, BetStatus::Active])
             ->count();
 
         if ($userBetCount >= config('game.max_bets_per_round', 2)) {
@@ -185,27 +185,41 @@ class BetController extends Controller
     {
         $validated = $request->validate([
             'bet_slot' => 'required|integer|in:1,2',
+            'bet_id'   => 'nullable|integer',
         ]);
 
         $user = $request->user();
         $slot = (int) $validated['bet_slot'];
+        $betId = $validated['bet_id'] ?? null;
 
-        // Find the user's active bet for the current running round
-        $round = GameRound::where('status', GameRoundStatus::Running)
-            ->latest()
-            ->first();
-
-        if (!$round) {
-            return response()->json([
-                'message' => 'No round currently running.',
-            ], 422);
+        // Primary lookup: by bet_id (most reliable — avoids round race conditions)
+        $bet = null;
+        if ($betId) {
+            $bet = Bet::where('id', $betId)
+                ->where('user_id', $user->id)
+                ->where('bet_slot', $slot)
+                ->whereIn('status', [BetStatus::Active, BetStatus::Pending])
+                ->first();
         }
 
-        $bet = Bet::where('user_id', $user->id)
-            ->where('game_round_id', $round->id)
-            ->where('bet_slot', $slot)
-            ->where('status', BetStatus::Active)
-            ->first();
+        // Fallback: find by current running round
+        if (!$bet) {
+            $round = GameRound::where('status', GameRoundStatus::Running)
+                ->latest()
+                ->first();
+
+            if (!$round) {
+                return response()->json([
+                    'message' => 'No round currently running.',
+                ], 422);
+            }
+
+            $bet = Bet::where('user_id', $user->id)
+                ->where('game_round_id', $round->id)
+                ->where('bet_slot', $slot)
+                ->whereIn('status', [BetStatus::Active, BetStatus::Pending])
+                ->first();
+        }
 
         if (!$bet) {
             return response()->json([
@@ -213,14 +227,27 @@ class BetController extends Controller
             ], 422);
         }
 
+        // Verify the bet's round is actually running
+        $betRound = $bet->gameRound;
+        if (!$betRound || $betRound->status !== GameRoundStatus::Running) {
+            return response()->json([
+                'message' => 'Round is no longer running.',
+            ], 422);
+        }
+
+        // Activate pending bets on-the-fly (placed during waiting phase)
+        if ($bet->status === BetStatus::Pending) {
+            $bet->update(['status' => BetStatus::Active]);
+        }
+
         // Calculate current multiplier from elapsed time
-        $elapsedMs  = $round->started_at
-            ? (int) ($round->started_at->diffInMilliseconds(now()))
+        $elapsedMs  = $betRound->started_at
+            ? (int) ($betRound->started_at->diffInMilliseconds(now()))
             : 0;
         $multiplier = GameEngine::multiplierAtMs($elapsedMs);
 
         // Ensure multiplier hasn't exceeded crash point (race condition guard)
-        if ($multiplier >= (float) $round->crash_point) {
+        if ($multiplier >= (float) $betRound->crash_point) {
             return response()->json([
                 'message' => 'Round has already crashed.',
             ], 422);
@@ -240,7 +267,7 @@ class BetController extends Controller
         // Broadcast cashout to all clients
         broadcast(new BetCashedOut(
             betId:      $bet->id,
-            roundId:    $round->id,
+            roundId:    $betRound->id,
             username:   $user->username,
             amount:     (float) $bet->amount,
             cashedOutAt: (float) $bet->cashed_out_at,
