@@ -16,7 +16,7 @@
             <!-- Sidebar -->
             <aside class="doc-sidebar" id="sidebar">
                 <div class="logo">
-                    <h2>🚀 Bet4Gain</h2>
+                    <h2><img src="logo.png" alt="Bet4Gain" style="height: 32px; vertical-align: middle; margin-right: 8px;">Bet4Gain</h2>
                     <span>v1.0</span>
                 </div>
                 <nav>
@@ -140,27 +140,7 @@
                     </li>
                 </ol>
 
-                <div
-                    class="screenshot-placeholder"
-                    style="
-                        background: #f1f5f9;
-                        border: 2px dashed #cbd5e1;
-                        border-radius: 8px;
-                        padding: 40px;
-                        text-align: center;
-                        margin: 16px 0 24px;
-                        color: #94a3b8;
-                    "
-                >
-                    <div style="font-size: 2rem; margin-bottom: 8px">📸</div>
-                    <p style="margin: 0; font-weight: 500">
-                        Screenshot: WebSocket architecture diagram showing event
-                        flow from Laravel → Reverb → Echo → Vue
-                    </p>
-                    <p style="margin: 4px 0 0; font-size: 0.8rem">
-                        Replace this placeholder with an actual screenshot
-                    </p>
-                </div>
+                <img src="images/reverb.png" alt="Screenshot: WebSocket architecture diagram showing event flow from Laravel → Reverb → Echo → Vue" class="screenshot">
 
                 <!-- Channels -->
                 <h2>Channels</h2>
@@ -558,27 +538,11 @@ stopwaitsecs=3600</code></pre>
                     </li>
                 </ol>
 
-                <div
-                    class="screenshot-placeholder"
-                    style="
-                        background: #f1f5f9;
-                        border: 2px dashed #cbd5e1;
-                        border-radius: 8px;
-                        padding: 40px;
-                        text-align: center;
-                        margin: 16px 0 24px;
-                        color: #94a3b8;
-                    "
-                >
-                    <div style="font-size: 2rem; margin-bottom: 8px">📸</div>
-                    <p style="margin: 0; font-weight: 500">
-                        Screenshot: Browser DevTools Network tab showing
-                        WebSocket frames
-                    </p>
-                    <p style="margin: 4px 0 0; font-size: 0.8rem">
-                        Replace this placeholder with an actual screenshot
-                    </p>
-                </div>
+                <img
+                    src="images/websocket.png"
+                    alt="Browser DevTools Network tab showing WebSocket frames"
+                    class="screenshot"
+                />
 
                 <h3>Reverb Logs</h3>
                 <p>
@@ -663,5 +627,44 @@ php artisan reverb:start --debug</code></pre>
         >
             ☰
         </button>
+
+        <!-- Image Modal -->
+        <div class="modal-overlay" id="imageModal">
+            <div class="modal-content">
+                <span class="modal-close" id="modalClose">&times;</span>
+                <img src="" alt="Enlarged screenshot" id="modalImage" />
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const modal = document.getElementById('imageModal');
+                const modalImg = document.getElementById('modalImage');
+                const closeModal = document.getElementById('modalClose');
+
+                document.querySelectorAll('.screenshot').forEach(img => {
+                    img.addEventListener('click', () => {
+                        modal.classList.add('visible');
+                        modalImg.src = img.src;
+                        modalImg.alt = img.alt;
+                    });
+                });
+
+                const close = () => modal.classList.remove('visible');
+
+                closeModal.addEventListener('click', close);
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        close();
+                    }
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && modal.classList.contains('visible')) {
+                        close();
+                    }
+                });
+            });
+        </script>
     </body>
 </html>

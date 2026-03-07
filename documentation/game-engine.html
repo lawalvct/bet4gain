@@ -16,7 +16,7 @@
             <!-- Sidebar -->
             <aside class="doc-sidebar" id="sidebar">
                 <div class="logo">
-                    <h2>🚀 Bet4Gain</h2>
+                    <h2><img src="logo.png" alt="Bet4Gain" style="height: 32px; vertical-align: middle; margin-right: 8px;">Bet4Gain</h2>
                     <span>v1.0</span>
                 </div>
                 <nav>
@@ -147,15 +147,7 @@
                     </tbody>
                 </table>
 
-                <div class="screenshot-placeholder">
-                    <div class="icon">📸</div>
-                    <p class="label">
-                        Screenshot: Game canvas during BETTING phase
-                    </p>
-                    <p class="hint">
-                        Replace this placeholder with an actual screenshot
-                    </p>
-                </div>
+                <img src="images/game_canvas.jpeg" alt="Game canvas during BETTING phase" class="screenshot">
 
                 <!-- ───────────────────────────────────── -->
                 <h2>Multiplier Formula</h2>
@@ -253,15 +245,7 @@
                     <strong>Provably Fair</strong> verification page.
                 </p>
 
-                <div class="screenshot-placeholder">
-                    <div class="icon">📸</div>
-                    <p class="label">
-                        Screenshot: Provably fair verification page
-                    </p>
-                    <p class="hint">
-                        Replace this placeholder with an actual screenshot
-                    </p>
-                </div>
+                <img src="images/fair_page.jpeg" alt="Screenshot: Provably fair verification page" class="screenshot">
 
                 <!-- ───────────────────────────────────── -->
                 <h2>Starting the Game Loop</h2>
@@ -378,26 +362,9 @@ php artisan game:start --once</code></pre>
                     supports both light and dark themes.
                 </p>
 
-                <div class="screenshot-placeholder">
-                    <div class="icon">📸</div>
-                    <p class="label">
-                        Screenshot: Game canvas during RUNNING phase (multiplier
-                        curve)
-                    </p>
-                    <p class="hint">
-                        Replace this placeholder with an actual screenshot
-                    </p>
-                </div>
+                <img src="images/light_thme.png" alt="Screenshot: Game canvas during RUNNING phase (multiplier curve)" class="screenshot">
 
-                <div class="screenshot-placeholder">
-                    <div class="icon">📸</div>
-                    <p class="label">
-                        Screenshot: Game canvas in CRASHED state
-                    </p>
-                    <p class="hint">
-                        Replace this placeholder with an actual screenshot
-                    </p>
-                </div>
+                <img src="images/crashed.png" alt="Screenshot: Game canvas in CRASHED state" class="screenshot">
 
                 <!-- ───────────────────────────────────── -->
                 <h2>Configuration Reference</h2>
@@ -480,5 +447,44 @@ php artisan game:start --once</code></pre>
         >
             ☰
         </button>
+
+        <!-- Image Modal -->
+        <div class="modal-overlay" id="imageModal">
+            <div class="modal-content">
+                <span class="modal-close" id="modalClose">&times;</span>
+                <img src="" alt="Enlarged screenshot" id="modalImage" />
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const modal = document.getElementById('imageModal');
+                const modalImg = document.getElementById('modalImage');
+                const closeModal = document.getElementById('modalClose');
+
+                document.querySelectorAll('.screenshot').forEach(img => {
+                    img.addEventListener('click', () => {
+                        modal.classList.add('visible');
+                        modalImg.src = img.src;
+                        modalImg.alt = img.alt;
+                    });
+                });
+
+                const close = () => modal.classList.remove('visible');
+
+                closeModal.addEventListener('click', close);
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        close();
+                    }
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && modal.classList.contains('visible')) {
+                        close();
+                    }
+                });
+            });
+        </script>
     </body>
 </html>

@@ -16,7 +16,7 @@
             <!-- Sidebar -->
             <aside class="doc-sidebar" id="sidebar">
                 <div class="logo">
-                    <h2>🚀 Bet4Gain</h2>
+                    <h2><img src="logo.png" alt="Bet4Gain" style="height: 32px; vertical-align: middle; margin-right: 8px;">Bet4Gain</h2>
                     <span>v1.0</span>
                 </div>
                 <nav>
@@ -114,15 +114,7 @@
                     via the admin panel or environment variables.
                 </p>
 
-                <div class="screenshot-placeholder">
-                    <div class="icon">📸</div>
-                    <p class="label">
-                        Screenshot: Wallet page showing balances (NGN + Coins)
-                    </p>
-                    <p class="hint">
-                        Replace this placeholder with an actual screenshot
-                    </p>
-                </div>
+                <img src="images/wallet_balance.jpeg" alt="Screenshot: Wallet page showing balances (NGN + Coins)" class="screenshot">
 
                 <!-- ───────────────────────────────────── -->
                 <h2>Payment Gateways</h2>
@@ -191,15 +183,7 @@
                     <code>.env</code> file is set to your production domain.
                 </div>
 
-                <div class="screenshot-placeholder">
-                    <div class="icon">📸</div>
-                    <p class="label">
-                        Screenshot: Deposit modal with gateway selection
-                    </p>
-                    <p class="hint">
-                        Replace this placeholder with an actual screenshot
-                    </p>
-                </div>
+                <img src="images/deposit.jpeg" alt="Screenshot: Deposit modal with gateway selection" class="screenshot">
 
                 <!-- ───────────────────────────────────── -->
                 <h2>Coin Exchange</h2>
@@ -307,13 +291,7 @@
                     </tbody>
                 </table>
 
-                <div class="screenshot-placeholder">
-                    <div class="icon">📸</div>
-                    <p class="label">Screenshot: Coin transfer / gift modal</p>
-                    <p class="hint">
-                        Replace this placeholder with an actual screenshot
-                    </p>
-                </div>
+                <img src="images/transfer_gift.jpeg" alt="Screenshot: Coin transfer / gift modal" class="screenshot">
 
                 <!-- ───────────────────────────────────── -->
                 <h2>Transaction Types</h2>
@@ -401,15 +379,7 @@
                     verify the account number and bank code before processing.
                 </div>
 
-                <div class="screenshot-placeholder">
-                    <div class="icon">📸</div>
-                    <p class="label">
-                        Screenshot: Withdrawal request form with bank details
-                    </p>
-                    <p class="hint">
-                        Replace this placeholder with an actual screenshot
-                    </p>
-                </div>
+                <img src="images/withdraw.jpeg" alt="Screenshot: Withdrawal request form with bank details" class="screenshot">
 
                 <!-- ───────────────────────────────────── -->
                 <h2>Transaction History</h2>
@@ -420,15 +390,7 @@
                     <code>GET /api/wallet/transactions/export</code>.
                 </p>
 
-                <div class="screenshot-placeholder">
-                    <div class="icon">📸</div>
-                    <p class="label">
-                        Screenshot: Transaction history page with filters
-                    </p>
-                    <p class="hint">
-                        Replace this placeholder with an actual screenshot
-                    </p>
-                </div>
+                <img src="images/history.jpeg" alt="Screenshot: Transaction history page with filters" class="screenshot">
 
                 <!-- Navigation Footer -->
                 <div class="doc-nav-footer">
@@ -447,5 +409,44 @@
         >
             ☰
         </button>
+
+        <!-- Image Modal -->
+        <div class="modal-overlay" id="imageModal">
+            <div class="modal-content">
+                <span class="modal-close" id="modalClose">&times;</span>
+                <img src="" alt="Enlarged screenshot" id="modalImage" />
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const modal = document.getElementById('imageModal');
+                const modalImg = document.getElementById('modalImage');
+                const closeModal = document.getElementById('modalClose');
+
+                document.querySelectorAll('.screenshot').forEach(img => {
+                    img.addEventListener('click', () => {
+                        modal.classList.add('visible');
+                        modalImg.src = img.src;
+                        modalImg.alt = img.alt;
+                    });
+                });
+
+                const close = () => modal.classList.remove('visible');
+
+                closeModal.addEventListener('click', close);
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        close();
+                    }
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && modal.classList.contains('visible')) {
+                        close();
+                    }
+                });
+            });
+        </script>
     </body>
 </html>
