@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>WebSockets — Bet4Gain Documentation</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
+    <body>
+        <div class="doc-layout">
+            <!-- Sidebar -->
+            <aside class="doc-sidebar" id="sidebar">
+                <div class="logo">
+                    <h2>🚀 Bet4Gain</h2>
+                    <span>v1.0</span>
+                </div>
+                <nav>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Getting Started</div>
+                        <a href="index.html" class="nav-link">Introduction</a>
+                        <a href="installation.html" class="nav-link"
+                            >Installation</a
+                        >
+                        <a href="configuration.html" class="nav-link"
+                            >Configuration</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Guide</div>
+                        <a href="features.html" class="nav-link"
+                            >Features Overview</a
+                        >
+                        <a href="admin-panel.html" class="nav-link"
+                            >Admin Panel</a
+                        >
+                        <a href="game-engine.html" class="nav-link"
+                            >Game Engine</a
+                        >
+                        <a href="payments.html" class="nav-link"
+                            >Payments &amp; Wallet</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Technical</div>
+                        <a href="api-reference.html" class="nav-link"
+                            >API Reference</a
+                        >
+                        <a href="websockets.html" class="nav-link active"
+                            >WebSockets</a
+                        >
+                        <a href="database.html" class="nav-link"
+                            >Database Schema</a
+                        >
+                        <a href="security.html" class="nav-link">Security</a>
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">More</div>
+                        <a href="customization.html" class="nav-link"
+                            >Customization</a
+                        >
+                        <a href="troubleshooting.html" class="nav-link"
+                            >Troubleshooting</a
+                        >
+                        <a href="changelog.html" class="nav-link">Changelog</a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="doc-main">
+                <h1>WebSockets</h1>
+                <p class="subtitle">
+                    Real-time communication architecture powering game state,
+                    chat, and notifications
+                </p>
+
+                <!-- Overview -->
+                <h2>Overview</h2>
+                <p>
+                    Bet4Gain uses <strong>Laravel Reverb</strong> for
+                    server-side WebSocket management and
+                    <strong>Laravel Echo</strong> +
+                    <strong>Pusher.js</strong> on the client side. All game
+                    state updates, chat messages, and user notifications are
+                    delivered in real-time over persistent WebSocket
+                    connections. This ensures every connected player sees the
+                    same multiplier, the same bets, and the same crash point
+                    simultaneously — with sub-100ms latency.
+                </p>
+
+                <div class="callout callout-info">
+                    <strong>Why Reverb?</strong>
+                    Laravel Reverb is a first-party WebSocket server built
+                    specifically for Laravel. It integrates natively with
+                    Laravel's broadcasting system, eliminating the need for
+                    third-party services like Pusher or Ably in production.
+                </div>
+
+                <!-- Architecture -->
+                <h2>Architecture</h2>
+                <p>
+                    The real-time architecture follows a unidirectional
+                    broadcast pattern. The server is the single source of truth
+                    — it computes game state, validates bets, and broadcasts
+                    events. Clients subscribe to channels and react to incoming
+                    events.
+                </p>
+
+                <h3>Event Flow</h3>
+                <p>The complete flow from server to client:</p>
+                <ol>
+                    <li>
+                        <strong>Laravel Event</strong> — A PHP event class is
+                        dispatched (e.g., <code>GameMultiplierUpdated</code>)
+                    </li>
+                    <li>
+                        <strong>ShouldBroadcastNow</strong> — The event
+                        implements <code>ShouldBroadcastNow</code> for instant
+                        delivery (no queue delay)
+                    </li>
+                    <li>
+                        <strong>Reverb Server</strong> — Laravel's broadcasting
+                        system sends the event payload to the Reverb WebSocket
+                        server
+                    </li>
+                    <li>
+                        <strong>Echo Client</strong> — Laravel Echo (connected
+                        via Pusher.js transport) receives the event on the
+                        subscribed channel
+                    </li>
+                    <li>
+                        <strong>Vue Component</strong> — The Vue component's
+                        Echo listener updates reactive state, triggering a UI
+                        re-render
+                    </li>
+                </ol>
+
+                <div
+                    class="screenshot-placeholder"
+                    style="
+                        background: #f1f5f9;
+                        border: 2px dashed #cbd5e1;
+                        border-radius: 8px;
+                        padding: 40px;
+                        text-align: center;
+                        margin: 16px 0 24px;
+                        color: #94a3b8;
+                    "
+                >
+                    <div style="font-size: 2rem; margin-bottom: 8px">📸</div>
+                    <p style="margin: 0; font-weight: 500">
+                        Screenshot: WebSocket architecture diagram showing event
+                        flow from Laravel → Reverb → Echo → Vue
+                    </p>
+                    <p style="margin: 4px 0 0; font-size: 0.8rem">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <!-- Channels -->
+                <h2>Channels</h2>
+                <p>
+                    Bet4Gain uses five broadcast channels, each serving a
+                    distinct purpose:
+                </p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Channel</th>
+                            <th>Type</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>game</code></td>
+                            <td>
+                                <span class="badge badge-primary">Public</span>
+                            </td>
+                            <td>
+                                Game state broadcasts — multiplier ticks, bet
+                                placements, cashouts, round start/end, and crash
+                                events. All connected users receive these.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>chat</code></td>
+                            <td>
+                                <span class="badge badge-post">Presence</span>
+                            </td>
+                            <td>
+                                Chat messages and online user tracking. Presence
+                                channel excludes banned users and tracks who is
+                                currently in the chat room.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>user.{id}</code></td>
+                            <td>
+                                <span class="badge badge-put">Private</span>
+                            </td>
+                            <td>
+                                Personal notifications for a specific user —
+                                coin transfers received, system alerts, etc.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>App.Models.User.{id}</code></td>
+                            <td>
+                                <span class="badge badge-put">Private</span>
+                            </td>
+                            <td>
+                                Laravel's default notification channel. Used for
+                                database notifications that are also broadcast
+                                in real-time.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>online</code></td>
+                            <td>
+                                <span class="badge badge-post">Presence</span>
+                            </td>
+                            <td>
+                                Global online user tracking. Used to display the
+                                online user count and list across the platform.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="callout callout-warning">
+                    <strong>Channel Authorization</strong>
+                    Private and Presence channels require authentication.
+                    Channel authorization routes are defined in
+                    <code>routes/channels.php</code>. Users must be
+                    authenticated via Sanctum before subscribing to private or
+                    presence channels.
+                </div>
+
+                <!-- Game Events -->
+                <h2>Game Events</h2>
+                <p>
+                    These events are broadcast on the <code>game</code> public
+                    channel and drive the entire game experience:
+                </p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Payload</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>GameCountdown</code></td>
+                            <td><code>secondsLeft</code></td>
+                            <td>
+                                Fired every second during the countdown between
+                                rounds. The client displays a countdown timer
+                                before the next round begins.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>GameBettingStarted</code></td>
+                            <td>round data</td>
+                            <td>
+                                Signals the start of the betting phase. Players
+                                can now place bets for the upcoming round.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>GameStarted</code></td>
+                            <td>round data</td>
+                            <td>
+                                The multiplier starts running. Betting is
+                                closed; players can only cash out from this
+                                point.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>GameMultiplierUpdated</code></td>
+                            <td>
+                                <code>multiplier</code>, <code>elapsed</code>
+                            </td>
+                            <td>
+                                Fired approximately every
+                                <strong>100ms</strong>. Updates the current
+                                multiplier value and elapsed time. The Canvas
+                                animation interpolates between ticks for smooth
+                                rendering.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>GameCrashed</code></td>
+                            <td><code>crashPoint</code>, round data</td>
+                            <td>
+                                The round has ended. Displays the final crash
+                                point. Any players who did not cash out lose
+                                their bet.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>BetPlaced</code></td>
+                            <td>bet data</td>
+                            <td>
+                                Broadcast when any player places a bet. Updates
+                                the live bet list visible to all players.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>BetCashedOut</code></td>
+                            <td>
+                                bet data, <code>multiplier</code>,
+                                <code>payout</code>
+                            </td>
+                            <td>
+                                Broadcast when a player cashes out. Shows the
+                                cashout multiplier and payout in the bet list.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Chat Events -->
+                <h2>Chat Events</h2>
+                <p>
+                    These events are broadcast on the <code>chat</code> presence
+                    channel:
+                </p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Payload</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>ChatMessageSent</code></td>
+                            <td>
+                                message data (id, user, message, type,
+                                timestamp)
+                            </td>
+                            <td>
+                                A new chat message has been sent. The client
+                                appends it to the chat window and auto-scrolls.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>ChatMessageDeleted</code></td>
+                            <td>message id</td>
+                            <td>
+                                A message has been deleted by a moderator or
+                                admin. The client removes it from the chat
+                                window.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Private Events -->
+                <h2>Private Events</h2>
+                <p>
+                    These events are broadcast on user-specific private channels
+                    (<code>user.{id}</code>):
+                </p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Payload</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>CoinTransferReceived</code></td>
+                            <td>
+                                <code>sender</code>, <code>amount</code>,
+                                <code>type</code>, <code>note</code>
+                            </td>
+                            <td>
+                                The authenticated user has received a coin
+                                transfer (gift or P2P transfer). A toast
+                                notification is shown and the balance is updated
+                                in real-time.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Client Setup -->
+                <h2>Client Setup</h2>
+                <p>
+                    The Echo client is configured in the frontend bootstrap
+                    file. It uses the Pusher.js transport protocol to connect to
+                    the Reverb WebSocket server:
+                </p>
+
+                <h3>Echo Configuration (<code>echo.js</code>)</h3>
+                <pre><code>import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
+
+window.Pusher = Pusher;
+
+window.Echo = new Echo({
+    broadcaster: 'reverb',
+    key: reverbConfig.key,
+    wsHost: reverbConfig.host,
+    wsPort: reverbConfig.port,
+    wssPort: reverbConfig.port,
+    forceTLS: reverbConfig.scheme === 'https',
+    enabledTransports: ['ws', 'wss'],
+});</code></pre>
+
+                <p>
+                    The <code>reverbConfig</code> object is injected from the
+                    server-side Blade template using values from your
+                    <code>.env</code> file. This ensures the client always
+                    connects to the correct Reverb instance.
+                </p>
+
+                <!-- Subscribing to Channels -->
+                <h2>Subscribing to Channels</h2>
+
+                <h3>Public Channel</h3>
+                <p>Subscribe to game events visible to all users:</p>
+                <pre><code>// Listen for game state events on the public 'game' channel
+window.Echo.channel('game')
+    .listen('GameCountdown', (e) => {
+        console.log('Countdown:', e.secondsLeft);
+    })
+    .listen('GameStarted', (e) => {
+        console.log('Round started:', e.round);
+    })
+    .listen('GameMultiplierUpdated', (e) => {
+        console.log('Multiplier:', e.multiplier);
+    })
+    .listen('GameCrashed', (e) => {
+        console.log('Crashed at:', e.crashPoint);
+    })
+    .listen('BetPlaced', (e) => {
+        console.log('Bet placed:', e.bet);
+    })
+    .listen('BetCashedOut', (e) => {
+        console.log('Cashed out:', e.bet, 'at', e.multiplier);
+    });</code></pre>
+
+                <h3>Private Channel</h3>
+                <p>
+                    Subscribe to user-specific notifications (requires
+                    authentication):
+                </p>
+                <pre><code>// Listen for private events on the authenticated user's channel
+window.Echo.private(`user.${userId}`)
+    .listen('CoinTransferReceived', (e) => {
+        console.log(`Received ${e.amount} coins from ${e.sender.username}`);
+        // Update balance, show toast notification
+    });</code></pre>
+
+                <h3>Presence Channel</h3>
+                <p>Subscribe to chat with online user tracking:</p>
+                <pre><code>// Join the chat presence channel
+window.Echo.join('chat')
+    .here((users) => {
+        console.log('Users currently online:', users);
+    })
+    .joining((user) => {
+        console.log('User joined:', user.username);
+    })
+    .leaving((user) => {
+        console.log('User left:', user.username);
+    })
+    .listen('ChatMessageSent', (e) => {
+        console.log('New message:', e.message);
+    })
+    .listen('ChatMessageDeleted', (e) => {
+        console.log('Message deleted:', e.messageId);
+    });</code></pre>
+
+                <!-- Running Reverb -->
+                <h2>Running Reverb</h2>
+
+                <h3>Development</h3>
+                <p>Start the Reverb WebSocket server in the foreground:</p>
+                <pre><code>php artisan reverb:start</code></pre>
+                <p>With debug output:</p>
+                <pre><code>php artisan reverb:start --debug</code></pre>
+
+                <h3>Environment Variables</h3>
+                <p>
+                    Configure the Reverb server in your <code>.env</code> file:
+                </p>
+                <pre><code>REVERB_APP_ID=your-app-id
+REVERB_APP_KEY=your-app-key
+REVERB_APP_SECRET=your-app-secret
+REVERB_HOST=0.0.0.0
+REVERB_PORT=8080
+REVERB_SCHEME=http
+
+VITE_REVERB_APP_KEY="${REVERB_APP_KEY}"
+VITE_REVERB_HOST="localhost"
+VITE_REVERB_PORT="${REVERB_PORT}"
+VITE_REVERB_SCHEME="${REVERB_SCHEME}"</code></pre>
+
+                <h3>Production — Supervisor</h3>
+                <p>
+                    In production, use Supervisor to keep the Reverb process
+                    running and auto-restart on failure:
+                </p>
+                <pre><code>[program:reverb]
+command=php /var/www/bet4gain/artisan reverb:start
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+user=www-data
+numprocs=1
+redirect_stderr=true
+stdout_logfile=/var/www/bet4gain/storage/logs/reverb.log
+stopwaitsecs=3600</code></pre>
+
+                <div class="callout callout-info">
+                    <strong>TLS in Production</strong>
+                    For production with HTTPS, set
+                    <code>REVERB_SCHEME=https</code> and use a reverse proxy
+                    (Nginx) to terminate SSL, forwarding WebSocket connections
+                    to Reverb's internal port.
+                </div>
+
+                <!-- Debugging -->
+                <h2>Debugging</h2>
+                <p>
+                    When WebSocket connections aren't working as expected, use
+                    these techniques to diagnose issues:
+                </p>
+
+                <h3>Browser DevTools</h3>
+                <ol>
+                    <li>Open browser DevTools (<code>F12</code>)</li>
+                    <li>Navigate to <strong>Network</strong> tab</li>
+                    <li>Filter by <strong>WS</strong> (WebSocket)</li>
+                    <li>Click on the WebSocket connection to inspect frames</li>
+                    <li>
+                        Check the <strong>Messages</strong> sub-tab to see
+                        incoming and outgoing frames in real-time
+                    </li>
+                </ol>
+
+                <div
+                    class="screenshot-placeholder"
+                    style="
+                        background: #f1f5f9;
+                        border: 2px dashed #cbd5e1;
+                        border-radius: 8px;
+                        padding: 40px;
+                        text-align: center;
+                        margin: 16px 0 24px;
+                        color: #94a3b8;
+                    "
+                >
+                    <div style="font-size: 2rem; margin-bottom: 8px">📸</div>
+                    <p style="margin: 0; font-weight: 500">
+                        Screenshot: Browser DevTools Network tab showing
+                        WebSocket frames
+                    </p>
+                    <p style="margin: 4px 0 0; font-size: 0.8rem">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <h3>Reverb Logs</h3>
+                <p>
+                    Check the Reverb server logs for connection and event
+                    issues:
+                </p>
+                <pre><code># View Reverb logs in real-time
+tail -f storage/logs/reverb.log
+
+# Run Reverb with debug output
+php artisan reverb:start --debug</code></pre>
+
+                <h3>Common Issues</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Symptom</th>
+                            <th>Cause</th>
+                            <th>Solution</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>WebSocket connection refused</td>
+                            <td>Reverb not running</td>
+                            <td>
+                                Start Reverb with
+                                <code>php artisan reverb:start</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Events not received</td>
+                            <td>Mismatched app key</td>
+                            <td>
+                                Ensure <code>VITE_REVERB_APP_KEY</code> matches
+                                <code>REVERB_APP_KEY</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Private channel 403</td>
+                            <td>Auth failed</td>
+                            <td>
+                                Verify user is authenticated and channel
+                                authorization in
+                                <code>routes/channels.php</code> is correct
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Connection drops on HTTPS</td>
+                            <td>TLS not configured</td>
+                            <td>
+                                Set <code>REVERB_SCHEME=https</code> and
+                                configure Nginx reverse proxy for WSS
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>High latency / lag</td>
+                            <td>Queue driver delay</td>
+                            <td>
+                                Ensure events use
+                                <code>ShouldBroadcastNow</code> (not
+                                <code>ShouldBroadcast</code>) for game events
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Navigation Footer -->
+                <div class="doc-nav-footer">
+                    <a href="api-reference.html">← API Reference</a>
+                    <a href="database.html">Database Schema →</a>
+                </div>
+            </main>
+        </div>
+
+        <button
+            class="sidebar-toggle"
+            id="sidebarToggle"
+            onclick="
+                document.getElementById('sidebar').classList.toggle('open')
+            "
+        >
+            ☰
+        </button>
+    </body>
+</html>

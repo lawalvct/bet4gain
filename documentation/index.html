@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Bet4Gain — Documentation</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
+    <body>
+        <div class="doc-layout">
+            <!-- Sidebar -->
+            <aside class="doc-sidebar" id="sidebar">
+                <div class="logo">
+                    <h2>🚀 Bet4Gain</h2>
+                    <span>v1.0</span>
+                </div>
+                <nav>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Getting Started</div>
+                        <a href="index.html" class="nav-link active"
+                            >Introduction</a
+                        >
+                        <a href="installation.html" class="nav-link"
+                            >Installation</a
+                        >
+                        <a href="configuration.html" class="nav-link"
+                            >Configuration</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Guide</div>
+                        <a href="features.html" class="nav-link"
+                            >Features Overview</a
+                        >
+                        <a href="admin-panel.html" class="nav-link"
+                            >Admin Panel</a
+                        >
+                        <a href="game-engine.html" class="nav-link"
+                            >Game Engine</a
+                        >
+                        <a href="payments.html" class="nav-link"
+                            >Payments &amp; Wallet</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Technical</div>
+                        <a href="api-reference.html" class="nav-link"
+                            >API Reference</a
+                        >
+                        <a href="websockets.html" class="nav-link"
+                            >WebSockets</a
+                        >
+                        <a href="database.html" class="nav-link"
+                            >Database Schema</a
+                        >
+                        <a href="security.html" class="nav-link">Security</a>
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">More</div>
+                        <a href="customization.html" class="nav-link"
+                            >Customization</a
+                        >
+                        <a href="troubleshooting.html" class="nav-link"
+                            >Troubleshooting</a
+                        >
+                        <a href="changelog.html" class="nav-link">Changelog</a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="doc-main">
+                <h1>Bet4Gain Documentation</h1>
+                <p class="subtitle">
+                    Real-Time Multiplayer Crash/Aviator Betting Game — Built
+                    with Laravel 12, Vue 3 &amp; WebSockets
+                </p>
+
+                <div class="callout callout-info">
+                    <strong>Thank you for purchasing Bet4Gain!</strong>
+                    This documentation covers installation, configuration,
+                    customization, and day-to-day administration of the
+                    platform. If you have any questions beyond what is covered
+                    here, please reach out through the item's support channel.
+                </div>
+
+                <h2>What is Bet4Gain?</h2>
+                <p>
+                    Bet4Gain is a
+                    <strong
+                        >production-ready, real-time multiplayer crash/aviator
+                        betting game</strong
+                    >. Players place bets before a round starts, then watch an
+                    exponentially growing multiplier on a canvas-animated curve.
+                    The goal is to
+                    <strong>cash out before the multiplier "crashes"</strong>.
+                    Every round is provably fair using HMAC-SHA256 cryptography,
+                    and the entire experience is synchronized in real-time
+                    across all connected players via WebSockets.
+                </p>
+
+                <h2>Key Highlights</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="icon">🎮</div>
+                        <h4>Real-Time Game</h4>
+                        <p>
+                            HTML5 Canvas animated multiplier curve with live
+                            WebSocket synchronization across all players.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">🔐</div>
+                        <h4>Provably Fair</h4>
+                        <p>
+                            HMAC-SHA256 cryptographic verification ensures every
+                            round outcome is transparent and verifiable.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">💳</div>
+                        <h4>Multi-Gateway Payments</h4>
+                        <p>
+                            Built-in Paystack &amp; Nomba gateways with deposit,
+                            withdrawal, coin exchange, and P2P transfers.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">🛡️</div>
+                        <h4>Admin Panel</h4>
+                        <p>
+                            Full Filament admin dashboard with user management,
+                            transactions, game rounds, chat moderation, and
+                            analytics.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">💬</div>
+                        <h4>Live Chat</h4>
+                        <p>
+                            Real-time public chat with emoji picker, player
+                            profiles, online user list, and moderation tools.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">📱</div>
+                        <h4>Fully Responsive</h4>
+                        <p>
+                            Mobile-first design with bottom navigation bar,
+                            touch-optimized controls, and adaptive layout.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">🎯</div>
+                        <h4>Auto Bet &amp; Auto Cashout</h4>
+                        <p>
+                            Automated betting strategies with stop loss, stop
+                            profit, and multiplier targeting.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">🏆</div>
+                        <h4>Leaderboards</h4>
+                        <p>
+                            Daily, weekly, monthly, and all-time rankings with
+                            cached performance data.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">🌓</div>
+                        <h4>Dark &amp; Light Theme</h4>
+                        <p>
+                            User-togglable themes with system-preference
+                            detection and persistent preference.
+                        </p>
+                    </div>
+                </div>
+
+                <h2>Technology Stack</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Layer</th>
+                            <th>Technology</th>
+                            <th>Version</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Backend</td>
+                            <td>Laravel</td>
+                            <td>12.x</td>
+                        </tr>
+                        <tr>
+                            <td>Frontend</td>
+                            <td>Vue 3 (SFC) + Blade</td>
+                            <td>3.5.x</td>
+                        </tr>
+                        <tr>
+                            <td>State Management</td>
+                            <td>Pinia</td>
+                            <td>3.x</td>
+                        </tr>
+                        <tr>
+                            <td>CSS Framework</td>
+                            <td>Tailwind CSS</td>
+                            <td>4.x</td>
+                        </tr>
+                        <tr>
+                            <td>WebSockets</td>
+                            <td>Laravel Reverb + Echo</td>
+                            <td>latest</td>
+                        </tr>
+                        <tr>
+                            <td>Game Rendering</td>
+                            <td>HTML5 Canvas</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td>Admin Panel</td>
+                            <td>Filament PHP</td>
+                            <td>5.x</td>
+                        </tr>
+                        <tr>
+                            <td>Authentication</td>
+                            <td>Laravel Fortify + Sanctum</td>
+                            <td>latest</td>
+                        </tr>
+                        <tr>
+                            <td>Social Login</td>
+                            <td>Laravel Socialite</td>
+                            <td>5.x</td>
+                        </tr>
+                        <tr>
+                            <td>Payment Gateways</td>
+                            <td>Paystack + Nomba</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td>Build Tool</td>
+                            <td>Vite</td>
+                            <td>7.x</td>
+                        </tr>
+                        <tr>
+                            <td>Database</td>
+                            <td>MySQL 8+ / SQLite</td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>System Requirements</h2>
+                <ul>
+                    <li><strong>PHP</strong> 8.2 or higher</li>
+                    <li><strong>Composer</strong> 2.x</li>
+                    <li><strong>Node.js</strong> 18+ &amp; npm</li>
+                    <li>
+                        <strong>MySQL</strong> 8.0+ (or SQLite for development)
+                    </li>
+                    <li>
+                        <strong>Redis</strong> (recommended for production —
+                        cache, sessions, queues)
+                    </li>
+                    <li>
+                        PHP extensions: OpenSSL, PDO, Mbstring, Tokenizer, XML,
+                        Ctype, JSON, BCMath, pcntl
+                    </li>
+                </ul>
+
+                <h2>Quick Links</h2>
+                <ul>
+                    <li>
+                        <a href="installation.html">Installation Guide</a> — Get
+                        up and running in minutes
+                    </li>
+                    <li>
+                        <a href="configuration.html">Configuration</a> —
+                        Customize all game, payment, and security settings
+                    </li>
+                    <li>
+                        <a href="features.html">Features Overview</a> — Detailed
+                        breakdown of all player and admin features
+                    </li>
+                    <li>
+                        <a href="admin-panel.html">Admin Panel Guide</a> —
+                        Manage users, rounds, transactions, and settings
+                    </li>
+                    <li>
+                        <a href="api-reference.html">API Reference</a> — Full
+                        endpoint documentation
+                    </li>
+                    <li>
+                        <a href="troubleshooting.html">Troubleshooting</a> —
+                        Common issues and solutions
+                    </li>
+                </ul>
+
+                <!-- Navigation Footer -->
+                <div class="doc-nav-footer">
+                    <span></span>
+                    <a href="installation.html">Installation →</a>
+                </div>
+            </main>
+        </div>
+
+        <button
+            class="sidebar-toggle"
+            id="sidebarToggle"
+            onclick="
+                document.getElementById('sidebar').classList.toggle('open')
+            "
+        >
+            ☰
+        </button>
+    </body>
+</html>

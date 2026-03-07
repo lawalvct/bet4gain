@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Security — Bet4Gain Documentation</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
+    <body>
+        <div class="doc-layout">
+            <!-- Sidebar -->
+            <aside class="doc-sidebar" id="sidebar">
+                <div class="logo">
+                    <h2>🚀 Bet4Gain</h2>
+                    <span>v1.0</span>
+                </div>
+                <nav>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Getting Started</div>
+                        <a href="index.html" class="nav-link">Introduction</a>
+                        <a href="installation.html" class="nav-link"
+                            >Installation</a
+                        >
+                        <a href="configuration.html" class="nav-link"
+                            >Configuration</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Guide</div>
+                        <a href="features.html" class="nav-link"
+                            >Features Overview</a
+                        >
+                        <a href="admin-panel.html" class="nav-link"
+                            >Admin Panel</a
+                        >
+                        <a href="game-engine.html" class="nav-link"
+                            >Game Engine</a
+                        >
+                        <a href="payments.html" class="nav-link"
+                            >Payments &amp; Wallet</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Technical</div>
+                        <a href="api-reference.html" class="nav-link"
+                            >API Reference</a
+                        >
+                        <a href="websockets.html" class="nav-link"
+                            >WebSockets</a
+                        >
+                        <a href="database.html" class="nav-link"
+                            >Database Schema</a
+                        >
+                        <a href="security.html" class="nav-link active"
+                            >Security</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">More</div>
+                        <a href="customization.html" class="nav-link"
+                            >Customization</a
+                        >
+                        <a href="troubleshooting.html" class="nav-link"
+                            >Troubleshooting</a
+                        >
+                        <a href="changelog.html" class="nav-link">Changelog</a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="doc-main">
+                <h1>Security</h1>
+                <p class="subtitle">
+                    Multi-layered security: authentication, rate limiting,
+                    anti-cheat, encryption, and responsible gaming.
+                </p>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Overview</h2>
+                <p>
+                    Bet4Gain implements defence-in-depth security. All security
+                    configuration lives in
+                    <code>config/security.php</code> and can be tuned via
+                    environment variables without code changes.
+                </p>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Authentication</h2>
+                <ul>
+                    <li>
+                        <strong>Laravel Fortify</strong> — Registration, login,
+                        email verification, password reset
+                    </li>
+                    <li>
+                        <strong>Laravel Sanctum</strong> — Session-based SPA
+                        authentication with CSRF protection
+                    </li>
+                    <li>
+                        <strong>Two-Factor Authentication</strong> — Optional
+                        TOTP 2FA with recovery codes
+                    </li>
+                    <li>
+                        <strong>Social Login</strong> — Google and GitHub via
+                        Laravel Socialite
+                    </li>
+                    <li>
+                        <strong>Guest Accounts</strong> — Limited demo accounts
+                        with restricted permissions (no deposits, no
+                        withdrawals, no transfers)
+                    </li>
+                </ul>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Rate Limiting</h2>
+                <p>Every sensitive action is rate-limited to prevent abuse:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Max Requests</th>
+                            <th>Window</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Bet placement</td>
+                            <td>5</td>
+                            <td>10 seconds</td>
+                        </tr>
+                        <tr>
+                            <td>Cashout</td>
+                            <td>5</td>
+                            <td>10 seconds</td>
+                        </tr>
+                        <tr>
+                            <td>Chat message</td>
+                            <td>1</td>
+                            <td>3 seconds</td>
+                        </tr>
+                        <tr>
+                            <td>Deposit</td>
+                            <td>5</td>
+                            <td>60 seconds</td>
+                        </tr>
+                        <tr>
+                            <td>Withdrawal</td>
+                            <td>3</td>
+                            <td>600 seconds</td>
+                        </tr>
+                        <tr>
+                            <td>Registration</td>
+                            <td>3</td>
+                            <td>600 seconds</td>
+                        </tr>
+                        <tr>
+                            <td>API general</td>
+                            <td>120</td>
+                            <td>60 seconds</td>
+                        </tr>
+                        <tr>
+                            <td>Game state</td>
+                            <td>60</td>
+                            <td>60 seconds</td>
+                        </tr>
+                        <tr>
+                            <td>Webhook</td>
+                            <td>100</td>
+                            <td>60 seconds</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="callout callout-info">
+                    <strong>Tip:</strong> Rate limits are enforced by IP
+                    address. You can adjust all limits via the
+                    <code>RATE_LIMIT_*</code> environment variables (see
+                    <a href="configuration.html">Configuration</a>).
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Anti-Cheat System</h2>
+                <p>
+                    The <code>AntiCheatService</code> automatically monitors
+                    player behaviour and flags anomalies. Flagged activities are
+                    stored in the <code>suspicious_activities</code> table for
+                    admin review.
+                </p>
+
+                <h3>Detection Rules</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rule</th>
+                            <th>Threshold</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Multi-Account</td>
+                            <td>3 users per IP (30-day lookback)</td>
+                            <td>
+                                Detects multiple accounts from the same IP
+                                address
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Win Streak</td>
+                            <td>&gt; 15 consecutive wins</td>
+                            <td>Unusually long unbroken win streaks</td>
+                        </tr>
+                        <tr>
+                            <td>Rapid Withdrawal</td>
+                            <td>&gt; ₦500,000 in 30 minutes</td>
+                            <td>High-value withdrawal bursts</td>
+                        </tr>
+                        <tr>
+                            <td>Deposit Spike</td>
+                            <td>&gt; 10× average deposit</td>
+                            <td>
+                                Abnormally large deposits compared to history
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Bot Detection</td>
+                            <td>&lt; 200 ms between bets</td>
+                            <td>Bet placement faster than humanly possible</td>
+                        </tr>
+                        <tr>
+                            <td>Cashout Pattern</td>
+                            <td>&gt; 20 identical repeats</td>
+                            <td>
+                                Repeated cashout at the exact same multiplier
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">
+                        Screenshot: Suspicious activity review in admin panel
+                    </p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>IP Restrictions</h2>
+                <p>
+                    Admins can manage an <strong>IP blacklist</strong> and
+                    <strong>whitelist</strong> from the admin panel. Each entry
+                    supports:
+                </p>
+                <ul>
+                    <li>Individual IP addresses or CIDR ranges</li>
+                    <li>Reason / notes for the restriction</li>
+                    <li>Optional expiry date (auto-removal)</li>
+                </ul>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Security Headers</h2>
+                <p>
+                    The <code>SecurityHeaders</code> middleware applies the
+                    following headers to every response:
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Header</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>X-Frame-Options</code></td>
+                            <td>DENY</td>
+                        </tr>
+                        <tr>
+                            <td><code>X-Content-Type-Options</code></td>
+                            <td>nosniff</td>
+                        </tr>
+                        <tr>
+                            <td><code>X-XSS-Protection</code></td>
+                            <td>1; mode=block</td>
+                        </tr>
+                        <tr>
+                            <td><code>Referrer-Policy</code></td>
+                            <td>strict-origin-when-cross-origin</td>
+                        </tr>
+                        <tr>
+                            <td><code>Content-Security-Policy</code></td>
+                            <td>Configurable (see config/security.php)</td>
+                        </tr>
+                        <tr>
+                            <td><code>Strict-Transport-Security</code></td>
+                            <td>max-age=31536000; includeSubDomains (HSTS)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Encryption</h2>
+                <ul>
+                    <li>
+                        <strong>Wallet balances</strong> — Encrypted at rest
+                        using Laravel's built-in encryption
+                    </li>
+                    <li>
+                        <strong>Server seeds</strong> — Encrypted before
+                        storage, revealed only after the round ends
+                    </li>
+                    <li>
+                        <strong>Passwords</strong> — Hashed with bcrypt (cost
+                        factor 12)
+                    </li>
+                    <li>
+                        <strong>CSRF protection</strong> — All state-changing
+                        requests validated via Sanctum
+                    </li>
+                    <li>
+                        <strong>Webhook signatures</strong> — Payment gateway
+                        webhooks verified using HMAC signatures
+                    </li>
+                </ul>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Audit Logging</h2>
+                <p>
+                    Every admin action is logged to the
+                    <code>audit_logs</code> table. Each entry records:
+                </p>
+                <ul>
+                    <li>The admin user who performed the action</li>
+                    <li>The action type (create, update, delete)</li>
+                    <li>The affected model and record ID</li>
+                    <li>Old and new values (JSON diff)</li>
+                    <li>The admin's IP address</li>
+                    <li>Timestamp</li>
+                </ul>
+                <p>
+                    Audit logs are viewable from the
+                    <strong>Audit Log</strong> resource in the admin panel.
+                </p>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Login Tracking</h2>
+                <p>
+                    Every login attempt (successful or failed) is logged to the
+                    <code>login_logs</code> table with:
+                </p>
+                <ul>
+                    <li>Email used in the attempt</li>
+                    <li>IP address</li>
+                    <li>User-agent string</li>
+                    <li>Success / failure status</li>
+                </ul>
+                <p>
+                    This data feeds into the anti-cheat system for pattern
+                    analysis and is viewable by admins.
+                </p>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Responsible Gaming</h2>
+                <p>
+                    All responsible gaming controls are
+                    <strong>enforced server-side</strong> and cannot be bypassed
+                    from the client.
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Self-Exclusion</strong></td>
+                            <td>
+                                Player can exclude themselves for 1–365 days.
+                                Cannot be reversed before the period ends.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Deposit Limits</strong></td>
+                            <td>
+                                Daily, weekly, and monthly caps on deposit
+                                amounts.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Bet Limit</strong></td>
+                            <td>
+                                Maximum amount per single bet, enforced in the
+                                game engine.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cooldown Timer</strong></td>
+                            <td>
+                                Temporary break from 15 minutes to 24 hours.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Session Reminders</strong></td>
+                            <td>
+                                Periodic alerts after extended play sessions.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">
+                        Screenshot: Responsible gaming settings page
+                    </p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Best Practices</h2>
+                <ul>
+                    <li>
+                        Always set <code>APP_DEBUG=false</code> in production
+                    </li>
+                    <li>Use HTTPS with a valid SSL certificate</li>
+                    <li>
+                        Use Redis for sessions (prevents session fixation via
+                        file system)
+                    </li>
+                    <li>
+                        Set strong, unique values for <code>APP_KEY</code>,
+                        <code>REVERB_APP_SECRET</code>
+                    </li>
+                    <li>
+                        Restrict database access to only the application
+                        server's IP
+                    </li>
+                    <li>
+                        Regularly review the audit log and suspicious activity
+                        reports
+                    </li>
+                    <li>
+                        Keep dependencies updated:
+                        <code>composer update</code> &amp;
+                        <code>npm update</code>
+                    </li>
+                </ul>
+
+                <!-- Navigation Footer -->
+                <div class="doc-nav-footer">
+                    <a href="database.html">← Database Schema</a>
+                    <a href="customization.html">Customization →</a>
+                </div>
+            </main>
+        </div>
+
+        <button
+            class="sidebar-toggle"
+            id="sidebarToggle"
+            onclick="
+                document.getElementById('sidebar').classList.toggle('open')
+            "
+        >
+            ☰
+        </button>
+    </body>
+</html>

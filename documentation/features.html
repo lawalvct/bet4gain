@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Features Overview — Bet4Gain Documentation</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
+    <body>
+        <div class="doc-layout">
+            <!-- Sidebar -->
+            <aside class="doc-sidebar" id="sidebar">
+                <div class="logo">
+                    <h2>🚀 Bet4Gain</h2>
+                    <span>v1.0</span>
+                </div>
+                <nav>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Getting Started</div>
+                        <a href="index.html" class="nav-link">Introduction</a>
+                        <a href="installation.html" class="nav-link"
+                            >Installation</a
+                        >
+                        <a href="configuration.html" class="nav-link"
+                            >Configuration</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Guide</div>
+                        <a href="features.html" class="nav-link active"
+                            >Features Overview</a
+                        >
+                        <a href="admin-panel.html" class="nav-link"
+                            >Admin Panel</a
+                        >
+                        <a href="game-engine.html" class="nav-link"
+                            >Game Engine</a
+                        >
+                        <a href="payments.html" class="nav-link"
+                            >Payments &amp; Wallet</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Technical</div>
+                        <a href="api-reference.html" class="nav-link"
+                            >API Reference</a
+                        >
+                        <a href="websockets.html" class="nav-link"
+                            >WebSockets</a
+                        >
+                        <a href="database.html" class="nav-link"
+                            >Database Schema</a
+                        >
+                        <a href="security.html" class="nav-link">Security</a>
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">More</div>
+                        <a href="customization.html" class="nav-link"
+                            >Customization</a
+                        >
+                        <a href="troubleshooting.html" class="nav-link"
+                            >Troubleshooting</a
+                        >
+                        <a href="changelog.html" class="nav-link">Changelog</a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="doc-main">
+                <h1>Features Overview</h1>
+                <p class="subtitle">
+                    A comprehensive breakdown of every feature in Bet4Gain.
+                </p>
+
+                <h2>🎮 Core Game</h2>
+
+                <h3>Real-Time Crash/Aviator Game</h3>
+                <p>
+                    The centerpiece of Bet4Gain is a real-time multiplayer crash
+                    game. Each round follows a lifecycle:
+                </p>
+                <ol>
+                    <li>
+                        <strong>Waiting</strong> — Brief countdown between
+                        rounds (default: 3 seconds)
+                    </li>
+                    <li>
+                        <strong>Betting</strong> — Players place bets (default:
+                        10 seconds)
+                    </li>
+                    <li>
+                        <strong>Running</strong> — Multiplier rises
+                        exponentially on a canvas-animated curve
+                    </li>
+                    <li>
+                        <strong>Crashed</strong> — Round ends at a random crash
+                        point; uncashed bets are lost
+                    </li>
+                </ol>
+                <p>
+                    The multiplier follows the exponential formula
+                    <strong>e<sup>0.06 × t</sup></strong> where <em>t</em> is
+                    elapsed seconds, broadcast to all players every 100ms via
+                    WebSockets.
+                </p>
+
+                <h3>Place Bet &amp; Cash Out</h3>
+                <ul>
+                    <li>
+                        Players can place up to
+                        <strong>2 simultaneous bets</strong> per round in
+                        independent bet slots
+                    </li>
+                    <li>
+                        Bets are placed during the betting phase with
+                        configurable min/max amounts
+                    </li>
+                    <li>
+                        Manual cashout during the running phase locks in the
+                        current multiplier
+                    </li>
+                    <li>Payout = bet amount × cashout multiplier</li>
+                </ul>
+
+                <h3>Auto Cashout</h3>
+                <ul>
+                    <li>
+                        Set a <strong>target multiplier</strong> before placing
+                        a bet
+                    </li>
+                    <li>
+                        The server automatically cashes out when the multiplier
+                        reaches the target
+                    </li>
+                    <li>
+                        Works even if the player closes their browser — fully
+                        server-side
+                    </li>
+                </ul>
+
+                <h3>Auto Bet</h3>
+                <p>
+                    Configure automated betting across multiple rounds with
+                    advanced strategies:
+                </p>
+                <ul>
+                    <li>
+                        <strong>Base bet amount</strong> — Starting bet per
+                        round
+                    </li>
+                    <li>
+                        <strong>Target multiplier</strong> — Auto-cashout point
+                    </li>
+                    <li>
+                        <strong>Stop loss</strong> — Maximum total loss before
+                        auto-bet stops
+                    </li>
+                    <li>
+                        <strong>Stop profit</strong> — Maximum total profit
+                        before stopping
+                    </li>
+                    <li>
+                        <strong>Increase on loss</strong> — Percentage to
+                        increase bet after a loss (Martingale)
+                    </li>
+                    <li>
+                        <strong>Increase on win</strong> — Percentage to
+                        increase bet after a win
+                    </li>
+                </ul>
+
+                <h3>Provably Fair</h3>
+                <p>Every round outcome is cryptographically verifiable:</p>
+                <ul>
+                    <li>
+                        <strong>Server seed</strong> — Generated before the
+                        round, hash shared with players
+                    </li>
+                    <li>
+                        <strong>Client seed</strong> — User-provided seed for
+                        added randomness
+                    </li>
+                    <li>
+                        <strong>HMAC-SHA256</strong> calculation determines the
+                        crash point
+                    </li>
+                    <li>1-in-33 chance of instant crash (1.00x multiplier)</li>
+                    <li>3% house edge applied mathematically</li>
+                    <li>
+                        Dedicated verification page at
+                        <code>/provably-fair</code>
+                    </li>
+                </ul>
+
+                <h3>Game History</h3>
+                <ul>
+                    <li>
+                        Recent crash results displayed in a scrollable rail
+                        above the canvas
+                    </li>
+                    <li>Full paginated history page with crash points</li>
+                    <li>
+                        Click any round to view detailed bets and verify
+                        fairness
+                    </li>
+                </ul>
+
+                <h2>💬 Live Chat</h2>
+                <ul>
+                    <li>
+                        <strong>Real-time messaging</strong> via WebSocket
+                        presence channel
+                    </li>
+                    <li><strong>Emoji picker</strong> for rich expression</li>
+                    <li>
+                        <strong>Player profile popovers</strong> — click any
+                        username to see stats
+                    </li>
+                    <li><strong>Online users list</strong> with live count</li>
+                    <li>
+                        <strong>Win announcements</strong> — auto-broadcast when
+                        players cash out above a configurable multiplier
+                        (default: 10x)
+                    </li>
+                    <li>
+                        <strong>Moderation tools</strong> — Admins can delete
+                        messages, mute/unmute users
+                    </li>
+                    <li>
+                        <strong>Rate limiting</strong> — Configurable cooldown
+                        between messages
+                    </li>
+                </ul>
+
+                <h2>💰 Wallet &amp; Payments</h2>
+
+                <h3>Dual Currency System</h3>
+                <ul>
+                    <li>
+                        <strong>NGN Wallet</strong> — Real money (Nigerian
+                        Naira) for deposits and withdrawals
+                    </li>
+                    <li>
+                        <strong>Coin Balance</strong> — Virtual currency used
+                        for betting
+                    </li>
+                    <li>
+                        <strong>Exchange</strong> — Buy coins with NGN, sell
+                        coins for NGN with configurable rates
+                    </li>
+                </ul>
+
+                <h3>Payment Gateways</h3>
+                <ul>
+                    <li>
+                        <strong>Paystack</strong> — Full integration with
+                        redirect-based checkout
+                    </li>
+                    <li>
+                        <strong>Nomba</strong> — Alternative gateway with
+                        API-based flow
+                    </li>
+                    <li>Webhook verification for both gateways</li>
+                    <li>Configurable limits and fees</li>
+                </ul>
+
+                <h3>Withdrawals</h3>
+                <ul>
+                    <li>Bank account resolution before withdrawal</li>
+                    <li>
+                        Auto-approval for amounts below configurable threshold
+                    </li>
+                    <li>
+                        Manual approval for larger amounts (via admin panel)
+                    </li>
+                    <li>Configurable withdrawal fee percentage</li>
+                </ul>
+
+                <h3>P2P Coin Transfer</h3>
+                <ul>
+                    <li>Send coins to other players by username</li>
+                    <li>Gift or transfer modes</li>
+                    <li>Configurable fee percentage (default: 2%)</li>
+                    <li>Daily transfer limits</li>
+                    <li>Minimum account age requirement</li>
+                    <li>Real-time notification to recipient via WebSocket</li>
+                </ul>
+
+                <h2>🏆 Leaderboards</h2>
+                <ul>
+                    <li>
+                        <strong>Four periods:</strong> Daily, Weekly, Monthly,
+                        All-Time
+                    </li>
+                    <li>Rankings based on total winnings</li>
+                    <li>Cached for performance (configurable TTL)</li>
+                    <li>Auto-calculated via scheduled command</li>
+                    <li>Public page at <code>/leaderboard</code></li>
+                </ul>
+
+                <h2>👤 User Features</h2>
+
+                <h3>Authentication</h3>
+                <ul>
+                    <li>Email/password registration and login</li>
+                    <li>
+                        Social login via <strong>Google</strong> and
+                        <strong>GitHub</strong>
+                    </li>
+                    <li>Email verification</li>
+                    <li>Password reset flow</li>
+                    <li>Two-factor authentication (2FA) support</li>
+                    <li>Guest/demo play without registration</li>
+                </ul>
+
+                <h3>Profile</h3>
+                <ul>
+                    <li>Upload custom avatar</li>
+                    <li>Update username and email</li>
+                    <li>Change password</li>
+                    <li>User preferences/settings (sound, theme, etc.)</li>
+                </ul>
+
+                <h3>Statistics</h3>
+                <ul>
+                    <li>
+                        Personal stats page: total bets, wins, losses,
+                        profit/loss
+                    </li>
+                    <li>Bet history with filterable list</li>
+                    <li>Transaction history with CSV export</li>
+                </ul>
+
+                <h2>📢 Advertisements</h2>
+                <ul>
+                    <li>
+                        Admin-managed ad system with multiple placements:
+                        <ul>
+                            <li>
+                                <strong>Sidebar</strong> — Shown next to the
+                                game
+                            </li>
+                            <li>
+                                <strong>Banner</strong> — Full-width banners
+                            </li>
+                            <li>
+                                <strong>Popup</strong> — Modal advertisements
+                            </li>
+                            <li>
+                                <strong>Between Rounds</strong> — Shown during
+                                waiting phase
+                            </li>
+                        </ul>
+                    </li>
+                    <li>Scheduling support (start/end dates)</li>
+                    <li>Click and impression tracking</li>
+                    <li>Automatic fallback when no ad matches a placement</li>
+                </ul>
+
+                <h2>🛡️ Security Features</h2>
+                <ul>
+                    <li>
+                        <strong>Rate limiting</strong> — Per-action rate limits
+                        on all endpoints
+                    </li>
+                    <li>
+                        <strong>Multi-account detection</strong> — Flag users
+                        sharing IP addresses
+                    </li>
+                    <li>
+                        <strong>Suspicious activity monitoring</strong> —
+                        Auto-detect win streaks, rapid withdrawals, deposit
+                        spikes, bot patterns
+                    </li>
+                    <li>
+                        <strong>IP blacklist/whitelist</strong> — Block or allow
+                        specific IP addresses
+                    </li>
+                    <li>
+                        <strong>Security headers</strong> — X-Frame-Options,
+                        HSTS, CSP, XSS protection
+                    </li>
+                    <li>
+                        <strong>Encrypted storage</strong> — Wallet balances and
+                        server seeds encrypted at rest
+                    </li>
+                    <li>
+                        <strong>Audit log</strong> — All admin actions logged
+                    </li>
+                    <li>
+                        <strong>Login tracking</strong> — IP, user agent,
+                        success/failure logging
+                    </li>
+                </ul>
+
+                <h2>🎯 Responsible Gaming</h2>
+                <ul>
+                    <li>
+                        <strong>Self-exclusion</strong> — Players can exclude
+                        themselves for 1–365 days
+                    </li>
+                    <li>
+                        <strong>Deposit limits</strong> — Daily, weekly, and
+                        monthly caps
+                    </li>
+                    <li>
+                        <strong>Bet limits</strong> — Maximum bet amount
+                        override
+                    </li>
+                    <li>
+                        <strong>Cooldown timer</strong> — Temporary lockout (15
+                        min to 24 hours)
+                    </li>
+                    <li>
+                        <strong>Session time reminders</strong> — Periodic
+                        alerts after configurable duration
+                    </li>
+                </ul>
+
+                <h2>📱 Responsive Design</h2>
+                <ul>
+                    <li>Mobile-first layout with adaptive grid</li>
+                    <li>
+                        Bottom navigation bar on mobile (Game, Chat, Bets,
+                        Leaderboard, Menu)
+                    </li>
+                    <li>Touch-optimized bet controls and canvas</li>
+                    <li>Tabbed interface on mobile to switch between panels</li>
+                    <li>
+                        Three-column layout on desktop (Chat | Game+Bets |
+                        LiveBets+Leaderboard)
+                    </li>
+                </ul>
+
+                <h2>🌓 Theming</h2>
+                <ul>
+                    <li>Dark and Light themes built with Tailwind CSS</li>
+                    <li>User-togglable via header button</li>
+                    <li>Respects system/OS preference by default</li>
+                    <li>Preference persists across sessions</li>
+                </ul>
+
+                <h2>🔊 Sound Effects</h2>
+                <ul>
+                    <li>
+                        Togglable sound effects for:
+                        <ul>
+                            <li>Bet placed</li>
+                            <li>Cash out</li>
+                            <li>Round crash</li>
+                            <li>Chat message</li>
+                            <li>Win notification</li>
+                            <li>Countdown tick</li>
+                        </ul>
+                    </li>
+                    <li>Preference saved in user settings</li>
+                </ul>
+
+                <!-- Navigation Footer -->
+                <div class="doc-nav-footer">
+                    <a href="configuration.html">← Configuration</a>
+                    <a href="admin-panel.html">Admin Panel →</a>
+                </div>
+            </main>
+        </div>
+
+        <button
+            class="sidebar-toggle"
+            id="sidebarToggle"
+            onclick="
+                document.getElementById('sidebar').classList.toggle('open')
+            "
+        >
+            ☰
+        </button>
+    </body>
+</html>

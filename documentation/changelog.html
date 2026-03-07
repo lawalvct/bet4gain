@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Changelog — Bet4Gain Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="doc-layout">
+
+    <!-- Sidebar -->
+    <aside class="doc-sidebar" id="sidebar">
+        <div class="logo">
+            <h2>🚀 Bet4Gain</h2>
+            <span>v1.0</span>
+        </div>
+        <nav>
+            <div class="nav-section">
+                <div class="nav-section-title">Getting Started</div>
+                <a href="index.html" class="nav-link">Introduction</a>
+                <a href="installation.html" class="nav-link">Installation</a>
+                <a href="configuration.html" class="nav-link">Configuration</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Guide</div>
+                <a href="features.html" class="nav-link">Features Overview</a>
+                <a href="admin-panel.html" class="nav-link">Admin Panel</a>
+                <a href="game-engine.html" class="nav-link">Game Engine</a>
+                <a href="payments.html" class="nav-link">Payments &amp; Wallet</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Technical</div>
+                <a href="api-reference.html" class="nav-link">API Reference</a>
+                <a href="websockets.html" class="nav-link">WebSockets</a>
+                <a href="database.html" class="nav-link">Database Schema</a>
+                <a href="security.html" class="nav-link">Security</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">More</div>
+                <a href="customization.html" class="nav-link">Customization</a>
+                <a href="troubleshooting.html" class="nav-link">Troubleshooting</a>
+                <a href="changelog.html" class="nav-link active">Changelog</a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="doc-main">
+        <h1>Changelog</h1>
+        <p class="subtitle">All notable changes to the Bet4Gain platform are documented here.</p>
+
+        <div class="callout callout-info">
+            <strong>Versioning:</strong> Bet4Gain follows <a href="https://semver.org/" target="_blank">Semantic Versioning</a>. Major versions may include breaking changes, minor versions add features, and patch versions fix bugs.
+        </div>
+
+        <!-- Version 1.0.0 -->
+        <h2 id="v1.0.0">Version 1.0.0 <span style="font-weight: 400; font-size: 0.85em; color: #6b7280;">— March 2026 (Initial Release)</span></h2>
+
+        <p>The first public release of Bet4Gain — a complete, production-ready real-time multiplayer crash/aviator betting platform.</p>
+
+        <h3>🎮 Game Engine</h3>
+        <ul>
+            <li>Real-time crash/aviator game with HTML5 Canvas rendering</li>
+            <li>Exponential multiplier curve with configurable growth rate</li>
+            <li>Up to 2 simultaneous bets per round</li>
+            <li>Auto cashout (server-side) with target multiplier</li>
+            <li>Auto bet with Martingale strategy support</li>
+            <li>Provably fair system with HMAC-SHA256 verification</li>
+            <li>Guest/demo play with virtual balance</li>
+            <li>Game history with per-round bet details</li>
+        </ul>
+
+        <h3>💰 Payments &amp; Wallet</h3>
+        <ul>
+            <li>Dual currency system (NGN + Coins)</li>
+            <li>Paystack payment gateway integration</li>
+            <li>Nomba payment gateway integration</li>
+            <li>Coin exchange (buy/sell)</li>
+            <li>P2P coin transfers with fee system</li>
+            <li>Withdrawal approval workflow</li>
+            <li>Transaction history with CSV export</li>
+        </ul>
+
+        <h3>💬 Social</h3>
+        <ul>
+            <li>Real-time public chat with WebSocket presence</li>
+            <li>Emoji picker</li>
+            <li>Player profile popovers</li>
+            <li>Online users list</li>
+            <li>Win announcements</li>
+            <li>Chat moderation (mute/delete)</li>
+        </ul>
+
+        <h3>🏆 Leaderboards &amp; Stats</h3>
+        <ul>
+            <li>Daily, weekly, monthly, all-time leaderboards</li>
+            <li>Personal statistics dashboard</li>
+            <li>Bet history</li>
+        </ul>
+
+        <h3>🛡️ Security</h3>
+        <ul>
+            <li>Rate limiting on all endpoints</li>
+            <li>Multi-account (IP) detection</li>
+            <li>Suspicious activity monitoring</li>
+            <li>IP blacklist/whitelist</li>
+            <li>Security headers</li>
+            <li>Encrypted wallet balances</li>
+            <li>Admin audit logging</li>
+            <li>Login attempt tracking</li>
+        </ul>
+
+        <h3>🎯 Responsible Gaming</h3>
+        <ul>
+            <li>Self-exclusion (1–365 days)</li>
+            <li>Deposit limits (daily/weekly/monthly)</li>
+            <li>Bet limits</li>
+            <li>Cooldown timer</li>
+            <li>Session time reminders</li>
+        </ul>
+
+        <h3>🛠️ Admin Panel</h3>
+        <ul>
+            <li>Filament-based dashboard with widgets</li>
+            <li>User management with ban/role controls</li>
+            <li>Game round inspection</li>
+            <li>Transaction management with approval workflow</li>
+            <li>Chat moderation</li>
+            <li>Advertisement management</li>
+            <li>Game, payment, and site settings pages</li>
+            <li>IP restriction management</li>
+            <li>Suspicious activity review</li>
+            <li>Reports and analytics</li>
+        </ul>
+
+        <h3>📱 UI/UX</h3>
+        <ul>
+            <li>Mobile-first responsive design</li>
+            <li>Dark/light theme with system preference detection</li>
+            <li>Sound effects (togglable)</li>
+            <li>Toast notifications</li>
+            <li>Social login (Google, GitHub)</li>
+            <li>Two-factor authentication support</li>
+        </ul>
+
+        <!-- Navigation Footer -->
+        <div class="doc-nav-footer">
+            <a href="troubleshooting.html">← Troubleshooting</a>
+            <span></span>
+        </div>
+    </main>
+</div>
+
+<button class="sidebar-toggle" id="sidebarToggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+</body>
+</html>

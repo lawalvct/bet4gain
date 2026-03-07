@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Troubleshooting — Bet4Gain Documentation</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
+    <body>
+        <div class="doc-layout">
+            <!-- Sidebar -->
+            <aside class="doc-sidebar" id="sidebar">
+                <div class="logo">
+                    <h2>🚀 Bet4Gain</h2>
+                    <span>v1.0</span>
+                </div>
+                <nav>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Getting Started</div>
+                        <a href="index.html" class="nav-link">Introduction</a>
+                        <a href="installation.html" class="nav-link"
+                            >Installation</a
+                        >
+                        <a href="configuration.html" class="nav-link"
+                            >Configuration</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Guide</div>
+                        <a href="features.html" class="nav-link"
+                            >Features Overview</a
+                        >
+                        <a href="admin-panel.html" class="nav-link"
+                            >Admin Panel</a
+                        >
+                        <a href="game-engine.html" class="nav-link"
+                            >Game Engine</a
+                        >
+                        <a href="payments.html" class="nav-link"
+                            >Payments &amp; Wallet</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Technical</div>
+                        <a href="api-reference.html" class="nav-link"
+                            >API Reference</a
+                        >
+                        <a href="websockets.html" class="nav-link"
+                            >WebSockets</a
+                        >
+                        <a href="database.html" class="nav-link"
+                            >Database Schema</a
+                        >
+                        <a href="security.html" class="nav-link">Security</a>
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">More</div>
+                        <a href="customization.html" class="nav-link"
+                            >Customization</a
+                        >
+                        <a href="troubleshooting.html" class="nav-link active"
+                            >Troubleshooting</a
+                        >
+                        <a href="changelog.html" class="nav-link">Changelog</a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="doc-main">
+                <h1>Troubleshooting</h1>
+                <p class="subtitle">
+                    Common issues and their solutions — organized in a problem →
+                    solution format for quick diagnosis.
+                </p>
+
+                <div class="callout callout-info">
+                    <strong>Tip:</strong> Always check
+                    <code>storage/logs/laravel.log</code> first — most errors
+                    are logged there with full stack traces. You can also use
+                    <code>php artisan tinker</code> to debug interactively.
+                </div>
+
+                <!-- 1. Blank Page -->
+                <h2 id="blank-page">1. Blank Page / White Screen</h2>
+                <p>
+                    If you see a completely blank (white) page after opening the
+                    app, the issue is usually a missing build step, a
+                    configuration error, or a permission problem.
+                </p>
+
+                <h4>Solutions</h4>
+                <ul>
+                    <li>
+                        <strong>Check the Laravel log</strong> — Open
+                        <code>storage/logs/laravel.log</code> and look at the
+                        most recent entries for error messages and stack traces.
+                    </li>
+                    <li>
+                        <strong>Clear all caches</strong> — Run:
+                        <pre><code>php artisan config:clear &amp;&amp; php artisan cache:clear &amp;&amp; php artisan view:clear</code></pre>
+                    </li>
+                    <li>
+                        <strong>Build frontend assets</strong> — If
+                        <code>public/build/</code> is missing or empty, assets
+                        haven't been compiled:
+                        <pre><code>npm run build</code></pre>
+                    </li>
+                    <li>
+                        <strong>Fix file permissions</strong> — The web server
+                        needs write access to <code>storage/</code> and
+                        <code>bootstrap/cache/</code>:
+                        <pre><code>chmod -R 775 storage bootstrap/cache
+chown -R www-data:www-data storage bootstrap/cache</code></pre>
+                    </li>
+                    <li>
+                        <strong>Generate app key</strong> — If
+                        <code>APP_KEY</code> is empty in <code>.env</code>:
+                        <pre><code>php artisan key:generate</code></pre>
+                    </li>
+                </ul>
+
+                <!-- 2. WebSocket Connection Failed -->
+                <h2 id="websocket-connection-failed">
+                    2. WebSocket Connection Failed
+                </h2>
+                <p>
+                    If the game doesn't update in real-time, chat doesn't load,
+                    or you see WebSocket errors in the browser console, the
+                    WebSocket server may not be running or misconfigured.
+                </p>
+
+                <h4>Solutions</h4>
+                <ul>
+                    <li>
+                        <strong>Verify Reverb is running</strong>:
+                        <pre><code>php artisan reverb:start</code></pre>
+                        You should see output confirming it's listening on a
+                        host and port.
+                    </li>
+                    <li>
+                        <strong>Check environment variables</strong> — Ensure
+                        the <code>REVERB_*</code> and
+                        <code>VITE_REVERB_*</code> variables in your
+                        <code>.env</code> match:
+                        <pre><code>REVERB_HOST=127.0.0.1
+REVERB_PORT=8080
+REVERB_SCHEME=http
+
+VITE_REVERB_HOST=127.0.0.1
+VITE_REVERB_PORT=8080
+VITE_REVERB_SCHEME=http</code></pre>
+                    </li>
+                    <li>
+                        <strong>Rebuild after changing VITE_* variables</strong>
+                        — Vite inlines these at build time, so you must rebuild:
+                        <pre><code>npm run build</code></pre>
+                    </li>
+                    <li>
+                        <strong>Check firewall</strong> — The WebSocket port
+                        (default <code>8080</code>) must be open in your
+                        firewall/security group.
+                    </li>
+                    <li>
+                        <strong>SSL/HTTPS setup</strong> — If your site uses
+                        HTTPS, Reverb must also use a secure connection:
+                        <pre><code>REVERB_SCHEME=https
+REVERB_PORT=443
+VITE_REVERB_SCHEME=https
+VITE_REVERB_PORT=443</code></pre>
+                    </li>
+                    <li>
+                        <strong>Debug in browser</strong> — Open DevTools →
+                        <strong>Network</strong> tab → filter by
+                        <strong>WS</strong> to inspect the WebSocket handshake
+                        and any error frames.
+                    </li>
+                </ul>
+
+                <!-- 3. Game Not Starting -->
+                <h2 id="game-not-starting">3. Game Not Starting / No Rounds</h2>
+                <p>
+                    If the game page loads but no rounds are being created or
+                    the timer is stuck, the game loop process is likely not
+                    running.
+                </p>
+
+                <h4>Solutions</h4>
+                <ul>
+                    <li>
+                        <strong>Start the game loop</strong>:
+                        <pre><code>php artisan game:start</code></pre>
+                    </li>
+                    <li>
+                        <strong>Use Supervisor in production</strong> —
+                        Supervisor will automatically restart the game loop if
+                        it crashes. Add a config like:
+                        <pre><code>[program:bet4gain-game]
+command=php /path/to/artisan game:start
+autostart=true
+autorestart=true
+redirect_stderr=true
+stdout_logfile=/path/to/storage/logs/game.log</code></pre>
+                    </li>
+                    <li>
+                        <strong>Check game logs</strong> — Look in
+                        <code>storage/logs/</code> for game-related error
+                        messages.
+                    </li>
+                    <li>
+                        <strong>Verify broadcast driver</strong> — Ensure your
+                        <code>.env</code> has:
+                        <pre><code>BROADCAST_CONNECTION=reverb</code></pre>
+                    </li>
+                </ul>
+
+                <!-- 4. Payment Not Working -->
+                <h2 id="payment-not-working">4. Payment Not Working</h2>
+                <p>
+                    If deposits or withdrawals fail, or webhook callbacks are
+                    not received, check the payment gateway configuration.
+                </p>
+
+                <h4>Solutions</h4>
+                <ul>
+                    <li>
+                        <strong>Verify API keys</strong> — Ensure
+                        <code>PAYSTACK_SECRET_KEY</code> and
+                        <code>PAYSTACK_PUBLIC_KEY</code> are set correctly in
+                        <code>.env</code>.
+                    </li>
+                    <li>
+                        <strong>Webhook accessibility</strong> — Webhook URLs
+                        must be reachable from the internet. For local
+                        development, use a tunnel service like ngrok.
+                    </li>
+                    <li>
+                        <strong>Use test keys for development</strong> —
+                        Paystack test keys start with <code>sk_test_</code> and
+                        <code>pk_test_</code>.
+                    </li>
+                    <li>
+                        <strong>Check logs</strong> — Look in
+                        <code>storage/logs/laravel.log</code> for payment
+                        gateway error responses.
+                    </li>
+                    <li>
+                        <strong>Verify APP_URL</strong> — Webhook callbacks use
+                        <code>APP_URL</code> to construct return URLs. Make sure
+                        it's correct:
+                        <pre><code>APP_URL=https://yourdomain.com</code></pre>
+                    </li>
+                </ul>
+
+                <!-- 5. Chat Not Loading -->
+                <h2 id="chat-not-loading">5. Chat Not Loading</h2>
+                <p>
+                    If the chat panel is empty or messages don't appear, it's
+                    usually a WebSocket or configuration issue.
+                </p>
+
+                <h4>Solutions</h4>
+                <ul>
+                    <li>
+                        <strong>Enable chat</strong> — Verify the setting in
+                        your <code>.env</code>:
+                        <pre><code>GAME_CHAT_ENABLED=true</code></pre>
+                    </li>
+                    <li>
+                        <strong>Check WebSocket connection</strong> — See
+                        <a href="#websocket-connection-failed">Issue #2</a>
+                        above.
+                    </li>
+                    <li>
+                        <strong>Check user ban status</strong> — Banned users
+                        are prevented from joining the chat channel. Check the
+                        user's status in the admin panel.
+                    </li>
+                    <li>
+                        <strong>Clear browser cache</strong> — Hard refresh with
+                        <code>Ctrl+Shift+R</code> or clear browser cache and
+                        cookies.
+                    </li>
+                </ul>
+
+                <!-- 6. Admin Panel Access Denied -->
+                <h2 id="admin-panel-access">6. Admin Panel Access Denied</h2>
+                <p>
+                    If you get a 403 Forbidden error when accessing
+                    <code>/admin</code>, your user account doesn't have the
+                    admin role.
+                </p>
+
+                <h4>Solutions</h4>
+                <ul>
+                    <li>
+                        <strong>Set admin role via Tinker</strong>:
+                        <pre><code>php artisan tinker
+&gt; User::find(1)-&gt;update(['role' =&gt; 'admin'])</code></pre>
+                    </li>
+                    <li>
+                        <strong>Run the database seeder</strong> — The default
+                        seeder creates an admin user:
+                        <pre><code>php artisan db:seed</code></pre>
+                    </li>
+                    <li>
+                        <strong>Ensure Filament is installed</strong> — The
+                        admin panel requires Filament:
+                        <pre><code>composer require filament/filament</code></pre>
+                    </li>
+                </ul>
+
+                <!-- 7. Assets Not Loading -->
+                <h2 id="assets-not-loading">7. Assets Not Loading / 404</h2>
+                <p>
+                    If CSS, JavaScript, or images return 404 errors, the assets
+                    haven't been compiled or the storage link is missing.
+                </p>
+
+                <h4>Solutions</h4>
+                <ul>
+                    <li>
+                        <strong>Compile frontend assets</strong>:
+                        <pre><code>npm run build</code></pre>
+                    </li>
+                    <li>
+                        <strong>Create storage symlink</strong> — Required for
+                        user uploads and public files:
+                        <pre><code>php artisan storage:link</code></pre>
+                    </li>
+                    <li>
+                        <strong>Verify build output</strong> — Ensure
+                        <code>public/build/</code> exists and contains a
+                        <code>manifest.json</code> file.
+                    </li>
+                    <li>
+                        <strong>Check web server config</strong> — Make sure the
+                        document root points to the
+                        <code>public/</code> directory.
+                    </li>
+                </ul>
+
+                <!-- 8. Migration Errors -->
+                <h2 id="migration-errors">8. Migration Errors</h2>
+                <p>
+                    Database migration failures are usually caused by incorrect
+                    database credentials or conflicting migration state.
+                </p>
+
+                <h4>Solutions</h4>
+                <ul>
+                    <li>
+                        <strong>Check migration status</strong>:
+                        <pre><code>php artisan migrate:status</code></pre>
+                    </li>
+                    <li>
+                        <strong>Fresh start</strong> (⚠️ WARNING: drops all
+                        data):
+                        <pre><code>php artisan migrate:fresh --seed</code></pre>
+                    </li>
+                    <li>
+                        <strong>Verify database credentials</strong> — Check
+                        these values in <code>.env</code>:
+                        <pre><code>DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=bet4gain
+DB_USERNAME=root
+DB_PASSWORD=</code></pre>
+                    </li>
+                    <li>
+                        <strong>Check MySQL version</strong> — MySQL 8.0+ is
+                        required for some column types and JSON operations.
+                    </li>
+                </ul>
+
+                <!-- 9. Leaderboard Not Showing -->
+                <h2 id="leaderboard-not-showing">9. Leaderboard Not Showing</h2>
+                <p>
+                    If the leaderboard page is empty or shows stale data, it may
+                    need to be recalculated.
+                </p>
+
+                <h4>Solutions</h4>
+                <ul>
+                    <li>
+                        <strong>Force recalculation</strong>:
+                        <pre><code>php artisan leaderboard:calculate</code></pre>
+                    </li>
+                    <li>
+                        <strong>Check cache TTL</strong> — The
+                        <code>GAME_LEADERBOARD_CACHE_TTL</code> setting controls
+                        how long leaderboard data is cached (in seconds). Lower
+                        it for more frequent updates.
+                    </li>
+                    <li>
+                        <strong>Verify data exists</strong> — Leaderboards
+                        require completed bets in the database. Check via
+                        Tinker:
+                        <pre><code>php artisan tinker
+&gt; \App\Models\Bet::where('status', 'won')-&gt;count()</code></pre>
+                    </li>
+                </ul>
+
+                <!-- 10. Performance Issues -->
+                <h2 id="performance-issues">10. Performance Issues</h2>
+                <p>
+                    Slow page loads, laggy game updates, or high server resource
+                    usage can often be resolved with caching and configuration
+                    tweaks.
+                </p>
+
+                <h4>Solutions</h4>
+                <ul>
+                    <li>
+                        <strong>Use Redis in production</strong> — Configure
+                        Redis for cache, sessions, and queues:
+                        <pre><code>CACHE_STORE=redis
+SESSION_DRIVER=redis
+QUEUE_CONNECTION=redis</code></pre>
+                    </li>
+                    <li>
+                        <strong>Cache configuration and routes</strong>:
+                        <pre><code>php artisan config:cache &amp;&amp; php artisan route:cache</code></pre>
+                    </li>
+                    <li>
+                        <strong>Scale queue workers</strong> — Increase the
+                        number of Supervisor queue workers to handle more jobs
+                        concurrently.
+                    </li>
+                    <li>
+                        <strong>Tune tick rate</strong> — The
+                        <code>GAME_TICK_RATE</code> setting controls how many
+                        WebSocket updates are sent per second during a round.
+                        Lower values reduce server and network load but make
+                        animations less smooth.
+                    </li>
+                    <li>
+                        <strong>Enable OPcache</strong> — Ensure PHP OPcache is
+                        enabled for significant performance gains in production.
+                    </li>
+                </ul>
+
+                <!-- 11. Coin Transfer Alert Not Showing -->
+                <h2 id="coin-transfer-alert">
+                    11. Coin Transfer Alert Not Showing
+                </h2>
+                <p>
+                    If users don't receive real-time notifications when someone
+                    sends them coins, the private channel setup may be
+                    misconfigured.
+                </p>
+
+                <h4>Solutions</h4>
+                <ul>
+                    <li>
+                        <strong>Verify Reverb is running</strong> — The
+                        notification relies on WebSockets:
+                        <pre><code>php artisan reverb:start</code></pre>
+                    </li>
+                    <li>
+                        <strong>Check channel authorization</strong> — Ensure
+                        <code>routes/channels.php</code> defines the
+                        <code>user.{id}</code> private channel.
+                    </li>
+                    <li>
+                        <strong>Verify broadcast driver</strong>:
+                        <pre><code>BROADCAST_CONNECTION=reverb</code></pre>
+                    </li>
+                    <li>
+                        <strong>Clear all caches and rebuild</strong>:
+                        <pre><code>php artisan config:clear &amp;&amp; npm run build</code></pre>
+                    </li>
+                </ul>
+
+                <!-- Useful Commands -->
+                <h2 id="useful-commands">Useful Commands</h2>
+                <p>
+                    Quick reference table for the most commonly used commands:
+                </p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Command</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>php artisan game:start</code></td>
+                            <td>Start game loop</td>
+                        </tr>
+                        <tr>
+                            <td><code>php artisan reverb:start</code></td>
+                            <td>Start WebSocket server</td>
+                        </tr>
+                        <tr>
+                            <td><code>php artisan queue:work</code></td>
+                            <td>Start queue worker</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <code>php artisan leaderboard:calculate</code>
+                            </td>
+                            <td>Recalculate leaderboards</td>
+                        </tr>
+                        <tr>
+                            <td><code>php artisan config:cache</code></td>
+                            <td>Cache configuration</td>
+                        </tr>
+                        <tr>
+                            <td><code>php artisan route:cache</code></td>
+                            <td>Cache routes</td>
+                        </tr>
+                        <tr>
+                            <td><code>php artisan cache:clear</code></td>
+                            <td>Clear application cache</td>
+                        </tr>
+                        <tr>
+                            <td><code>php artisan migrate</code></td>
+                            <td>Run database migrations</td>
+                        </tr>
+                        <tr>
+                            <td><code>php artisan db:seed</code></td>
+                            <td>Seed default data</td>
+                        </tr>
+                        <tr>
+                            <td><code>php artisan storage:link</code></td>
+                            <td>Create storage symlink</td>
+                        </tr>
+                        <tr>
+                            <td><code>php artisan tinker</code></td>
+                            <td>Interactive PHP shell</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Navigation Footer -->
+                <div class="doc-nav-footer">
+                    <a href="customization.html">← Customization</a>
+                    <a href="changelog.html">Changelog →</a>
+                </div>
+            </main>
+        </div>
+
+        <button
+            class="sidebar-toggle"
+            id="sidebarToggle"
+            onclick="
+                document.getElementById('sidebar').classList.toggle('open')
+            "
+        >
+            ☰
+        </button>
+    </body>
+</html>

@@ -13,12 +13,18 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    @php
+        $siteName = \App\Models\SiteSetting::get('site_name', config('app.name', 'Bet4Gain'));
+        $siteLogo = \App\Models\SiteSetting::get('site_logo', '');
+    @endphp
     <script>
         window.__BET4GAIN__ = {
             user: null,
             csrfToken: '{{ csrf_token() }}',
             appName: '{{ config("app.name") }}',
             appUrl: '{{ config("app.url") }}',
+            siteName: {!! json_encode($siteName) !!},
+            siteLogo: {!! json_encode($siteLogo) !!},
         };
     </script>
 </head>

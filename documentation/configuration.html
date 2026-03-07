@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Configuration — Bet4Gain Documentation</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
+    <body>
+        <div class="doc-layout">
+            <!-- Sidebar -->
+            <aside class="doc-sidebar" id="sidebar">
+                <div class="logo">
+                    <h2>🚀 Bet4Gain</h2>
+                    <span>v1.0</span>
+                </div>
+                <nav>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Getting Started</div>
+                        <a href="index.html" class="nav-link">Introduction</a>
+                        <a href="installation.html" class="nav-link"
+                            >Installation</a
+                        >
+                        <a href="configuration.html" class="nav-link active"
+                            >Configuration</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Guide</div>
+                        <a href="features.html" class="nav-link"
+                            >Features Overview</a
+                        >
+                        <a href="admin-panel.html" class="nav-link"
+                            >Admin Panel</a
+                        >
+                        <a href="game-engine.html" class="nav-link"
+                            >Game Engine</a
+                        >
+                        <a href="payments.html" class="nav-link"
+                            >Payments &amp; Wallet</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Technical</div>
+                        <a href="api-reference.html" class="nav-link"
+                            >API Reference</a
+                        >
+                        <a href="websockets.html" class="nav-link"
+                            >WebSockets</a
+                        >
+                        <a href="database.html" class="nav-link"
+                            >Database Schema</a
+                        >
+                        <a href="security.html" class="nav-link">Security</a>
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">More</div>
+                        <a href="customization.html" class="nav-link"
+                            >Customization</a
+                        >
+                        <a href="troubleshooting.html" class="nav-link"
+                            >Troubleshooting</a
+                        >
+                        <a href="changelog.html" class="nav-link">Changelog</a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="doc-main">
+                <h1>Configuration</h1>
+                <p class="subtitle">
+                    All environment variables and configuration options for
+                    Bet4Gain.
+                </p>
+
+                <p>
+                    Configuration is managed through environment variables in
+                    the <code>.env</code> file and config files in the
+                    <code>config/</code> directory. Most settings can also be
+                    managed from the
+                    <a href="admin-panel.html">Admin Panel</a> without touching
+                    any files.
+                </p>
+
+                <h2>Game Settings</h2>
+                <p>File: <code>config/game.php</code></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>GAME_MIN_BET</code></td>
+                            <td>10</td>
+                            <td>Minimum bet amount per slot</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_MAX_BET</code></td>
+                            <td>100,000</td>
+                            <td>Maximum bet amount per slot</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_MAX_PAYOUT_MULTIPLIER</code></td>
+                            <td>1,000</td>
+                            <td>Max payout multiplier cap</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_BETTING_DURATION</code></td>
+                            <td>10</td>
+                            <td>Betting phase duration in seconds</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_WAITING_DURATION</code></td>
+                            <td>3</td>
+                            <td>Wait time between rounds (seconds)</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_TICK_RATE</code></td>
+                            <td>100</td>
+                            <td>Multiplier broadcast interval (ms)</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_HOUSE_EDGE</code></td>
+                            <td>0.03</td>
+                            <td>House edge percentage (3%)</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_GROWTH_RATE</code></td>
+                            <td>0.06</td>
+                            <td>Exponential curve constant</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_DEMO_STARTING_BALANCE</code></td>
+                            <td>10,000</td>
+                            <td>Demo/guest starting coin balance</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_GUEST_PLAY_ENABLED</code></td>
+                            <td>true</td>
+                            <td>Allow guest/demo play</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_MAX_BETS_PER_ROUND</code></td>
+                            <td>2</td>
+                            <td>Max bets per round per user</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Visual Settings</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>GAME_FLYING_OBJECT</code></td>
+                            <td>rocket</td>
+                            <td>
+                                Sprite type: <code>rocket</code>,
+                                <code>plane</code>, or <code>custom</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_BACKGROUND_THEME</code></td>
+                            <td>starfield</td>
+                            <td>Canvas background theme</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Chat Settings</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>GAME_CHAT_ENABLED</code></td>
+                            <td>true</td>
+                            <td>Enable/disable public chat</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_CHAT_RATE_LIMIT</code></td>
+                            <td>3</td>
+                            <td>Min seconds between messages</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_CHAT_MAX_LENGTH</code></td>
+                            <td>200</td>
+                            <td>Max message length</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_CHAT_HISTORY_COUNT</code></td>
+                            <td>50</td>
+                            <td>Number of messages to load initially</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_WIN_ANNOUNCEMENT_MIN</code></td>
+                            <td>10</td>
+                            <td>Min multiplier for auto win announcements</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Leaderboard Settings</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>GAME_LEADERBOARD_CACHE_TTL</code></td>
+                            <td>300</td>
+                            <td>Leaderboard cache duration (seconds)</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_LEADERBOARD_TOP_COUNT</code></td>
+                            <td>50</td>
+                            <td>Number of top entries per period</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Payment Settings</h2>
+                <p>File: <code>config/payment.php</code></p>
+
+                <h3>Gateway Configuration</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>PAYMENT_DEFAULT_GATEWAY</code></td>
+                            <td>paystack</td>
+                            <td>Default payment gateway</td>
+                        </tr>
+                        <tr>
+                            <td><code>PAYSTACK_ENABLED</code></td>
+                            <td>true</td>
+                            <td>Enable Paystack gateway</td>
+                        </tr>
+                        <tr>
+                            <td><code>PAYSTACK_SECRET_KEY</code></td>
+                            <td>—</td>
+                            <td>Paystack secret API key</td>
+                        </tr>
+                        <tr>
+                            <td><code>PAYSTACK_PUBLIC_KEY</code></td>
+                            <td>—</td>
+                            <td>Paystack public API key</td>
+                        </tr>
+                        <tr>
+                            <td><code>PAYSTACK_WEBHOOK_SECRET</code></td>
+                            <td>—</td>
+                            <td>Paystack webhook verification secret</td>
+                        </tr>
+                        <tr>
+                            <td><code>NOMBA_ENABLED</code></td>
+                            <td>true</td>
+                            <td>Enable Nomba gateway</td>
+                        </tr>
+                        <tr>
+                            <td><code>NOMBA_CLIENT_ID</code></td>
+                            <td>—</td>
+                            <td>Nomba API client ID</td>
+                        </tr>
+                        <tr>
+                            <td><code>NOMBA_CLIENT_SECRET</code></td>
+                            <td>—</td>
+                            <td>Nomba API client secret</td>
+                        </tr>
+                        <tr>
+                            <td><code>NOMBA_ACCOUNT_ID</code></td>
+                            <td>—</td>
+                            <td>Nomba account identifier</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Currency &amp; Rates</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>PAYMENT_CURRENCY</code></td>
+                            <td>NGN</td>
+                            <td>Primary fiat currency</td>
+                        </tr>
+                        <tr>
+                            <td><code>COIN_TO_NGN_RATE</code></td>
+                            <td>1</td>
+                            <td>1 coin = X NGN (exchange rate)</td>
+                        </tr>
+                        <tr>
+                            <td><code>NGN_TO_COIN_RATE</code></td>
+                            <td>1</td>
+                            <td>1 NGN = X coins (exchange rate)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Limits &amp; Fees</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>PAYMENT_MIN_DEPOSIT</code></td>
+                            <td>500</td>
+                            <td>Minimum deposit amount (NGN)</td>
+                        </tr>
+                        <tr>
+                            <td><code>PAYMENT_MAX_DEPOSIT</code></td>
+                            <td>1,000,000</td>
+                            <td>Maximum deposit amount (NGN)</td>
+                        </tr>
+                        <tr>
+                            <td><code>PAYMENT_MIN_WITHDRAWAL</code></td>
+                            <td>1,000</td>
+                            <td>Minimum withdrawal amount</td>
+                        </tr>
+                        <tr>
+                            <td><code>PAYMENT_MAX_WITHDRAWAL</code></td>
+                            <td>500,000</td>
+                            <td>Maximum withdrawal amount</td>
+                        </tr>
+                        <tr>
+                            <td><code>PAYMENT_AUTO_APPROVE_LIMIT</code></td>
+                            <td>50,000</td>
+                            <td>Auto-approve withdrawal threshold</td>
+                        </tr>
+                        <tr>
+                            <td><code>PAYMENT_WITHDRAWAL_FEE</code></td>
+                            <td>1</td>
+                            <td>Withdrawal fee percentage</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>P2P Coin Transfer</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>COIN_TRANSFER_FEE_PERCENT</code></td>
+                            <td>2</td>
+                            <td>Fee charged on P2P transfers</td>
+                        </tr>
+                        <tr>
+                            <td><code>COIN_MIN_TRANSFER</code></td>
+                            <td>100</td>
+                            <td>Minimum transfer amount</td>
+                        </tr>
+                        <tr>
+                            <td><code>COIN_MAX_TRANSFER</code></td>
+                            <td>100,000</td>
+                            <td>Maximum transfer amount</td>
+                        </tr>
+                        <tr>
+                            <td><code>COIN_DAILY_TRANSFER_LIMIT</code></td>
+                            <td>500,000</td>
+                            <td>Daily transfer cap per user</td>
+                        </tr>
+                        <tr>
+                            <td><code>COIN_TRANSFER_MIN_ACCOUNT_AGE</code></td>
+                            <td>3</td>
+                            <td>Minimum account age (days) to transfer</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>WebSocket Configuration</h2>
+                <p>File: <code>config/reverb.php</code></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>BROADCAST_CONNECTION</code></td>
+                            <td>reverb</td>
+                            <td>
+                                Must be set to <code>reverb</code> for real-time
+                                game
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>REVERB_APP_ID</code></td>
+                            <td>—</td>
+                            <td>Reverb application ID</td>
+                        </tr>
+                        <tr>
+                            <td><code>REVERB_APP_KEY</code></td>
+                            <td>—</td>
+                            <td>Reverb application key</td>
+                        </tr>
+                        <tr>
+                            <td><code>REVERB_APP_SECRET</code></td>
+                            <td>—</td>
+                            <td>Reverb application secret</td>
+                        </tr>
+                        <tr>
+                            <td><code>REVERB_SERVER_HOST</code></td>
+                            <td>0.0.0.0</td>
+                            <td>Server bind address</td>
+                        </tr>
+                        <tr>
+                            <td><code>REVERB_SERVER_PORT</code></td>
+                            <td>8080</td>
+                            <td>Server listen port</td>
+                        </tr>
+                        <tr>
+                            <td><code>REVERB_HOST</code></td>
+                            <td>localhost</td>
+                            <td>Client-facing host</td>
+                        </tr>
+                        <tr>
+                            <td><code>REVERB_PORT</code></td>
+                            <td>443</td>
+                            <td>Client-facing port</td>
+                        </tr>
+                        <tr>
+                            <td><code>REVERB_SCHEME</code></td>
+                            <td>https</td>
+                            <td>Client-facing scheme (http/https)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="callout callout-warning">
+                    <strong>Important:</strong> The
+                    <code>VITE_REVERB_*</code> variables must match the Reverb
+                    client-facing settings. These are baked into the frontend
+                    JavaScript at build time, so you must run
+                    <code>npm run build</code> after changing them.
+                </div>
+
+                <h2>Security Configuration</h2>
+                <p>File: <code>config/security.php</code></p>
+
+                <h3>Rate Limiting</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Limit</th>
+                            <th>Window</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Bet placement</td>
+                            <td>5 requests</td>
+                            <td>10 seconds</td>
+                        </tr>
+                        <tr>
+                            <td>Cashout</td>
+                            <td>5 requests</td>
+                            <td>10 seconds</td>
+                        </tr>
+                        <tr>
+                            <td>Chat message</td>
+                            <td>1 request</td>
+                            <td>3 seconds</td>
+                        </tr>
+                        <tr>
+                            <td>Deposit</td>
+                            <td>5 requests</td>
+                            <td>60 seconds</td>
+                        </tr>
+                        <tr>
+                            <td>Withdrawal</td>
+                            <td>3 requests</td>
+                            <td>600 seconds</td>
+                        </tr>
+                        <tr>
+                            <td>Registration</td>
+                            <td>3 requests</td>
+                            <td>600 seconds</td>
+                        </tr>
+                        <tr>
+                            <td>API (general)</td>
+                            <td>120 requests</td>
+                            <td>60 seconds</td>
+                        </tr>
+                        <tr>
+                            <td>Webhook</td>
+                            <td>100 requests</td>
+                            <td>60 seconds</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Anti-Cheat &amp; Suspicious Activity</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Setting</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Max users per IP</td>
+                            <td>3</td>
+                            <td>Multi-account detection limit</td>
+                        </tr>
+                        <tr>
+                            <td>IP lookback</td>
+                            <td>30 days</td>
+                            <td>Period for IP analysis</td>
+                        </tr>
+                        <tr>
+                            <td>Win streak threshold</td>
+                            <td>15</td>
+                            <td>Auto-flag consecutive wins</td>
+                        </tr>
+                        <tr>
+                            <td>Rapid withdrawal</td>
+                            <td>500K / 30min</td>
+                            <td>Flag large rapid withdrawals</td>
+                        </tr>
+                        <tr>
+                            <td>Deposit spike</td>
+                            <td>10x average</td>
+                            <td>Flag abnormal deposit patterns</td>
+                        </tr>
+                        <tr>
+                            <td>Min bet interval</td>
+                            <td>200ms</td>
+                            <td>Bot detection threshold</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Responsible Gaming</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Options</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Self-exclusion</td>
+                            <td>1 day to 365 days</td>
+                        </tr>
+                        <tr>
+                            <td>Deposit limits</td>
+                            <td>Daily, weekly, monthly caps</td>
+                        </tr>
+                        <tr>
+                            <td>Cooldown</td>
+                            <td>15min, 30min, 1hr, 3hr, 6hr, 12hr, 24hr</td>
+                        </tr>
+                        <tr>
+                            <td>Session reminder</td>
+                            <td>Every 60 minutes (configurable)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Social Login (OAuth)</h2>
+                <p>File: <code>config/services.php</code></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>GOOGLE_CLIENT_ID</code></td>
+                            <td>Google OAuth client ID</td>
+                        </tr>
+                        <tr>
+                            <td><code>GOOGLE_CLIENT_SECRET</code></td>
+                            <td>Google OAuth client secret</td>
+                        </tr>
+                        <tr>
+                            <td><code>GOOGLE_REDIRECT_URI</code></td>
+                            <td>Google OAuth callback URL</td>
+                        </tr>
+                        <tr>
+                            <td><code>GITHUB_CLIENT_ID</code></td>
+                            <td>GitHub OAuth client ID</td>
+                        </tr>
+                        <tr>
+                            <td><code>GITHUB_CLIENT_SECRET</code></td>
+                            <td>GitHub OAuth client secret</td>
+                        </tr>
+                        <tr>
+                            <td><code>GITHUB_REDIRECT_URI</code></td>
+                            <td>GitHub OAuth callback URL</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="callout callout-info">
+                    <strong>Tip:</strong> Callback URLs follow the pattern:
+                    <code>https://yourdomain.com/auth/{provider}/callback</code>
+                </div>
+
+                <h2>Caching Configuration</h2>
+                <p>For production, use Redis for best performance:</p>
+                <pre><code># .env
+CACHE_STORE=redis
+SESSION_DRIVER=redis
+QUEUE_CONNECTION=redis
+
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379</code></pre>
+
+                <p>
+                    After making any changes, clear and rebuild the config
+                    cache:
+                </p>
+                <pre><code>php artisan config:cache
+php artisan route:cache
+php artisan view:cache</code></pre>
+
+                <!-- Navigation Footer -->
+                <div class="doc-nav-footer">
+                    <a href="installation.html">← Installation</a>
+                    <a href="features.html">Features Overview →</a>
+                </div>
+            </main>
+        </div>
+
+        <button
+            class="sidebar-toggle"
+            id="sidebarToggle"
+            onclick="
+                document.getElementById('sidebar').classList.toggle('open')
+            "
+        >
+            ☰
+        </button>
+    </body>
+</html>

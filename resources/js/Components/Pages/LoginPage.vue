@@ -6,12 +6,19 @@
             <!-- Logo -->
             <div class="text-center mb-8">
                 <a href="/" class="inline-block group">
+                    <img
+                        v-if="siteLogoUrl"
+                        :src="siteLogoUrl"
+                        :alt="siteName"
+                        class="h-14 w-auto max-w-55 object-contain mx-auto transition-transform group-hover:scale-105"
+                    />
                     <span
+                        v-else
                         class="text-4xl block transition-transform group-hover:scale-110"
                         >🎮</span
                     >
                     <h1 class="text-2xl font-bold text-primary-500 mt-2">
-                        Bet4Gain
+                        {{ siteName }}
                     </h1>
                 </a>
                 <p class="text-slate-500 dark:text-slate-400 mt-2">
@@ -210,7 +217,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
+import { computed, ref, reactive } from "vue";
 import axios from "axios";
 import { BaseInput, BaseButton } from "@/Components/UI";
 
@@ -222,6 +229,24 @@ const form = reactive({
     email: "",
     password: "",
     remember: false,
+});
+
+const appData = window.__BET4GAIN__ || {};
+
+const siteName = computed(
+    () => appData.siteName || appData.appName || "Bet4Gain",
+);
+
+const siteLogoUrl = computed(() => {
+    const raw = appData.siteLogo;
+    if (!raw) return "";
+
+    const logo = String(raw);
+    if (logo.startsWith("http")) return logo;
+    if (logo.startsWith("/storage/")) return logo;
+    if (logo.startsWith("storage/")) return `/${logo}`;
+
+    return `/storage/${logo.replace(/^\/+/, "")}`;
 });
 
 const handleLogin = async () => {

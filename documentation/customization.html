@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Customization — Bet4Gain Documentation</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
+    <body>
+        <div class="doc-layout">
+            <!-- Sidebar -->
+            <aside class="doc-sidebar" id="sidebar">
+                <div class="logo">
+                    <h2>🚀 Bet4Gain</h2>
+                    <span>v1.0</span>
+                </div>
+                <nav>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Getting Started</div>
+                        <a href="index.html" class="nav-link">Introduction</a>
+                        <a href="installation.html" class="nav-link"
+                            >Installation</a
+                        >
+                        <a href="configuration.html" class="nav-link"
+                            >Configuration</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Guide</div>
+                        <a href="features.html" class="nav-link"
+                            >Features Overview</a
+                        >
+                        <a href="admin-panel.html" class="nav-link"
+                            >Admin Panel</a
+                        >
+                        <a href="game-engine.html" class="nav-link"
+                            >Game Engine</a
+                        >
+                        <a href="payments.html" class="nav-link"
+                            >Payments &amp; Wallet</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Technical</div>
+                        <a href="api-reference.html" class="nav-link"
+                            >API Reference</a
+                        >
+                        <a href="websockets.html" class="nav-link"
+                            >WebSockets</a
+                        >
+                        <a href="database.html" class="nav-link"
+                            >Database Schema</a
+                        >
+                        <a href="security.html" class="nav-link">Security</a>
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">More</div>
+                        <a href="customization.html" class="nav-link active"
+                            >Customization</a
+                        >
+                        <a href="troubleshooting.html" class="nav-link"
+                            >Troubleshooting</a
+                        >
+                        <a href="changelog.html" class="nav-link">Changelog</a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="doc-main">
+                <h1>Customization</h1>
+                <p class="subtitle">
+                    Tailor Bet4Gain's branding, theme, game visuals, sounds, and
+                    architecture to your needs.
+                </p>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Branding</h2>
+                <p>
+                    Core branding is managed from
+                    <strong>Admin Panel → Site Settings</strong> — no code
+                    changes required:
+                </p>
+                <ul>
+                    <li>
+                        <strong>Site Name</strong> — Displayed in the header,
+                        page titles, and meta tags
+                    </li>
+                    <li>
+                        <strong>Site Logo</strong> — Upload a logo image
+                        (recommended: SVG or transparent PNG, ≤ 200 px height)
+                    </li>
+                    <li><strong>Favicon</strong> — Upload a 32 × 32 favicon</li>
+                    <li>
+                        <strong>Meta Description</strong> — SEO description
+                        shown in search results
+                    </li>
+                </ul>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">
+                        Screenshot: Site settings — branding fields
+                    </p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Theme &amp; Colors</h2>
+                <p>
+                    The frontend uses <strong>Tailwind CSS 4.x</strong> with a
+                    token-based colour system. Dark/light mode is controlled via
+                    a CSS class on the <code>&lt;html&gt;</code> element and
+                    persisted to the user's settings.
+                </p>
+
+                <h3>Key Colour Tokens</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Token</th>
+                            <th>Usage</th>
+                            <th>Where to Edit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>primary-500</code></td>
+                            <td>Buttons, links, active states</td>
+                            <td><code>resources/css/app.css</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>game-green</code></td>
+                            <td>Win indicators, cashout, profit</td>
+                            <td><code>resources/css/app.css</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>game-red</code></td>
+                            <td>Loss indicators, crash, danger</td>
+                            <td><code>resources/css/app.css</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>amber-500</code></td>
+                            <td>Warnings, pending states</td>
+                            <td><code>resources/css/app.css</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>surface-light</code></td>
+                            <td>Light-mode card/panel backgrounds</td>
+                            <td><code>resources/css/app.css</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>surface-dark</code></td>
+                            <td>Dark-mode card/panel backgrounds</td>
+                            <td><code>resources/css/app.css</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>
+                    After editing CSS tokens, rebuild with
+                    <code>npm run build</code>.
+                </p>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">
+                        Screenshot: Light theme vs dark theme comparison
+                    </p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Game Canvas</h2>
+                <p>
+                    The game canvas is rendered by
+                    <code>resources/js/Components/Game/GameCanvas.vue</code>.
+                    Key visual settings:
+                </p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Setting</th>
+                            <th>Env Variable</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Flying Object</td>
+                            <td><code>GAME_FLYING_OBJECT</code></td>
+                            <td><code>rocket</code></td>
+                            <td>
+                                The emoji/sprite that follows the curve (🚀)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Background</td>
+                            <td><code>GAME_BACKGROUND_THEME</code></td>
+                            <td><code>default</code></td>
+                            <td>Canvas background style</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Canvas Colour Constants</h3>
+                <p>
+                    Curve and text colours are defined in
+                    <code>resources/js/constants.js</code>:
+                </p>
+                <pre><code>CANVAS: {
+    CURVE_COLOR: '#22c55e',        // Green curve during running
+    CURVE_COLOR_CRASHED: '#ef4444', // Red curve after crash
+    TEXT_COLOR: '#ffffff',          // Multiplier text
+    GRID_COLOR: 'rgba(255,255,255,0.1)',
+}</code></pre>
+                <p>
+                    Edit these values and run <code>npm run build</code> to
+                    apply.
+                </p>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">
+                        Screenshot: Game canvas with custom colours
+                    </p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Sound Effects</h2>
+                <p>
+                    Sound files are located in
+                    <code>public/assets/sounds/</code>:
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>File</th>
+                            <th>Trigger</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>bet-placed.mp3</code></td>
+                            <td>Player places a bet</td>
+                        </tr>
+                        <tr>
+                            <td><code>cashout.mp3</code></td>
+                            <td>Player cashes out (success)</td>
+                        </tr>
+                        <tr>
+                            <td><code>crash.mp3</code></td>
+                            <td>Round crashes</td>
+                        </tr>
+                        <tr>
+                            <td><code>tick.mp3</code></td>
+                            <td>Multiplier tick (optional)</td>
+                        </tr>
+                        <tr>
+                            <td><code>chat.mp3</code></td>
+                            <td>New chat message received</td>
+                        </tr>
+                        <tr>
+                            <td><code>win.mp3</code></td>
+                            <td>Player wins / receives coins</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>
+                    To use custom sounds, replace the files with your own MP3s
+                    using the <strong>same filenames</strong>.
+                </p>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Adding a Payment Gateway</h2>
+                <p>Follow these steps to integrate a new payment provider:</p>
+                <ol>
+                    <li>
+                        Create a service class in <code>app/Services/</code> —
+                        follow the pattern in <code>PaystackService.php</code>:
+                        <ul>
+                            <li>
+                                Implement <code>initializeDeposit()</code>,
+                                <code>verifyPayment()</code>,
+                                <code>initiateTransfer()</code>,
+                                <code>handleWebhook()</code>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        Add configuration to
+                        <code>config/payment.php</code> under a new key
+                    </li>
+                    <li>
+                        Add environment variables for API keys, secrets, and
+                        URLs
+                    </li>
+                    <li>
+                        Register webhook and callback routes in
+                        <code>routes/api.php</code>
+                    </li>
+                    <li>
+                        Update the frontend deposit/withdrawal modals to include
+                        the new gateway option
+                    </li>
+                    <li>Rebuild: <code>npm run build</code></li>
+                </ol>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Extending Chat</h2>
+                <p>
+                    Chat is powered by <code>App\Services\ChatService</code> and
+                    rendered by
+                    <code>resources/js/Components/Chat/ChatBox.vue</code>.
+                </p>
+                <ul>
+                    <li>
+                        <strong>New message types:</strong> Add entries to the
+                        <code>App\Enums\ChatMessageType</code> enum and handle
+                        rendering in <code>ChatMessage.vue</code>.
+                    </li>
+                    <li>
+                        <strong>Chat commands:</strong> Add custom
+                        slash-commands in
+                        <code>ChatService::processCommand()</code>.
+                    </li>
+                    <li>
+                        <strong>Media support:</strong> Extend the message input
+                        component to upload images or GIFs.
+                    </li>
+                </ul>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Frontend Structure</h2>
+                <h3>Pages</h3>
+                <p>
+                    All page-level Vue components live in
+                    <code>resources/js/Components/Pages/</code>:
+                </p>
+                <pre><code>HomePage.vue           — Main game page
+WalletPage.vue         — Wallet, deposit, withdraw, exchange, transfer
+LeaderboardPage.vue    — Leaderboard rankings
+ProfilePage.vue        — User profile & settings
+GameHistoryPage.vue    — Full game round history
+ProvablyFairPage.vue   — Round verification
+ResponsibleGamingPage.vue — Self-exclusion & limits
+LoginPage.vue / RegisterPage.vue — Auth pages
+...</code></pre>
+
+                <h3>Stores (Pinia)</h3>
+                <p>
+                    <code>resources/js/Stores/</code> — Centralized state
+                    management:
+                </p>
+                <ul>
+                    <li>
+                        <code>gameStore</code> — Game state, round data,
+                        multiplier
+                    </li>
+                    <li>
+                        <code>betStore</code> — Active bets, bet placement,
+                        cashout
+                    </li>
+                    <li><code>userStore</code> — Auth state, user profile</li>
+                    <li><code>walletStore</code> — Balances, transactions</li>
+                    <li><code>chatStore</code> — Messages, online users</li>
+                    <li>
+                        <code>settingsStore</code> — Site settings, feature
+                        flags
+                    </li>
+                    <li><code>leaderboardStore</code> — Leaderboard data</li>
+                </ul>
+
+                <h3>Composables</h3>
+                <p><code>resources/js/Composables/</code> — Reusable logic:</p>
+                <ul>
+                    <li>
+                        <code>useTheme</code> — Dark/light mode toggle &amp;
+                        persistence
+                    </li>
+                    <li>
+                        <code>useSound</code> — Sound effect playback with mute
+                        support
+                    </li>
+                    <li><code>useToast</code> — Toast notification system</li>
+                    <li>
+                        <code>usePresence</code> — Online user presence via
+                        WebSocket
+                    </li>
+                    <li>
+                        <code>useNotifications</code> — Private channel listener
+                        for real-time alerts
+                    </li>
+                </ul>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Backend Structure</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Directory</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>app/Services/</code></td>
+                            <td>
+                                Business logic — GameEngine, WalletService,
+                                ChatService, PaystackService, NombaService,
+                                AntiCheatService, ProvablyFairService
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>app/Enums/</code></td>
+                            <td>
+                                Type-safe enums — GameRoundStatus, BetStatus,
+                                TransactionType, TransactionStatus,
+                                ChatMessageType, UserRole, etc.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>app/Events/</code></td>
+                            <td>
+                                Broadcast events — GameCrashed, BetPlaced,
+                                ChatMessageSent, etc.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>app/Models/</code></td>
+                            <td>17 Eloquent models with relationships</td>
+                        </tr>
+                        <tr>
+                            <td><code>app/Http/Controllers/</code></td>
+                            <td>API controllers grouped by feature</td>
+                        </tr>
+                        <tr>
+                            <td><code>app/Filament/</code></td>
+                            <td>Admin panel resources, pages, and widgets</td>
+                        </tr>
+                        <tr>
+                            <td><code>app/Jobs/</code></td>
+                            <td>
+                                Queued jobs (ProcessWithdrawal,
+                                CalculateLeaderboard, etc.)
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Build Process</h2>
+                <pre><code># Development (with HMR hot-reload)
+npm run dev
+
+# Production build (minified, optimised)
+npm run build</code></pre>
+                <p>
+                    Vite configuration is in <code>vite.config.js</code>. The
+                    build outputs to <code>public/build/</code> with a
+                    <code>manifest.json</code> that Laravel uses for asset
+                    versioning.
+                </p>
+
+                <div class="callout callout-warning">
+                    <strong>Reminder:</strong> Always run
+                    <code>npm run build</code> after modifying any frontend
+                    file, CSS token, or <code>VITE_*</code> environment variable
+                    before deploying.
+                </div>
+
+                <!-- Navigation Footer -->
+                <div class="doc-nav-footer">
+                    <a href="security.html">← Security</a>
+                    <a href="troubleshooting.html">Troubleshooting →</a>
+                </div>
+            </main>
+        </div>
+
+        <button
+            class="sidebar-toggle"
+            id="sidebarToggle"
+            onclick="
+                document.getElementById('sidebar').classList.toggle('open')
+            "
+        >
+            ☰
+        </button>
+    </body>
+</html>

@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Game Engine — Bet4Gain Documentation</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
+    <body>
+        <div class="doc-layout">
+            <!-- Sidebar -->
+            <aside class="doc-sidebar" id="sidebar">
+                <div class="logo">
+                    <h2>🚀 Bet4Gain</h2>
+                    <span>v1.0</span>
+                </div>
+                <nav>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Getting Started</div>
+                        <a href="index.html" class="nav-link">Introduction</a>
+                        <a href="installation.html" class="nav-link"
+                            >Installation</a
+                        >
+                        <a href="configuration.html" class="nav-link"
+                            >Configuration</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Guide</div>
+                        <a href="features.html" class="nav-link"
+                            >Features Overview</a
+                        >
+                        <a href="admin-panel.html" class="nav-link"
+                            >Admin Panel</a
+                        >
+                        <a href="game-engine.html" class="nav-link active"
+                            >Game Engine</a
+                        >
+                        <a href="payments.html" class="nav-link"
+                            >Payments &amp; Wallet</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Technical</div>
+                        <a href="api-reference.html" class="nav-link"
+                            >API Reference</a
+                        >
+                        <a href="websockets.html" class="nav-link"
+                            >WebSockets</a
+                        >
+                        <a href="database.html" class="nav-link"
+                            >Database Schema</a
+                        >
+                        <a href="security.html" class="nav-link">Security</a>
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">More</div>
+                        <a href="customization.html" class="nav-link"
+                            >Customization</a
+                        >
+                        <a href="troubleshooting.html" class="nav-link"
+                            >Troubleshooting</a
+                        >
+                        <a href="changelog.html" class="nav-link">Changelog</a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="doc-main">
+                <h1>Game Engine</h1>
+                <p class="subtitle">
+                    How the crash/aviator game loop works — from round lifecycle
+                    to provably-fair crash points.
+                </p>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Overview</h2>
+                <p>
+                    The game engine lives in
+                    <code>App\Services\GameEngine</code> and is driven by the
+                    <code>php artisan game:start</code> Artisan command
+                    (<code>App\Console\Commands\StartGameLoop</code>). It
+                    continuously cycles through rounds, broadcasting every state
+                    change over WebSockets so that all connected clients stay
+                    perfectly synchronized.
+                </p>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Round Lifecycle</h2>
+                <p>Each round progresses through four phases:</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Phase</th>
+                            <th>Duration</th>
+                            <th>What Happens</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>WAITING</strong></td>
+                            <td>Configurable (default&nbsp;3 s)</td>
+                            <td>
+                                Countdown between rounds. Broadcasts
+                                <code>GameCountdown</code> event with seconds
+                                remaining.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>BETTING</strong></td>
+                            <td>Configurable (default&nbsp;10 s)</td>
+                            <td>
+                                Players can place bets. Broadcasts
+                                <code>GameBettingStarted</code>. Bets arrive via
+                                the API and are broadcast as
+                                <code>BetPlaced</code>.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>RUNNING</strong></td>
+                            <td>Until crash point reached</td>
+                            <td>
+                                Multiplier grows exponentially. Broadcasts
+                                <code>GameStarted</code> once, then
+                                <code>GameMultiplierUpdated</code> every tick
+                                (~100 ms). Players can cash out;
+                                <code>BetCashedOut</code> is broadcast on
+                                success.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>CRASHED</strong></td>
+                            <td>Instant</td>
+                            <td>
+                                Round ends. Broadcasts
+                                <code>GameCrashed</code> with the final crash
+                                point. Unsettled bets are marked as lost.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">
+                        Screenshot: Game canvas during BETTING phase
+                    </p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Multiplier Formula</h2>
+                <p>The multiplier follows an exponential curve:</p>
+                <pre><code>multiplier = e^(growthRate × elapsedSeconds)</code></pre>
+                <p>
+                    Where <code>growthRate</code> defaults to
+                    <strong>0.06</strong> (configurable via
+                    <code>GAME_GROWTH_RATE</code>). Example values:
+                </p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Elapsed Time</th>
+                            <th>Multiplier</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>0 s</td>
+                            <td>1.00×</td>
+                        </tr>
+                        <tr>
+                            <td>5 s</td>
+                            <td>1.35×</td>
+                        </tr>
+                        <tr>
+                            <td>10 s</td>
+                            <td>1.82×</td>
+                        </tr>
+                        <tr>
+                            <td>20 s</td>
+                            <td>3.32×</td>
+                        </tr>
+                        <tr>
+                            <td>30 s</td>
+                            <td>6.05×</td>
+                        </tr>
+                        <tr>
+                            <td>40 s</td>
+                            <td>11.02×</td>
+                        </tr>
+                        <tr>
+                            <td>50 s</td>
+                            <td>20.09×</td>
+                        </tr>
+                        <tr>
+                            <td>60 s</td>
+                            <td>36.60×</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Crash Point Generation</h2>
+                <p>
+                    Crash points are generated using a
+                    <strong>provably-fair</strong> algorithm handled by
+                    <code>App\Services\ProvablyFairService</code>:
+                </p>
+                <ol>
+                    <li>
+                        A <strong>server seed</strong> is generated and its
+                        SHA-256 hash is published before the round.
+                    </li>
+                    <li>
+                        A combined string
+                        <code>"{client_seed}-{nonce}"</code> is HMAC-SHA256
+                        hashed with the server seed.
+                    </li>
+                    <li>
+                        The first 8 hex characters are converted to an integer
+                        <code>h</code>.
+                    </li>
+                    <li>
+                        If <code>h % 33 === 0</code> the round is an
+                        <strong>instant crash</strong> at
+                        <strong>1.00×</strong> (≈3% chance).
+                    </li>
+                    <li>
+                        Otherwise:
+                        <code
+                            >crash_point = floor((100 × e) / (e − h)) /
+                            100</code
+                        >, where <code>e = 2^32</code>.
+                    </li>
+                    <li>
+                        A <strong>3% house edge</strong> is applied:
+                        <code>crash_point = max(1, crash_point × 0.97)</code>.
+                    </li>
+                </ol>
+                <p>
+                    Players can verify any round after it completes using the
+                    <strong>Provably Fair</strong> verification page.
+                </p>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">
+                        Screenshot: Provably fair verification page
+                    </p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Starting the Game Loop</h2>
+                <pre><code># Run continuously (production)
+php artisan game:start
+
+# Run a single round (testing)
+php artisan game:start --once</code></pre>
+                <p>
+                    The command handles <code>SIGTERM</code> /
+                    <code>SIGINT</code> gracefully — it finishes the current
+                    round before shutting down. In production, run this under
+                    <strong>Supervisor</strong> (see
+                    <a href="installation.html">Installation</a>).
+                </p>
+
+                <div class="callout callout-warning">
+                    <strong>Important:</strong> Only one instance of
+                    <code>game:start</code> should run at a time. Running
+                    multiple instances will create duplicate rounds.
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Broadcasting</h2>
+                <p>
+                    All game events are broadcast on the public
+                    <code>game</code> channel:
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Payload</th>
+                            <th>Frequency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>GameCountdown</code></td>
+                            <td>secondsLeft</td>
+                            <td>Every second during waiting phase</td>
+                        </tr>
+                        <tr>
+                            <td><code>GameBettingStarted</code></td>
+                            <td>round id, hash, betting duration</td>
+                            <td>Once per round</td>
+                        </tr>
+                        <tr>
+                            <td><code>GameStarted</code></td>
+                            <td>round id</td>
+                            <td>Once per round</td>
+                        </tr>
+                        <tr>
+                            <td><code>GameMultiplierUpdated</code></td>
+                            <td>multiplier, elapsed seconds</td>
+                            <td>Every ~100 ms</td>
+                        </tr>
+                        <tr>
+                            <td><code>GameCrashed</code></td>
+                            <td>crash point, round data</td>
+                            <td>Once per round</td>
+                        </tr>
+                        <tr>
+                            <td><code>BetPlaced</code></td>
+                            <td>bet data (user, amount, slot)</td>
+                            <td>When a player bets</td>
+                        </tr>
+                        <tr>
+                            <td><code>BetCashedOut</code></td>
+                            <td>bet data, multiplier, payout</td>
+                            <td>When a player cashes out</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Auto-Cashout Processing</h2>
+                <p>
+                    Auto-cashout is processed
+                    <strong>server-side</strong> during the running phase. On
+                    each tick the engine iterates all active bets that have an
+                    <code>auto_cashout_at</code> value. If the current
+                    multiplier meets or exceeds the target, the bet is
+                    automatically cashed out and a
+                    <code>BetCashedOut</code> event is broadcast.
+                </p>
+                <p>
+                    This ensures fairness — auto-cashouts execute at the exact
+                    server multiplier, not the client's rendered value.
+                </p>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Canvas Rendering</h2>
+                <p>
+                    The frontend renders the multiplier curve on an
+                    <strong>HTML5 Canvas</strong> element via
+                    <code>GameCanvas.vue</code>. A
+                    <code>requestAnimationFrame</code> loop draws:
+                </p>
+                <ul>
+                    <li>
+                        The exponential curve path from (0, 1×) to the current
+                        multiplier
+                    </li>
+                    <li>
+                        A flying object emoji (default 🚀) at the tip of the
+                        curve
+                    </li>
+                    <li>The current multiplier value as large centered text</li>
+                    <li>Grid lines and axis labels</li>
+                </ul>
+                <p>
+                    The canvas automatically adapts to the container size and
+                    supports both light and dark themes.
+                </p>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">
+                        Screenshot: Game canvas during RUNNING phase (multiplier
+                        curve)
+                    </p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">
+                        Screenshot: Game canvas in CRASHED state
+                    </p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Configuration Reference</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>GAME_HOUSE_EDGE</code></td>
+                            <td>3</td>
+                            <td>House edge percentage</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_MIN_BET</code></td>
+                            <td>100</td>
+                            <td>Minimum bet (coins)</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_MAX_BET</code></td>
+                            <td>1000000</td>
+                            <td>Maximum bet (coins)</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_BETTING_DURATION</code></td>
+                            <td>10</td>
+                            <td>Betting phase duration (seconds)</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_COUNTDOWN_DURATION</code></td>
+                            <td>3</td>
+                            <td>Waiting phase (seconds)</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_TICK_RATE</code></td>
+                            <td>100</td>
+                            <td>Multiplier broadcast interval (ms)</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_GROWTH_RATE</code></td>
+                            <td>0.06</td>
+                            <td>Exponential growth rate</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_FLYING_OBJECT</code></td>
+                            <td>rocket</td>
+                            <td>Canvas flying object (rocket / plane)</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_BACKGROUND_THEME</code></td>
+                            <td>default</td>
+                            <td>Canvas background theme</td>
+                        </tr>
+                        <tr>
+                            <td><code>GAME_MAX_SLOTS</code></td>
+                            <td>2</td>
+                            <td>Max simultaneous bets per player</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Navigation Footer -->
+                <div class="doc-nav-footer">
+                    <a href="admin-panel.html">← Admin Panel</a>
+                    <a href="payments.html">Payments &amp; Wallet →</a>
+                </div>
+            </main>
+        </div>
+
+        <button
+            class="sidebar-toggle"
+            id="sidebarToggle"
+            onclick="
+                document.getElementById('sidebar').classList.toggle('open')
+            "
+        >
+            ☰
+        </button>
+    </body>
+</html>

@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Installation — Bet4Gain Documentation</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
+    <body>
+        <div class="doc-layout">
+            <!-- Sidebar -->
+            <aside class="doc-sidebar" id="sidebar">
+                <div class="logo">
+                    <h2>🚀 Bet4Gain</h2>
+                    <span>v1.0</span>
+                </div>
+                <nav>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Getting Started</div>
+                        <a href="index.html" class="nav-link">Introduction</a>
+                        <a href="installation.html" class="nav-link active"
+                            >Installation</a
+                        >
+                        <a href="configuration.html" class="nav-link"
+                            >Configuration</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Guide</div>
+                        <a href="features.html" class="nav-link"
+                            >Features Overview</a
+                        >
+                        <a href="admin-panel.html" class="nav-link"
+                            >Admin Panel</a
+                        >
+                        <a href="game-engine.html" class="nav-link"
+                            >Game Engine</a
+                        >
+                        <a href="payments.html" class="nav-link"
+                            >Payments &amp; Wallet</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Technical</div>
+                        <a href="api-reference.html" class="nav-link"
+                            >API Reference</a
+                        >
+                        <a href="websockets.html" class="nav-link"
+                            >WebSockets</a
+                        >
+                        <a href="database.html" class="nav-link"
+                            >Database Schema</a
+                        >
+                        <a href="security.html" class="nav-link">Security</a>
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">More</div>
+                        <a href="customization.html" class="nav-link"
+                            >Customization</a
+                        >
+                        <a href="troubleshooting.html" class="nav-link"
+                            >Troubleshooting</a
+                        >
+                        <a href="changelog.html" class="nav-link">Changelog</a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="doc-main">
+                <h1>Installation Guide</h1>
+                <p class="subtitle">
+                    Step-by-step instructions to get Bet4Gain running on your
+                    server.
+                </p>
+
+                <h2>Prerequisites</h2>
+                <p>
+                    Before you begin, make sure your server meets these
+                    requirements:
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Requirement</th>
+                            <th>Minimum Version</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>PHP</td>
+                            <td>8.2+</td>
+                        </tr>
+                        <tr>
+                            <td>Composer</td>
+                            <td>2.x</td>
+                        </tr>
+                        <tr>
+                            <td>Node.js</td>
+                            <td>18+</td>
+                        </tr>
+                        <tr>
+                            <td>npm</td>
+                            <td>9+</td>
+                        </tr>
+                        <tr>
+                            <td>MySQL</td>
+                            <td>8.0+ (or MariaDB 10.6+)</td>
+                        </tr>
+                        <tr>
+                            <td>Redis</td>
+                            <td>6+ (recommended for production)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>
+                    <strong>Required PHP extensions:</strong> OpenSSL, PDO,
+                    PDO_MySQL, Mbstring, Tokenizer, XML, Ctype, JSON, BCMath,
+                    pcntl, fileinfo, GD or Imagick
+                </p>
+
+                <h2>Step-by-Step Installation</h2>
+                <ol class="steps">
+                    <li>
+                        <h3 class="mt-0">Upload &amp; Extract Files</h3>
+                        <p>
+                            Upload the project archive to your server and
+                            extract it to your web root directory (e.g.,
+                            <code>/var/www/bet4gain</code>).
+                        </p>
+                        <pre><code># Example: Extract and set permissions
+unzip bet4gain.zip -d /var/www/bet4gain
+cd /var/www/bet4gain
+</code></pre>
+                    </li>
+
+                    <li>
+                        <h3 class="mt-0">Install PHP Dependencies</h3>
+                        <p>Run Composer to install all backend dependencies:</p>
+                        <pre><code>composer install --optimize-autoloader --no-dev</code></pre>
+                        <div class="callout callout-info">
+                            <strong>Note:</strong> Use the
+                            <code>--no-dev</code> flag in production to exclude
+                            development dependencies like Telescope, Debugbar,
+                            and PHPUnit.
+                        </div>
+                    </li>
+
+                    <li>
+                        <h3 class="mt-0">
+                            Install Node Dependencies &amp; Build Assets
+                        </h3>
+                        <pre><code>npm install
+npm run build</code></pre>
+                        <p>
+                            This compiles Vue components, Tailwind CSS, and
+                            JavaScript into optimized production assets in
+                            <code>public/build/</code>.
+                        </p>
+                    </li>
+
+                    <li>
+                        <h3 class="mt-0">Configure Environment</h3>
+                        <p>
+                            Copy the example environment file and generate an
+                            application key:
+                        </p>
+                        <pre><code>cp .env.example .env
+php artisan key:generate</code></pre>
+                        <p>
+                            Then open <code>.env</code> and configure the
+                            essential settings:
+                        </p>
+                        <pre><code># Application
+APP_NAME=Bet4Gain
+APP_URL=https://yourdomain.com
+
+# Database
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=bet4gain
+DB_USERNAME=your_db_user
+DB_PASSWORD=your_db_password
+
+# Broadcasting (required for real-time game)
+BROADCAST_CONNECTION=reverb
+
+# Reverb WebSocket Server
+REVERB_APP_ID=your-app-id
+REVERB_APP_KEY=your-app-key
+REVERB_APP_SECRET=your-app-secret
+REVERB_HOST=yourdomain.com
+REVERB_PORT=8080
+REVERB_SCHEME=https
+
+# Frontend Reverb config (used by Vite)
+VITE_REVERB_APP_KEY="${REVERB_APP_KEY}"
+VITE_REVERB_HOST="${REVERB_HOST}"
+VITE_REVERB_PORT="${REVERB_PORT}"
+VITE_REVERB_SCHEME="${REVERB_SCHEME}"
+
+# Payment Gateways (see Configuration page)
+PAYSTACK_SECRET_KEY=sk_live_xxxxx
+PAYSTACK_PUBLIC_KEY=pk_live_xxxxx
+
+# Cache & Sessions (recommended for production)
+CACHE_STORE=redis
+SESSION_DRIVER=redis
+QUEUE_CONNECTION=redis
+</code></pre>
+                        <p>
+                            See the
+                            <a href="configuration.html">Configuration</a> page
+                            for full details on all available environment
+                            variables.
+                        </p>
+                    </li>
+
+                    <li>
+                        <h3 class="mt-0">Create the Database</h3>
+                        <p>
+                            Create a MySQL database matching your
+                            <code>.env</code> settings, then run migrations and
+                            seed initial data:
+                        </p>
+                        <pre><code># Create the database
+mysql -u root -p -e "CREATE DATABASE bet4gain CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
+# Run migrations
+php artisan migrate
+
+# Seed default data (site settings, demo users, etc.)
+php artisan db:seed</code></pre>
+                    </li>
+
+                    <li>
+                        <h3 class="mt-0">Create Storage Symlink</h3>
+                        <pre><code>php artisan storage:link</code></pre>
+                        <p>
+                            This creates a symbolic link from
+                            <code>public/storage</code> to
+                            <code>storage/app/public</code> for file uploads
+                            (avatars, ads, etc.).
+                        </p>
+                    </li>
+
+                    <li>
+                        <h3 class="mt-0">Set File Permissions</h3>
+                        <pre><code>chmod -R 775 storage bootstrap/cache
+chown -R www-data:www-data storage bootstrap/cache</code></pre>
+                    </li>
+
+                    <li>
+                        <h3 class="mt-0">Create Admin User</h3>
+                        <p>
+                            Register a normal user account via the app, then
+                            promote it to admin:
+                        </p>
+                        <pre><code>php artisan tinker
+
+# Inside Tinker:
+$user = \App\Models\User::where('username', 'your-username')->first();
+$user->role = 'admin';
+$user->save();
+</code></pre>
+                        <p>
+                            You can now access the admin panel at
+                            <code>/admin</code>.
+                        </p>
+                    </li>
+                </ol>
+
+                <h2>Web Server Configuration</h2>
+
+                <h3>Nginx (Recommended)</h3>
+                <pre><code>server {
+    listen 80;
+    server_name yourdomain.com;
+    root /var/www/bet4gain/public;
+    index index.php;
+
+    add_header X-Frame-Options "DENY";
+    add_header X-Content-Type-Options "nosniff";
+    add_header X-XSS-Protection "1; mode=block";
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+}</code></pre>
+
+                <h3>Apache</h3>
+                <p>
+                    The project includes <code>public/.htaccess</code> which
+                    handles URL rewriting. Ensure <code>mod_rewrite</code> is
+                    enabled:
+                </p>
+                <pre><code>sudo a2enmod rewrite
+sudo systemctl restart apache2</code></pre>
+
+                <h2 id="running-services">Required Background Services</h2>
+                <p>
+                    Bet4Gain requires three background services to run alongside
+                    your web server:
+                </p>
+
+                <h3>1. WebSocket Server (Laravel Reverb)</h3>
+                <p>
+                    Required for real-time game synchronization, live chat, and
+                    notifications.
+                </p>
+                <pre><code>php artisan reverb:start</code></pre>
+
+                <h3>2. Game Loop</h3>
+                <p>The game engine that runs continuous crash game rounds:</p>
+                <pre><code>php artisan game:start</code></pre>
+
+                <h3>3. Queue Worker (if using Redis/database queue)</h3>
+                <pre><code>php artisan queue:work --queue=default,game</code></pre>
+
+                <div class="callout callout-warning">
+                    <strong>Production Tip:</strong> Use
+                    <a href="http://supervisord.org/" target="_blank"
+                        >Supervisor</a
+                    >
+                    to keep these processes running and auto-restart them on
+                    failure. See the Supervisor configuration examples below.
+                </div>
+
+                <h3>Supervisor Configuration</h3>
+                <pre><code># /etc/supervisor/conf.d/bet4gain-reverb.conf
+[program:bet4gain-reverb]
+process_name=%(program_name)s
+command=php /var/www/bet4gain/artisan reverb:start
+autostart=true
+autorestart=true
+user=www-data
+redirect_stderr=true
+stdout_logfile=/var/www/bet4gain/storage/logs/reverb.log
+
+# /etc/supervisor/conf.d/bet4gain-game.conf
+[program:bet4gain-game]
+process_name=%(program_name)s
+command=php /var/www/bet4gain/artisan game:start
+autostart=true
+autorestart=true
+user=www-data
+redirect_stderr=true
+stdout_logfile=/var/www/bet4gain/storage/logs/game-loop.log
+
+# /etc/supervisor/conf.d/bet4gain-queue.conf
+[program:bet4gain-queue]
+process_name=%(program_name)s_%(process_num)02d
+command=php /var/www/bet4gain/artisan queue:work redis --sleep=3 --tries=3 --max-time=3600
+autostart=true
+autorestart=true
+user=www-data
+numprocs=2
+redirect_stderr=true
+stdout_logfile=/var/www/bet4gain/storage/logs/queue.log</code></pre>
+
+                <p>After creating the Supervisor configs:</p>
+                <pre><code>sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start all</code></pre>
+
+                <h2>SSL / HTTPS Setup</h2>
+                <p>
+                    For production, HTTPS is <strong>required</strong> —
+                    especially for WebSocket (WSS) connections and payment
+                    gateway callbacks.
+                </p>
+                <pre><code># Using Certbot with Nginx
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d yourdomain.com</code></pre>
+                <p>After enabling SSL, update your <code>.env</code>:</p>
+                <pre><code>APP_URL=https://yourdomain.com
+REVERB_SCHEME=https
+REVERB_PORT=443</code></pre>
+
+                <h2>Verifying Installation</h2>
+                <ol>
+                    <li>
+                        Visit <code>https://yourdomain.com</code> — you should
+                        see the game page
+                    </li>
+                    <li>Register an account and verify you can log in</li>
+                    <li>
+                        Check that the game canvas loads and rounds start
+                        automatically
+                    </li>
+                    <li>
+                        Open browser DevTools → Network → WS tab to confirm
+                        WebSocket connection
+                    </li>
+                    <li>
+                        Visit <code>https://yourdomain.com/admin</code> to
+                        access the admin panel
+                    </li>
+                    <li>
+                        Try placing a demo bet to verify the game loop is
+                        running
+                    </li>
+                </ol>
+
+                <div class="callout callout-success">
+                    <strong>Installation Complete!</strong>
+                    Head over to the
+                    <a href="configuration.html">Configuration</a> page to
+                    customize game settings, payment gateways, and security
+                    options.
+                </div>
+
+                <!-- Navigation Footer -->
+                <div class="doc-nav-footer">
+                    <a href="index.html">← Introduction</a>
+                    <a href="configuration.html">Configuration →</a>
+                </div>
+            </main>
+        </div>
+
+        <button
+            class="sidebar-toggle"
+            id="sidebarToggle"
+            onclick="
+                document.getElementById('sidebar').classList.toggle('open')
+            "
+        >
+            ☰
+        </button>
+    </body>
+</html>

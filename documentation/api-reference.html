@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>API Reference — Bet4Gain Documentation</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
+    <body>
+        <div class="doc-layout">
+            <!-- Sidebar -->
+            <aside class="doc-sidebar" id="sidebar">
+                <div class="logo">
+                    <h2>🚀 Bet4Gain</h2>
+                    <span>v1.0</span>
+                </div>
+                <nav>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Getting Started</div>
+                        <a href="index.html" class="nav-link">Introduction</a>
+                        <a href="installation.html" class="nav-link"
+                            >Installation</a
+                        >
+                        <a href="configuration.html" class="nav-link"
+                            >Configuration</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Guide</div>
+                        <a href="features.html" class="nav-link"
+                            >Features Overview</a
+                        >
+                        <a href="admin-panel.html" class="nav-link"
+                            >Admin Panel</a
+                        >
+                        <a href="game-engine.html" class="nav-link"
+                            >Game Engine</a
+                        >
+                        <a href="payments.html" class="nav-link"
+                            >Payments &amp; Wallet</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Technical</div>
+                        <a href="api-reference.html" class="nav-link active"
+                            >API Reference</a
+                        >
+                        <a href="websockets.html" class="nav-link"
+                            >WebSockets</a
+                        >
+                        <a href="database.html" class="nav-link"
+                            >Database Schema</a
+                        >
+                        <a href="security.html" class="nav-link">Security</a>
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">More</div>
+                        <a href="customization.html" class="nav-link"
+                            >Customization</a
+                        >
+                        <a href="troubleshooting.html" class="nav-link"
+                            >Troubleshooting</a
+                        >
+                        <a href="changelog.html" class="nav-link">Changelog</a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="doc-main">
+                <h1>API Reference</h1>
+                <p class="subtitle">
+                    Complete endpoint reference for the Bet4Gain REST API. All
+                    endpoints are prefixed with <code>/api</code>.
+                </p>
+
+                <div class="callout callout-info">
+                    <strong>Authentication:</strong> Bet4Gain uses
+                    <strong>Laravel Sanctum</strong> session-based
+                    authentication. Endpoints marked <em>Auth Required</em> need
+                    an authenticated session (cookie). Guest endpoints accept
+                    the guest token returned by <code>/api/guest</code>.
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Authentication</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Auth</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/guest</code></td>
+                            <td>
+                                Create a guest (demo) account and receive
+                                session
+                            </td>
+                            <td>Public</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/guest/resume</code></td>
+                            <td>Resume an existing guest session</td>
+                            <td>Public</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="text-muted">
+                    Standard login/register is handled by Laravel Fortify at
+                    <code>/login</code> and <code>/register</code> (web routes).
+                </p>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Game — Public</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Auth</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/game/state</code></td>
+                            <td>
+                                Current game state (phase, multiplier, round
+                                data)
+                            </td>
+                            <td>Public</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/game/history</code></td>
+                            <td>Recent game rounds with crash points</td>
+                            <td>Public</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/game/live-bets</code></td>
+                            <td>Active bets in the current round</td>
+                            <td>Public</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/game/round/{id}</code></td>
+                            <td>Details for a specific round</td>
+                            <td>Public</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/game/round/{id}/bets</code></td>
+                            <td>All bets placed in a specific round</td>
+                            <td>Public</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/game/rounds</code></td>
+                            <td>Paginated game round history</td>
+                            <td>Public</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/game/verify</code></td>
+                            <td>Verify a round's provably-fair outcome</td>
+                            <td>Public</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Game — Authenticated</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Auth</th>
+                            <th>Parameters</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/game/bet</code></td>
+                            <td>Place a bet on the current round</td>
+                            <td>Required</td>
+                            <td>
+                                <code>amount</code>,
+                                <code>auto_cashout</code> (optional),
+                                <code>slot</code> (1 or 2)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/game/cashout</code></td>
+                            <td>Cash out an active bet</td>
+                            <td>Required</td>
+                            <td><code>slot</code>, <code>bet_id</code></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/game/cancel-bet</code></td>
+                            <td>Cancel a pending bet (before round starts)</td>
+                            <td>Required</td>
+                            <td><code>slot</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>User</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Auth</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/user</code></td>
+                            <td>
+                                Current authenticated user with wallet &amp;
+                                coin balances
+                            </td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/user/avatar</code></td>
+                            <td>Upload a profile avatar</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="badge badge-delete">DELETE</span>
+                            </td>
+                            <td><code>/api/user/avatar</code></td>
+                            <td>Remove profile avatar</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-put">PUT</span></td>
+                            <td><code>/api/user/settings</code></td>
+                            <td>
+                                Update user preferences (sound, theme, etc.)
+                            </td>
+                            <td>Required</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Wallet</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Auth</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/wallet</code></td>
+                            <td>Get wallet &amp; coin balances</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/wallet/transactions</code></td>
+                            <td>
+                                Transaction history (filterable by
+                                type/status/date)
+                            </td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td>
+                                <code>/api/wallet/transactions/export</code>
+                            </td>
+                            <td>Export transactions as CSV</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/wallet/gateways</code></td>
+                            <td>List available payment gateways</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/wallet/banks</code></td>
+                            <td>List supported banks (for withdrawals)</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/wallet/resolve-account</code></td>
+                            <td>
+                                Resolve bank account name from account number
+                                &amp; bank code
+                            </td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/wallet/deposit</code></td>
+                            <td>Initialize a deposit (returns redirect URL)</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/wallet/withdraw</code></td>
+                            <td>Request a withdrawal to a bank account</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/wallet/purchase-coins</code></td>
+                            <td>Convert NGN wallet balance to coins</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/wallet/sell-coins</code></td>
+                            <td>Convert coins back to NGN wallet balance</td>
+                            <td>Required</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>P2P Transfer</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Auth</th>
+                            <th>Parameters</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/wallet/resolve-user</code></td>
+                            <td>
+                                Resolve a username to verify recipient exists
+                            </td>
+                            <td>Required</td>
+                            <td><code>username</code></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/wallet/transfer-coins</code></td>
+                            <td>Send coins to another player</td>
+                            <td>Required</td>
+                            <td>
+                                <code>username</code>, <code>amount</code>,
+                                <code>type</code> (gift/transfer),
+                                <code>note</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/wallet/transfers</code></td>
+                            <td>P2P transfer history</td>
+                            <td>Required</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/wallet/transfer-config</code></td>
+                            <td>Get transfer limits &amp; configuration</td>
+                            <td>Required</td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Chat</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Auth</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/chat/messages</code></td>
+                            <td>Recent chat messages</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/chat/messages/older</code></td>
+                            <td>Load older messages (pagination)</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/chat/messages</code></td>
+                            <td>Send a chat message</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="badge badge-delete">DELETE</span>
+                            </td>
+                            <td><code>/api/chat/messages/{id}</code></td>
+                            <td>Delete a message (moderator/admin)</td>
+                            <td>Required (mod+)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/chat/mute</code></td>
+                            <td>Mute a user for a duration</td>
+                            <td>Required (mod+)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/chat/unmute</code></td>
+                            <td>Unmute a user</td>
+                            <td>Required (mod+)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/chat/user/{id}</code></td>
+                            <td>Get a player's public profile</td>
+                            <td>Required</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Leaderboard &amp; Statistics</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Auth</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/leaderboard/{period?}</code></td>
+                            <td>
+                                Leaderboard (daily / weekly / monthly / alltime)
+                            </td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td>
+                                <code>/api/leaderboard-public/{period?}</code>
+                            </td>
+                            <td>Public leaderboard (no auth needed)</td>
+                            <td>Public</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/stats/live</code></td>
+                            <td>Live platform statistics</td>
+                            <td>Public</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/stats/me</code></td>
+                            <td>Authenticated user's personal statistics</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/stats/my-bets</code></td>
+                            <td>Authenticated user's bet history</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/stats/player/{id}</code></td>
+                            <td>Public statistics for a specific player</td>
+                            <td>Required</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Responsible Gaming</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Auth</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/responsible-gaming/status</code></td>
+                            <td>
+                                Current responsible gaming settings for the user
+                            </td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td>
+                                <code
+                                    >/api/responsible-gaming/self-exclude</code
+                                >
+                            </td>
+                            <td>Activate self-exclusion (1–365 days)</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td>
+                                <code
+                                    >/api/responsible-gaming/deposit-limits</code
+                                >
+                            </td>
+                            <td>Set daily/weekly/monthly deposit limits</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td>
+                                <code>/api/responsible-gaming/bet-limit</code>
+                            </td>
+                            <td>Set a per-bet spending limit</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td>
+                                <code>/api/responsible-gaming/cooldown</code>
+                            </td>
+                            <td>Activate a cooldown timer (15 min – 24 hr)</td>
+                            <td>Required</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Webhooks &amp; Callbacks</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Auth</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/payments/paystack/webhook</code></td>
+                            <td>Paystack payment event webhook</td>
+                            <td>Signature verified</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/payments/nomba/webhook</code></td>
+                            <td>Nomba payment event webhook</td>
+                            <td>Signature verified</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td>
+                                <code>/api/payments/{gateway}/callback</code>
+                            </td>
+                            <td>Payment gateway redirect callback</td>
+                            <td>Public</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Site &amp; Ads</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Auth</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/settings</code></td>
+                            <td>
+                                Public site settings (branding, feature flags)
+                            </td>
+                            <td>Public</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-get">GET</span></td>
+                            <td><code>/api/ads/{placement}</code></td>
+                            <td>Get active advertisement for a placement</td>
+                            <td>Public</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/ads/{ad}/impression</code></td>
+                            <td>Track an ad impression</td>
+                            <td>Public</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-post">POST</span></td>
+                            <td><code>/api/ads/{ad}/click</code></td>
+                            <td>Track an ad click</td>
+                            <td>Public</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Error Responses</h2>
+                <p>All API errors follow a consistent JSON format:</p>
+                <pre><code>{
+    "message": "Human-readable error description",
+    "errors": {
+        "field": ["Validation error message"]
+    }
+}</code></pre>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>HTTP Code</th>
+                            <th>Meaning</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>200</code></td>
+                            <td>Success</td>
+                        </tr>
+                        <tr>
+                            <td><code>401</code></td>
+                            <td>Unauthenticated — login required</td>
+                        </tr>
+                        <tr>
+                            <td><code>403</code></td>
+                            <td>Forbidden — insufficient permissions</td>
+                        </tr>
+                        <tr>
+                            <td><code>404</code></td>
+                            <td>Resource not found</td>
+                        </tr>
+                        <tr>
+                            <td><code>422</code></td>
+                            <td>
+                                Validation error — check
+                                <code>errors</code> object
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>429</code></td>
+                            <td>Rate limited — too many requests</td>
+                        </tr>
+                        <tr>
+                            <td><code>500</code></td>
+                            <td>Server error</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Navigation Footer -->
+                <div class="doc-nav-footer">
+                    <a href="payments.html">← Payments &amp; Wallet</a>
+                    <a href="websockets.html">WebSockets →</a>
+                </div>
+            </main>
+        </div>
+
+        <button
+            class="sidebar-toggle"
+            id="sidebarToggle"
+            onclick="
+                document.getElementById('sidebar').classList.toggle('open')
+            "
+        >
+            ☰
+        </button>
+    </body>
+</html>

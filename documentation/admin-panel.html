@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Admin Panel — Bet4Gain Documentation</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
+    <body>
+        <div class="doc-layout">
+            <!-- Sidebar -->
+            <aside class="doc-sidebar" id="sidebar">
+                <div class="logo">
+                    <h2>🚀 Bet4Gain</h2>
+                    <span>v1.0</span>
+                </div>
+                <nav>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Getting Started</div>
+                        <a href="index.html" class="nav-link">Introduction</a>
+                        <a href="installation.html" class="nav-link"
+                            >Installation</a
+                        >
+                        <a href="configuration.html" class="nav-link"
+                            >Configuration</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Guide</div>
+                        <a href="features.html" class="nav-link"
+                            >Features Overview</a
+                        >
+                        <a href="admin-panel.html" class="nav-link active"
+                            >Admin Panel</a
+                        >
+                        <a href="game-engine.html" class="nav-link"
+                            >Game Engine</a
+                        >
+                        <a href="payments.html" class="nav-link"
+                            >Payments &amp; Wallet</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Technical</div>
+                        <a href="api-reference.html" class="nav-link"
+                            >API Reference</a
+                        >
+                        <a href="websockets.html" class="nav-link"
+                            >WebSockets</a
+                        >
+                        <a href="database.html" class="nav-link"
+                            >Database Schema</a
+                        >
+                        <a href="security.html" class="nav-link">Security</a>
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">More</div>
+                        <a href="customization.html" class="nav-link"
+                            >Customization</a
+                        >
+                        <a href="troubleshooting.html" class="nav-link"
+                            >Troubleshooting</a
+                        >
+                        <a href="changelog.html" class="nav-link">Changelog</a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="doc-main">
+                <h1>Admin Panel</h1>
+                <p class="subtitle">
+                    Manage every aspect of your platform from the
+                    Filament-powered administration dashboard.
+                </p>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Accessing the Admin Panel</h2>
+                <p>
+                    The admin panel is available at <code>/admin</code>. Only
+                    users with the <strong>admin</strong> role can sign in.
+                    After running the database seeder a default admin account is
+                    created — see
+                    <a href="installation.html">Installation</a> for details.
+                </p>
+                <div class="callout callout-info">
+                    <strong>Tip:</strong> You can promote any user to admin via
+                    Tinker: <code>php artisan tinker</code> →
+                    <code>User::find(1)->update(['role' =&gt; 'admin'])</code>
+                </div>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">Screenshot: Admin login page</p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Dashboard</h2>
+                <p>
+                    The dashboard shows key metrics at a glance via three
+                    built-in widgets:
+                </p>
+                <ul>
+                    <li>
+                        <strong>StatsOverviewWidget</strong> — Cards showing
+                        total users, active bets, today's revenue, total rounds
+                        played, and pending withdrawals.
+                    </li>
+                    <li>
+                        <strong>RevenueChartWidget</strong> — Interactive line
+                        chart plotting platform revenue over the last 30 days.
+                    </li>
+                    <li>
+                        <strong>LatestBetsWidget</strong> — Live-updated table
+                        of the most recent bets with player, amount, multiplier,
+                        and payout.
+                    </li>
+                </ul>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">
+                        Screenshot: Admin dashboard with widgets
+                    </p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>User Management</h2>
+                <p>
+                    The <strong>Users</strong> resource lets you list, search,
+                    filter, and edit every registered account.
+                </p>
+                <h3>Capabilities</h3>
+                <ul>
+                    <li>Search by username, email, or ID</li>
+                    <li>
+                        Filter by role (<code>user</code>, <code>admin</code>,
+                        <code>moderator</code>) and status (active / banned)
+                    </li>
+                    <li>Ban / un-ban a user instantly</li>
+                    <li>Adjust wallet balance &amp; coin balance</li>
+                    <li>Change a user's role</li>
+                    <li>View full bet history and transaction log per user</li>
+                    <li>Soft-delete an account</li>
+                </ul>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">Screenshot: User management list view</p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Game Round Management</h2>
+                <p>
+                    Every crash round is recorded and viewable from the
+                    <strong>Game Rounds</strong> resource.
+                </p>
+                <ul>
+                    <li>
+                        Browse all rounds with crash point, status, start/crash
+                        timestamps
+                    </li>
+                    <li>
+                        Filter by status: <code>waiting</code>,
+                        <code>betting</code>, <code>running</code>,
+                        <code>crashed</code>
+                    </li>
+                    <li>
+                        Click into a round to see all bets placed, cashout
+                        times, profit/loss per player
+                    </li>
+                    <li>
+                        View provably-fair seeds (server seed, client seed,
+                        nonce, hash)
+                    </li>
+                </ul>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">
+                        Screenshot: Game rounds list &amp; round detail view
+                    </p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Transaction Management</h2>
+                <p>
+                    The <strong>Transactions</strong> resource provides a
+                    complete financial audit trail.
+                </p>
+                <h3>Filters</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Filter</th>
+                            <th>Options</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Type</td>
+                            <td>
+                                deposit, withdrawal, purchase_coins, sell_coins,
+                                bet, win, refund, bonus, coin_transfer_sent,
+                                coin_transfer_received
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Status</td>
+                            <td>pending, completed, failed, reversed</td>
+                        </tr>
+                        <tr>
+                            <td>Gateway</td>
+                            <td>paystack, nomba</td>
+                        </tr>
+                        <tr>
+                            <td>Date Range</td>
+                            <td>Custom start / end dates</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Withdrawal Approval</h3>
+                <p>
+                    Pending withdrawal requests appear with an
+                    <strong>Approve / Reject</strong> action. Withdrawals below
+                    the auto-approve threshold are processed automatically;
+                    those above require manual admin approval.
+                </p>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">
+                        Screenshot: Transaction list with filters &amp; approval
+                        actions
+                    </p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Chat Moderation</h2>
+                <p>
+                    View all chat messages, delete inappropriate content, and
+                    mute / unmute players.
+                </p>
+                <ul>
+                    <li>Browse messages chronologically with search</li>
+                    <li>Bulk or single-delete messages</li>
+                    <li>Mute a user for a configurable duration</li>
+                    <li>Review reported messages</li>
+                </ul>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">Screenshot: Chat moderation view</p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Advertisement Management</h2>
+                <p>
+                    Create, schedule, and track advertisements displayed
+                    throughout the platform.
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Title</td>
+                            <td>Internal label for the ad</td>
+                        </tr>
+                        <tr>
+                            <td>Image URL</td>
+                            <td>Creative asset path (uploaded or external)</td>
+                        </tr>
+                        <tr>
+                            <td>Target URL</td>
+                            <td>Click-through destination</td>
+                        </tr>
+                        <tr>
+                            <td>Placement</td>
+                            <td>
+                                <code>sidebar</code>, <code>banner</code>,
+                                <code>popup</code>, <code>between_rounds</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Schedule</td>
+                            <td>Start date / End date</td>
+                        </tr>
+                        <tr>
+                            <td>Status</td>
+                            <td>Active / Inactive toggle</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>
+                    Each ad automatically tracks
+                    <strong>impressions</strong> and <strong>clicks</strong> so
+                    you can measure performance.
+                </p>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">Screenshot: Advertisement management</p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Settings Pages</h2>
+
+                <h3>Game Settings</h3>
+                <p>
+                    Configure core game parameters: minimum / maximum bet
+                    amounts, house edge percentage, betting-phase duration,
+                    countdown duration, tick rate, flying object emoji, and
+                    canvas background theme.
+                </p>
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">Screenshot: Game settings page</p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <h3>Payment Gateway Settings</h3>
+                <p>
+                    Enter API keys, set deposit / withdrawal limits, configure
+                    fees, and toggle gateways on/off — all without touching
+                    <code>.env</code>.
+                </p>
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">Screenshot: Payment gateway settings</p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <h3>Site Settings</h3>
+                <p>
+                    Branding (site name, logo, favicon), meta tags, feature
+                    toggles (chat, leaderboard, guest mode), and coin-to-NGN
+                    exchange rates.
+                </p>
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">Screenshot: Site settings page</p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Reports &amp; Analytics</h2>
+                <p>
+                    The <strong>Reports</strong> page provides aggregated
+                    insights:
+                </p>
+                <ul>
+                    <li>Total platform revenue &amp; house profit</li>
+                    <li>Active-user counts (daily / weekly / monthly)</li>
+                    <li>Average bet size &amp; cashout multiplier</li>
+                    <li>Deposit vs. withdrawal volume trends</li>
+                </ul>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">
+                        Screenshot: Reports &amp; analytics page
+                    </p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Security Management</h2>
+
+                <h3>IP Restrictions</h3>
+                <p>
+                    Manage an IP blacklist and whitelist. Define optional expiry
+                    dates and reasons.
+                </p>
+
+                <h3>Suspicious Activity</h3>
+                <p>
+                    The anti-cheat system automatically flags anomalies
+                    (multi-accounting, rapid withdrawals, bot-like betting
+                    patterns). Review and resolve suspicious activities from
+                    this resource.
+                </p>
+
+                <h3>Audit Log</h3>
+                <p>
+                    Every admin action (create, update, delete) is logged with
+                    old/new values, the acting admin's ID, and IP address.
+                </p>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <p class="label">
+                        Screenshot: Security — IP restrictions, suspicious
+                        activity &amp; audit log
+                    </p>
+                    <p class="hint">
+                        Replace this placeholder with an actual screenshot
+                    </p>
+                </div>
+
+                <!-- Navigation Footer -->
+                <div class="doc-nav-footer">
+                    <a href="features.html">← Features Overview</a>
+                    <a href="game-engine.html">Game Engine →</a>
+                </div>
+            </main>
+        </div>
+
+        <button
+            class="sidebar-toggle"
+            id="sidebarToggle"
+            onclick="
+                document.getElementById('sidebar').classList.toggle('open')
+            "
+        >
+            ☰
+        </button>
+    </body>
+</html>

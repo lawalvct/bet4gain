@@ -1,0 +1,1270 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Database Schema — Bet4Gain Documentation</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
+    <body>
+        <div class="doc-layout">
+            <!-- Sidebar -->
+            <aside class="doc-sidebar" id="sidebar">
+                <div class="logo">
+                    <h2>🚀 Bet4Gain</h2>
+                    <span>v1.0</span>
+                </div>
+                <nav>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Getting Started</div>
+                        <a href="index.html" class="nav-link">Introduction</a>
+                        <a href="installation.html" class="nav-link"
+                            >Installation</a
+                        >
+                        <a href="configuration.html" class="nav-link"
+                            >Configuration</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Guide</div>
+                        <a href="features.html" class="nav-link"
+                            >Features Overview</a
+                        >
+                        <a href="admin-panel.html" class="nav-link"
+                            >Admin Panel</a
+                        >
+                        <a href="game-engine.html" class="nav-link"
+                            >Game Engine</a
+                        >
+                        <a href="payments.html" class="nav-link"
+                            >Payments &amp; Wallet</a
+                        >
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">Technical</div>
+                        <a href="api-reference.html" class="nav-link"
+                            >API Reference</a
+                        >
+                        <a href="websockets.html" class="nav-link"
+                            >WebSockets</a
+                        >
+                        <a href="database.html" class="nav-link active"
+                            >Database Schema</a
+                        >
+                        <a href="security.html" class="nav-link">Security</a>
+                    </div>
+                    <div class="nav-section">
+                        <div class="nav-section-title">More</div>
+                        <a href="customization.html" class="nav-link"
+                            >Customization</a
+                        >
+                        <a href="troubleshooting.html" class="nav-link"
+                            >Troubleshooting</a
+                        >
+                        <a href="changelog.html" class="nav-link">Changelog</a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="doc-main">
+                <h1>Database Schema</h1>
+                <p class="subtitle">
+                    Complete database structure — 22 migrations, 17 Eloquent
+                    models, and key relationships.
+                </p>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Overview</h2>
+                <p>
+                    Bet4Gain uses <strong>MySQL 8+</strong> in production
+                    (SQLite is supported for local development). The schema is
+                    managed through Laravel migrations located in
+                    <code>database/migrations/</code>.
+                </p>
+
+                <div class="callout callout-info">
+                    <strong>Quick Start:</strong> Run
+                    <code>php artisan migrate</code> to create all tables, or
+                    <code>php artisan migrate:fresh --seed</code> for a clean
+                    database with default seed data.
+                </div>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Entity Relationships</h2>
+                <ul>
+                    <li>
+                        A <strong>User</strong> has one
+                        <strong>Wallet</strong> and one
+                        <strong>CoinBalance</strong>
+                    </li>
+                    <li>
+                        A <strong>User</strong> has many <strong>Bets</strong>,
+                        <strong>Transactions</strong>, and
+                        <strong>ChatMessages</strong>
+                    </li>
+                    <li>
+                        A <strong>GameRound</strong> has many
+                        <strong>Bets</strong>
+                    </li>
+                    <li>
+                        Each <strong>Bet</strong> belongs to one
+                        <strong>User</strong> and one <strong>GameRound</strong>
+                    </li>
+                    <li>
+                        A <strong>CoinTransfer</strong> belongs to a sender
+                        (<strong>User</strong>) and a recipient
+                        (<strong>User</strong>)
+                    </li>
+                    <li>
+                        A <strong>LeaderboardEntry</strong> belongs to one
+                        <strong>User</strong>
+                    </li>
+                    <li>
+                        <strong>AuditLog</strong>,
+                        <strong>SuspiciousActivity</strong>, and
+                        <strong>LoginLog</strong> belong to a
+                        <strong>User</strong>
+                    </li>
+                </ul>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Users &amp; Authentication</h2>
+
+                <h3><code>users</code></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>bigint PK</td>
+                            <td>Primary key</td>
+                        </tr>
+                        <tr>
+                            <td><code>username</code></td>
+                            <td>varchar</td>
+                            <td>Unique display name</td>
+                        </tr>
+                        <tr>
+                            <td><code>email</code></td>
+                            <td>varchar (nullable)</td>
+                            <td>Email address (null for guests)</td>
+                        </tr>
+                        <tr>
+                            <td><code>password</code></td>
+                            <td>varchar (nullable)</td>
+                            <td>Bcrypt hashed password</td>
+                        </tr>
+                        <tr>
+                            <td><code>role</code></td>
+                            <td>enum</td>
+                            <td>
+                                <code>user</code> | <code>admin</code> |
+                                <code>moderator</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>avatar</code></td>
+                            <td>varchar (nullable)</td>
+                            <td>Avatar file path</td>
+                        </tr>
+                        <tr>
+                            <td><code>is_guest</code></td>
+                            <td>boolean</td>
+                            <td>Guest/demo account flag</td>
+                        </tr>
+                        <tr>
+                            <td><code>is_banned</code></td>
+                            <td>boolean</td>
+                            <td>Ban status</td>
+                        </tr>
+                        <tr>
+                            <td><code>social_provider</code></td>
+                            <td>varchar (nullable)</td>
+                            <td>OAuth provider (google/github)</td>
+                        </tr>
+                        <tr>
+                            <td><code>social_id</code></td>
+                            <td>varchar (nullable)</td>
+                            <td>OAuth provider user ID</td>
+                        </tr>
+                        <tr>
+                            <td><code>muted_until</code></td>
+                            <td>timestamp (nullable)</td>
+                            <td>Chat mute expiry</td>
+                        </tr>
+                        <tr>
+                            <td><code>settings</code></td>
+                            <td>json (nullable)</td>
+                            <td>User preferences (sound, theme, etc.)</td>
+                        </tr>
+                        <tr>
+                            <td><code>last_seen_at</code></td>
+                            <td>timestamp (nullable)</td>
+                            <td>Last activity timestamp</td>
+                        </tr>
+                        <tr>
+                            <td><code>login_ip</code></td>
+                            <td>varchar (nullable)</td>
+                            <td>Last login IP address</td>
+                        </tr>
+                        <tr>
+                            <td><code>two_factor_*</code></td>
+                            <td>various</td>
+                            <td>
+                                2FA columns (secret, recovery codes, confirmed)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>self_exclusion_*</code></td>
+                            <td>various</td>
+                            <td>Self-exclusion start/end and status</td>
+                        </tr>
+                        <tr>
+                            <td><code>deposit_limit_*</code></td>
+                            <td>various</td>
+                            <td>Daily/weekly/monthly deposit caps</td>
+                        </tr>
+                        <tr>
+                            <td><code>bet_limit</code></td>
+                            <td>decimal (nullable)</td>
+                            <td>Per-bet spending cap</td>
+                        </tr>
+                        <tr>
+                            <td><code>cooldown_until</code></td>
+                            <td>timestamp (nullable)</td>
+                            <td>Cooldown timer expiry</td>
+                        </tr>
+                        <tr>
+                            <td><code>email_verified_at</code></td>
+                            <td>timestamp (nullable)</td>
+                            <td>Email verification timestamp</td>
+                        </tr>
+                        <tr>
+                            <td><code>deleted_at</code></td>
+                            <td>timestamp (nullable)</td>
+                            <td>Soft-delete timestamp</td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at / updated_at</code></td>
+                            <td>timestamps</td>
+                            <td>Standard timestamps</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3><code>login_logs</code></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>bigint PK</td>
+                            <td>Primary key</td>
+                        </tr>
+                        <tr>
+                            <td><code>user_id</code></td>
+                            <td>bigint (nullable)</td>
+                            <td>User FK (null for failed logins)</td>
+                        </tr>
+                        <tr>
+                            <td><code>email</code></td>
+                            <td>varchar</td>
+                            <td>Email used in attempt</td>
+                        </tr>
+                        <tr>
+                            <td><code>ip_address</code></td>
+                            <td>varchar</td>
+                            <td>Client IP</td>
+                        </tr>
+                        <tr>
+                            <td><code>user_agent</code></td>
+                            <td>text</td>
+                            <td>Browser user-agent string</td>
+                        </tr>
+                        <tr>
+                            <td><code>success</code></td>
+                            <td>boolean</td>
+                            <td>Whether login succeeded</td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at / updated_at</code></td>
+                            <td>timestamps</td>
+                            <td>Standard timestamps</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Financial</h2>
+
+                <h3><code>wallets</code></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>bigint PK</td>
+                            <td>Primary key</td>
+                        </tr>
+                        <tr>
+                            <td><code>user_id</code></td>
+                            <td>bigint FK</td>
+                            <td>User FK (unique)</td>
+                        </tr>
+                        <tr>
+                            <td><code>balance</code></td>
+                            <td>decimal(16,2)</td>
+                            <td>NGN balance (encrypted at rest)</td>
+                        </tr>
+                        <tr>
+                            <td><code>currency</code></td>
+                            <td>varchar</td>
+                            <td>Currency code (NGN)</td>
+                        </tr>
+                        <tr>
+                            <td><code>is_locked</code></td>
+                            <td>boolean</td>
+                            <td>Lock flag for processing transactions</td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at / updated_at</code></td>
+                            <td>timestamps</td>
+                            <td>Standard timestamps</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3><code>coin_balances</code></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>bigint PK</td>
+                            <td>Primary key</td>
+                        </tr>
+                        <tr>
+                            <td><code>user_id</code></td>
+                            <td>bigint FK</td>
+                            <td>User FK (unique)</td>
+                        </tr>
+                        <tr>
+                            <td><code>balance</code></td>
+                            <td>decimal(16,2)</td>
+                            <td>Real coin balance</td>
+                        </tr>
+                        <tr>
+                            <td><code>demo_balance</code></td>
+                            <td>decimal(16,2)</td>
+                            <td>Demo/guest coin balance</td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at / updated_at</code></td>
+                            <td>timestamps</td>
+                            <td>Standard timestamps</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3><code>transactions</code></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>bigint PK</td>
+                            <td>Primary key</td>
+                        </tr>
+                        <tr>
+                            <td><code>user_id</code></td>
+                            <td>bigint FK</td>
+                            <td>User FK</td>
+                        </tr>
+                        <tr>
+                            <td><code>type</code></td>
+                            <td>enum</td>
+                            <td>
+                                deposit | withdrawal | purchase_coins |
+                                sell_coins | bet | win | refund | bonus |
+                                coin_transfer_sent | coin_transfer_received
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>amount</code></td>
+                            <td>decimal(16,2)</td>
+                            <td>Transaction amount</td>
+                        </tr>
+                        <tr>
+                            <td><code>currency</code></td>
+                            <td>varchar</td>
+                            <td>NGN or COINS</td>
+                        </tr>
+                        <tr>
+                            <td><code>reference</code></td>
+                            <td>varchar</td>
+                            <td>Unique reference/idempotency key</td>
+                        </tr>
+                        <tr>
+                            <td><code>gateway</code></td>
+                            <td>varchar (nullable)</td>
+                            <td>Payment gateway (paystack/nomba)</td>
+                        </tr>
+                        <tr>
+                            <td><code>status</code></td>
+                            <td>enum</td>
+                            <td>pending | completed | failed | reversed</td>
+                        </tr>
+                        <tr>
+                            <td><code>description</code></td>
+                            <td>text (nullable)</td>
+                            <td>Human-readable description</td>
+                        </tr>
+                        <tr>
+                            <td><code>metadata</code></td>
+                            <td>json (nullable)</td>
+                            <td>Additional data (gateway response, etc.)</td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at / updated_at</code></td>
+                            <td>timestamps</td>
+                            <td>Standard timestamps</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3><code>coin_transfers</code></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>bigint PK</td>
+                            <td>Primary key</td>
+                        </tr>
+                        <tr>
+                            <td><code>sender_id</code></td>
+                            <td>bigint FK</td>
+                            <td>Sender user FK</td>
+                        </tr>
+                        <tr>
+                            <td><code>recipient_id</code></td>
+                            <td>bigint FK</td>
+                            <td>Recipient user FK</td>
+                        </tr>
+                        <tr>
+                            <td><code>amount</code></td>
+                            <td>decimal(16,2)</td>
+                            <td>Amount sent (before fee)</td>
+                        </tr>
+                        <tr>
+                            <td><code>fee</code></td>
+                            <td>decimal(16,2)</td>
+                            <td>Fee deducted</td>
+                        </tr>
+                        <tr>
+                            <td><code>net_amount</code></td>
+                            <td>decimal(16,2)</td>
+                            <td>Amount received after fee</td>
+                        </tr>
+                        <tr>
+                            <td><code>reference</code></td>
+                            <td>varchar</td>
+                            <td>Unique reference</td>
+                        </tr>
+                        <tr>
+                            <td><code>type</code></td>
+                            <td>enum</td>
+                            <td>gift | transfer</td>
+                        </tr>
+                        <tr>
+                            <td><code>note</code></td>
+                            <td>text (nullable)</td>
+                            <td>Optional message</td>
+                        </tr>
+                        <tr>
+                            <td><code>status</code></td>
+                            <td>enum</td>
+                            <td>pending | completed | failed</td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at / updated_at</code></td>
+                            <td>timestamps</td>
+                            <td>Standard timestamps</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Game</h2>
+
+                <h3><code>game_rounds</code></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>bigint PK</td>
+                            <td>Primary key</td>
+                        </tr>
+                        <tr>
+                            <td><code>hash</code></td>
+                            <td>varchar</td>
+                            <td>
+                                SHA-256 hash of server seed (published before
+                                round)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>server_seed</code></td>
+                            <td>varchar</td>
+                            <td>Server seed (revealed after crash)</td>
+                        </tr>
+                        <tr>
+                            <td><code>client_seed</code></td>
+                            <td>varchar</td>
+                            <td>Client seed used for verification</td>
+                        </tr>
+                        <tr>
+                            <td><code>nonce</code></td>
+                            <td>integer</td>
+                            <td>Incrementing nonce</td>
+                        </tr>
+                        <tr>
+                            <td><code>crash_point</code></td>
+                            <td>decimal(8,2)</td>
+                            <td>Final crash multiplier</td>
+                        </tr>
+                        <tr>
+                            <td><code>status</code></td>
+                            <td>enum</td>
+                            <td>waiting | betting | running | crashed</td>
+                        </tr>
+                        <tr>
+                            <td><code>started_at</code></td>
+                            <td>timestamp (nullable)</td>
+                            <td>When multiplier started running</td>
+                        </tr>
+                        <tr>
+                            <td><code>crashed_at</code></td>
+                            <td>timestamp (nullable)</td>
+                            <td>When round crashed</td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at / updated_at</code></td>
+                            <td>timestamps</td>
+                            <td>Standard timestamps</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3><code>bets</code></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>bigint PK</td>
+                            <td>Primary key</td>
+                        </tr>
+                        <tr>
+                            <td><code>user_id</code></td>
+                            <td>bigint FK</td>
+                            <td>User FK</td>
+                        </tr>
+                        <tr>
+                            <td><code>game_round_id</code></td>
+                            <td>bigint FK</td>
+                            <td>Round FK</td>
+                        </tr>
+                        <tr>
+                            <td><code>amount</code></td>
+                            <td>decimal(16,2)</td>
+                            <td>Bet amount in coins</td>
+                        </tr>
+                        <tr>
+                            <td><code>currency</code></td>
+                            <td>varchar</td>
+                            <td>Currency (coins)</td>
+                        </tr>
+                        <tr>
+                            <td><code>auto_cashout_at</code></td>
+                            <td>decimal(8,2) (nullable)</td>
+                            <td>Auto-cashout target multiplier</td>
+                        </tr>
+                        <tr>
+                            <td><code>cashout_multiplier</code></td>
+                            <td>decimal(8,2) (nullable)</td>
+                            <td>Actual cashout multiplier (null if lost)</td>
+                        </tr>
+                        <tr>
+                            <td><code>payout</code></td>
+                            <td>decimal(16,2) (nullable)</td>
+                            <td>Coins received if won</td>
+                        </tr>
+                        <tr>
+                            <td><code>profit</code></td>
+                            <td>decimal(16,2) (nullable)</td>
+                            <td>Net profit/loss</td>
+                        </tr>
+                        <tr>
+                            <td><code>status</code></td>
+                            <td>enum</td>
+                            <td>pending | active | won | lost | cancelled</td>
+                        </tr>
+                        <tr>
+                            <td><code>slot</code></td>
+                            <td>tinyint</td>
+                            <td>Bet slot (1 or 2)</td>
+                        </tr>
+                        <tr>
+                            <td><code>bet_id</code></td>
+                            <td>varchar</td>
+                            <td>Client-side unique bet identifier</td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at / updated_at</code></td>
+                            <td>timestamps</td>
+                            <td>Standard timestamps</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3><code>provably_fair_seeds</code></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>bigint PK</td>
+                            <td>Primary key</td>
+                        </tr>
+                        <tr>
+                            <td><code>user_id</code></td>
+                            <td>bigint FK</td>
+                            <td>User FK</td>
+                        </tr>
+                        <tr>
+                            <td><code>server_seed</code></td>
+                            <td>varchar</td>
+                            <td>Active server seed</td>
+                        </tr>
+                        <tr>
+                            <td><code>server_seed_hash</code></td>
+                            <td>varchar</td>
+                            <td>SHA-256 hash of server seed</td>
+                        </tr>
+                        <tr>
+                            <td><code>client_seed</code></td>
+                            <td>varchar</td>
+                            <td>Client-provided seed</td>
+                        </tr>
+                        <tr>
+                            <td><code>nonce</code></td>
+                            <td>integer</td>
+                            <td>Current nonce counter</td>
+                        </tr>
+                        <tr>
+                            <td><code>is_active</code></td>
+                            <td>boolean</td>
+                            <td>Whether this seed set is in use</td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at / updated_at</code></td>
+                            <td>timestamps</td>
+                            <td>Standard timestamps</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3><code>auto_bet_configs</code></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>bigint PK</td>
+                            <td>Primary key</td>
+                        </tr>
+                        <tr>
+                            <td><code>user_id</code></td>
+                            <td>bigint FK</td>
+                            <td>User FK</td>
+                        </tr>
+                        <tr>
+                            <td><code>base_amount</code></td>
+                            <td>decimal</td>
+                            <td>Starting bet amount</td>
+                        </tr>
+                        <tr>
+                            <td><code>target_multiplier</code></td>
+                            <td>decimal</td>
+                            <td>Target cashout multiplier</td>
+                        </tr>
+                        <tr>
+                            <td><code>stop_loss</code></td>
+                            <td>decimal (nullable)</td>
+                            <td>Stop-loss threshold</td>
+                        </tr>
+                        <tr>
+                            <td><code>stop_profit</code></td>
+                            <td>decimal (nullable)</td>
+                            <td>Stop-profit threshold</td>
+                        </tr>
+                        <tr>
+                            <td><code>increase_on_loss</code></td>
+                            <td>decimal (nullable)</td>
+                            <td>Bet increase % on loss (Martingale)</td>
+                        </tr>
+                        <tr>
+                            <td><code>increase_on_win</code></td>
+                            <td>decimal (nullable)</td>
+                            <td>Bet increase % on win</td>
+                        </tr>
+                        <tr>
+                            <td><code>is_active</code></td>
+                            <td>boolean</td>
+                            <td>Whether auto-bet is running</td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at / updated_at</code></td>
+                            <td>timestamps</td>
+                            <td>Standard timestamps</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Social</h2>
+
+                <h3><code>chat_messages</code></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>bigint PK</td>
+                            <td>Primary key</td>
+                        </tr>
+                        <tr>
+                            <td><code>user_id</code></td>
+                            <td>bigint FK</td>
+                            <td>Author FK</td>
+                        </tr>
+                        <tr>
+                            <td><code>message</code></td>
+                            <td>text</td>
+                            <td>Message content</td>
+                        </tr>
+                        <tr>
+                            <td><code>type</code></td>
+                            <td>enum</td>
+                            <td>text | system | gif | emoji</td>
+                        </tr>
+                        <tr>
+                            <td><code>deleted_at</code></td>
+                            <td>timestamp (nullable)</td>
+                            <td>Soft-delete timestamp</td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at / updated_at</code></td>
+                            <td>timestamps</td>
+                            <td>Standard timestamps</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Leaderboard</h2>
+
+                <h3><code>leaderboard_entries</code></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>bigint PK</td>
+                            <td>Primary key</td>
+                        </tr>
+                        <tr>
+                            <td><code>user_id</code></td>
+                            <td>bigint FK</td>
+                            <td>User FK</td>
+                        </tr>
+                        <tr>
+                            <td><code>period</code></td>
+                            <td>enum</td>
+                            <td>daily | weekly | monthly | alltime</td>
+                        </tr>
+                        <tr>
+                            <td><code>total_bets</code></td>
+                            <td>integer</td>
+                            <td>Number of bets placed</td>
+                        </tr>
+                        <tr>
+                            <td><code>total_wagered</code></td>
+                            <td>decimal</td>
+                            <td>Total amount wagered</td>
+                        </tr>
+                        <tr>
+                            <td><code>total_won</code></td>
+                            <td>decimal</td>
+                            <td>Total amount won</td>
+                        </tr>
+                        <tr>
+                            <td><code>total_profit</code></td>
+                            <td>decimal</td>
+                            <td>Net profit (won − wagered)</td>
+                        </tr>
+                        <tr>
+                            <td><code>win_count</code></td>
+                            <td>integer</td>
+                            <td>Number of winning bets</td>
+                        </tr>
+                        <tr>
+                            <td><code>best_multiplier</code></td>
+                            <td>decimal</td>
+                            <td>Highest cashout multiplier</td>
+                        </tr>
+                        <tr>
+                            <td><code>rank</code></td>
+                            <td>integer</td>
+                            <td>Computed ranking</td>
+                        </tr>
+                        <tr>
+                            <td><code>calculated_at</code></td>
+                            <td>timestamp</td>
+                            <td>When the entry was last computed</td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at / updated_at</code></td>
+                            <td>timestamps</td>
+                            <td>Standard timestamps</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Admin &amp; Security</h2>
+
+                <h3><code>advertisements</code></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>bigint PK</td>
+                            <td>Primary key</td>
+                        </tr>
+                        <tr>
+                            <td><code>title</code></td>
+                            <td>varchar</td>
+                            <td>Ad title/label</td>
+                        </tr>
+                        <tr>
+                            <td><code>image_url</code></td>
+                            <td>varchar</td>
+                            <td>Creative image path</td>
+                        </tr>
+                        <tr>
+                            <td><code>target_url</code></td>
+                            <td>varchar</td>
+                            <td>Click-through URL</td>
+                        </tr>
+                        <tr>
+                            <td><code>placement</code></td>
+                            <td>enum</td>
+                            <td>sidebar | banner | popup | between_rounds</td>
+                        </tr>
+                        <tr>
+                            <td><code>is_active</code></td>
+                            <td>boolean</td>
+                            <td>Active toggle</td>
+                        </tr>
+                        <tr>
+                            <td><code>starts_at</code></td>
+                            <td>timestamp (nullable)</td>
+                            <td>Scheduled start date</td>
+                        </tr>
+                        <tr>
+                            <td><code>ends_at</code></td>
+                            <td>timestamp (nullable)</td>
+                            <td>Scheduled end date</td>
+                        </tr>
+                        <tr>
+                            <td><code>impressions</code></td>
+                            <td>integer</td>
+                            <td>View count</td>
+                        </tr>
+                        <tr>
+                            <td><code>clicks</code></td>
+                            <td>integer</td>
+                            <td>Click count</td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at / updated_at</code></td>
+                            <td>timestamps</td>
+                            <td>Standard timestamps</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3><code>site_settings</code></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>bigint PK</td>
+                            <td>Primary key</td>
+                        </tr>
+                        <tr>
+                            <td><code>key</code></td>
+                            <td>varchar (unique)</td>
+                            <td>Setting key</td>
+                        </tr>
+                        <tr>
+                            <td><code>value</code></td>
+                            <td>text (nullable)</td>
+                            <td>Setting value</td>
+                        </tr>
+                        <tr>
+                            <td><code>group</code></td>
+                            <td>varchar</td>
+                            <td>Grouping (site, game, payment, etc.)</td>
+                        </tr>
+                        <tr>
+                            <td><code>type</code></td>
+                            <td>varchar</td>
+                            <td>Value type hint (string, boolean, number)</td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at / updated_at</code></td>
+                            <td>timestamps</td>
+                            <td>Standard timestamps</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3><code>audit_logs</code></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>bigint PK</td>
+                            <td>Primary key</td>
+                        </tr>
+                        <tr>
+                            <td><code>user_id</code></td>
+                            <td>bigint FK</td>
+                            <td>Admin who performed the action</td>
+                        </tr>
+                        <tr>
+                            <td><code>action</code></td>
+                            <td>varchar</td>
+                            <td>
+                                Action performed (create, update, delete, etc.)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>model_type</code></td>
+                            <td>varchar</td>
+                            <td>Eloquent model class</td>
+                        </tr>
+                        <tr>
+                            <td><code>model_id</code></td>
+                            <td>bigint</td>
+                            <td>Target record ID</td>
+                        </tr>
+                        <tr>
+                            <td><code>old_values</code></td>
+                            <td>json (nullable)</td>
+                            <td>Previous values</td>
+                        </tr>
+                        <tr>
+                            <td><code>new_values</code></td>
+                            <td>json (nullable)</td>
+                            <td>New values</td>
+                        </tr>
+                        <tr>
+                            <td><code>ip_address</code></td>
+                            <td>varchar</td>
+                            <td>Admin's IP address</td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at / updated_at</code></td>
+                            <td>timestamps</td>
+                            <td>Standard timestamps</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3><code>ip_restrictions</code></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>bigint PK</td>
+                            <td>Primary key</td>
+                        </tr>
+                        <tr>
+                            <td><code>ip_address</code></td>
+                            <td>varchar</td>
+                            <td>IP address or CIDR range</td>
+                        </tr>
+                        <tr>
+                            <td><code>type</code></td>
+                            <td>enum</td>
+                            <td>blacklist | whitelist</td>
+                        </tr>
+                        <tr>
+                            <td><code>reason</code></td>
+                            <td>text (nullable)</td>
+                            <td>Reason for restriction</td>
+                        </tr>
+                        <tr>
+                            <td><code>expires_at</code></td>
+                            <td>timestamp (nullable)</td>
+                            <td>Auto-expiry date</td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at / updated_at</code></td>
+                            <td>timestamps</td>
+                            <td>Standard timestamps</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3><code>suspicious_activities</code></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>bigint PK</td>
+                            <td>Primary key</td>
+                        </tr>
+                        <tr>
+                            <td><code>user_id</code></td>
+                            <td>bigint FK</td>
+                            <td>Flagged user FK</td>
+                        </tr>
+                        <tr>
+                            <td><code>type</code></td>
+                            <td>varchar</td>
+                            <td>
+                                Activity type (multi_account, rapid_withdrawal,
+                                etc.)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>details</code></td>
+                            <td>json</td>
+                            <td>Detection details &amp; evidence</td>
+                        </tr>
+                        <tr>
+                            <td><code>severity</code></td>
+                            <td>varchar</td>
+                            <td>low | medium | high | critical</td>
+                        </tr>
+                        <tr>
+                            <td><code>is_resolved</code></td>
+                            <td>boolean</td>
+                            <td>Whether admin has reviewed</td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at / updated_at</code></td>
+                            <td>timestamps</td>
+                            <td>Standard timestamps</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>System Tables</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Table</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>notifications</code></td>
+                            <td>Laravel default notifications table</td>
+                        </tr>
+                        <tr>
+                            <td><code>cache</code></td>
+                            <td>Database cache driver table</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <code>jobs</code> / <code>failed_jobs</code>
+                            </td>
+                            <td>Queue worker job storage</td>
+                        </tr>
+                        <tr>
+                            <td><code>sessions</code></td>
+                            <td>Session storage (database driver)</td>
+                        </tr>
+                        <tr>
+                            <td><code>personal_access_tokens</code></td>
+                            <td>Sanctum API tokens</td>
+                        </tr>
+                        <tr>
+                            <td><code>telescope_entries</code></td>
+                            <td>Laravel Telescope debugging (dev only)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ───────────────────────────────────── -->
+                <h2>Running Migrations</h2>
+                <pre><code># Run pending migrations
+php artisan migrate
+
+# Check migration status
+php artisan migrate:status
+
+# Fresh install with seed data (drops all tables!)
+php artisan migrate:fresh --seed
+
+# Rollback last batch
+php artisan migrate:rollback</code></pre>
+
+                <div class="callout callout-danger">
+                    <strong>Warning:</strong> <code>migrate:fresh</code> drops
+                    <strong>all</strong> tables and re-runs all migrations.
+                    Never run this in production unless you intend to wipe all
+                    data.
+                </div>
+
+                <!-- Navigation Footer -->
+                <div class="doc-nav-footer">
+                    <a href="websockets.html">← WebSockets</a>
+                    <a href="security.html">Security →</a>
+                </div>
+            </main>
+        </div>
+
+        <button
+            class="sidebar-toggle"
+            id="sidebarToggle"
+            onclick="
+                document.getElementById('sidebar').classList.toggle('open')
+            "
+        >
+            ☰
+        </button>
+    </body>
+</html>
