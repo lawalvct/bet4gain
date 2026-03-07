@@ -8,13 +8,20 @@
                 class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between"
             >
                 <a href="/" class="flex items-center gap-2 group">
+                    <img
+                        v-if="siteLogoUrl"
+                        :src="siteLogoUrl"
+                        :alt="siteName"
+                        class="h-8 w-auto object-contain transition-transform group-hover:scale-105"
+                    />
                     <span
+                        v-else
                         class="text-2xl transition-transform group-hover:scale-110"
                         >🎮</span
                     >
-                    <span class="text-lg font-bold text-primary-500"
-                        >Bet4Gain</span
-                    >
+                    <span class="text-lg font-bold text-primary-500">{{
+                        siteName
+                    }}</span>
                 </a>
                 <nav class="flex items-center gap-4 text-sm">
                     <a
@@ -587,6 +594,20 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
 import { useLeaderboardStore } from "@/Stores/leaderboardStore";
+
+const appData = window.__BET4GAIN__ || {};
+const siteName = computed(
+    () => appData.siteName || appData.appName || "Bet4Gain",
+);
+const siteLogoUrl = computed(() => {
+    const raw = appData.siteLogo;
+    if (!raw) return "";
+    const logo = String(raw);
+    if (logo.startsWith("http")) return logo;
+    if (logo.startsWith("/storage/")) return logo;
+    if (logo.startsWith("storage/")) return `/${logo}`;
+    return `/storage/${logo.replace(/^\/+/, "")}`;
+});
 import {
     formatCoins,
     formatMultiplier,
