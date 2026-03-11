@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
+        <!-- Enforce dark mode before CSS renders to prevent flash of light theme -->
+        <script>if(localStorage.getItem('bet4gain_theme')==='light')document.documentElement.classList.remove('dark');</script>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
