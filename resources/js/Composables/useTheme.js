@@ -1,4 +1,4 @@
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import api from "@/Utils/api";
 
 const STORAGE_KEY = "bet4gain_theme";
@@ -20,21 +20,10 @@ export function useTheme() {
         } else if (saved === "dark") {
             isDark.value = true;
         } else {
-            // Respect system preference, default dark
-            isDark.value = !window.matchMedia("(prefers-color-scheme: light)")
-                .matches;
+            // Enforce dark mode as the app default for first-time visitors.
+            isDark.value = true;
         }
         applyTheme();
-
-        // Listen for system preference changes
-        window
-            .matchMedia("(prefers-color-scheme: dark)")
-            .addEventListener("change", (e) => {
-                if (!localStorage.getItem(STORAGE_KEY)) {
-                    isDark.value = e.matches;
-                    applyTheme();
-                }
-            });
     };
 
     const applyTheme = () => {
